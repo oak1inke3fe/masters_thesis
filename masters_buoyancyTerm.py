@@ -10,19 +10,19 @@ Created on Mon Oct 23 10:37:44 2023
 #%%
 import numpy as np
 import pandas as pd
-# from pandas import rolling_median
-import os
+# import os
 import matplotlib.pyplot as plt
-import natsort
-import time
-import datetime
-import math
-from numpy import trapz
-from hampel import hampel
+# import natsort
+# import time
+# import datetime
+# import math
+# from numpy import trapz
+# from hampel import hampel
 
 print('done with imports')
 #%%
-file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
+# file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
+file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
 sonic1_df = pd.read_csv(file_path + 'despiked_s1_turbulenceTerms_andMore_combined.csv')
 sonic2_df = pd.read_csv(file_path + 'despiked_s2_turbulenceTerms_andMore_combined.csv')
 sonic3_df = pd.read_csv(file_path + 'despiked_s3_turbulenceTerms_andMore_combined.csv')
