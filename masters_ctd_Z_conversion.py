@@ -3,6 +3,28 @@
 Created on Tue Sep 12 10:25:16 2023
 
 @author: oak
+
+NOtE: this code needs to be run on the remote desktop.
+
+This file is used to caculate the height of each sonic above the sea surface given the depth of the CTD sensor, and knowing
+the distance between the CTD sensor and all of the sonics.
+
+
+INPUT files:
+    CTD_data_spring.mat  (file with ctd observations of spring deployment)
+    Fall_Seabird_CTD.mat (file with ctd observations of fall deployment)
+
+    
+The OUTPUT file is one files with all the buoyancy terms per sonic combined into one dataframe (saved as a .csv):
+    ctd20mAvg_allSpring.csv     (file taking average of the 20min period and then concatenating them together; spring deployment, ctd obs)
+    ctd20mAvg_allFall.csv       (file taking average of the 20min period and then concatenating them together; fall deployment, ctd obs)
+    zAvg_fromCTD_allSpring.csv  (file filled with the full spring sonic/other sensor heights average (1 value that represents the entrie time period's average))
+    zAvg_fromCTD_allFall.csv    (file filled with the full fall sonic/other sensor heights average (1 value that represents the entrie time period's average))
+    z_airSide_allSpring.csv     (file taking average of the 20min period and then concatenating them together; spring deployment, sonic/other sensor heights)
+    z_airSide_allFall.csv     (file taking average of the 20min period and then concatenating them together; fall deployment, sonic/other sensor heights)
+
+
+
 """
 
 #%%
@@ -243,7 +265,7 @@ ctd_20minAvg_df_fall.to_csv(path_save+'ctd20mAvg_allFall.csv')
 
 #%%
 # SPRING
-# for getting zu, zt, zq from CTD depth:
+# for getting zu, zt, zq from CTD depth: (these are used in COARE)
 ctd_avgDepth_spring = ctd_20minAvg_df_spring['depth'].mean()
 s1_ctd_diff_spring = 15.015 - 9.91
 s2_ctd_diff_spring = 17.71  - 9.91
@@ -300,7 +322,7 @@ z_paros2_spring = []
 z_paros3_spring = []
 
 
-for i in range (8,len(ctd_20minAvg_df_spring)+8): #start at 8 because that is the first index entry
+for i in range (8,len(ctd_20minAvg_df_spring)+8): #start at 8 because that is the entry in the matlab file corresponding to our first spring index
     
     z_sonic1_spring_i = s1_ctd_diff_spring - ctd_20minAvg_df_spring['depth'][i]
     z_sonic1_spring_i = s1_ctd_diff_spring - ctd_20minAvg_df_spring['depth'][i]
@@ -398,7 +420,7 @@ z_met2_fall = []
 z_paros1_fall = []
 z_paros2_fall = []
 z_paros3_fall = []
-for i in range (45, len(ctd_20minAvg_df_fall)+45): #start at 45 because that is the first fall index entry
+for i in range (45, len(ctd_20minAvg_df_fall)+45): #start at 45 because that is the entry in the matlab file corresponding to our first fall index
 
     z_sonic1_fall_i = s1_ctd_diff_fall - ctd_20minAvg_df_fall['depth'][i]
     z_sonic2_fall_i = s2_ctd_diff_fall - ctd_20minAvg_df_fall['depth'][i]
@@ -438,32 +460,5 @@ z_df_20m_Fall['z_paros3']=z_paros3_fall
 z_df_20m_Fall.to_csv(path_save+'z_airSide_allFall.csv')
 
 
-#%% Code for Rain Rate blank (zeros) file
-rain_df_spring = pd.DataFrame()
-rain_rate_spring = np.zeros(len(ctd_20minAvg_df_spring))
-rain_df_spring['date'] = time_20MinStart_spring[spring_start_index : spring_stop_index + 1]
-rain_df_spring['rain_rate'] = rain_rate_spring
-rain_df_spring.to_csv(path_save+'rain_rate_allSpring.csv')
-
-rain_df_fall = pd.DataFrame()
-rain_rate_fall = np.zeros(len(ctd_20minAvg_df_fall))
-rain_df_fall['date'] = time_20MinStart_fall[fall_start_index : fall_stop_index + 1]
-rain_df_fall['rain_rate'] = rain_rate_fall
-rain_df_fall.to_csv(path_save+'rain_rate_allFall.csv')
-
-#%% Code for Lat/Lon repeated file
-LatLon_df_spring = pd.DataFrame()
-lat_spring = np.ones(len(ctd_20minAvg_df_spring))*41.57770 #degN
-lon_spring = np.ones(len(ctd_20minAvg_df_spring))*-70.74611 #degE (+70.74611 for degW)
-LatLon_df_spring['date'] = time_20MinStart_spring[spring_start_index : spring_stop_index + 1]
-LatLon_df_spring['lat'] = lat_spring
-LatLon_df_spring['lon'] = lon_spring
-LatLon_df_spring.to_csv(path_save+'LatLon_allSpring.csv')
-
-LatLon_df_fall = pd.DataFrame()
-lat_fall = np.ones(len(ctd_20minAvg_df_fall))*41.57770 #degN
-lon_fall = np.ones(len(ctd_20minAvg_df_fall))*-70.74611 #degE (+70.74611 for degW)
-LatLon_df_fall['date'] = time_20MinStart_fall[fall_start_index : fall_stop_index + 1]
-LatLon_df_fall['lat'] = lat_fall
-LatLon_df_fall['lon'] = lon_fall
-LatLon_df_fall.to_csv(path_save+'LatLon_allFall.csv')
+print('done with saving to .csv')
+print('done with code')

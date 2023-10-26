@@ -3,15 +3,27 @@
 """
 Created on Fri Mar 17 16:13:19 2023
 
-@author: oak
+@author: oaklin keefe
+
+NOTE: this file needs to be run on the remote desktop.
+
+This file is used to calculate the 20min file averages of the high resolution paros pressure sensors.
+
+INPUT files:
+    port6/ paros files from /Level1_align-despike-interp/ folder
+    
+OUTPUT files:
+    parosAvg_combinedAnalysis.csv
+    
 """
+#%% IMPORTS
 
 import os
 import pandas as pd
 import numpy as np
 import natsort
-print('done with imports')
 
+print('done with imports')
 #%%
 # filepath = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level2_analysis\port6/"
 filepath = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level1_align-despike-interp/'
@@ -38,21 +50,21 @@ for root, dirnames, filenames in os.walk(filepath): #this is for looping through
         if filename.startswith("L1"):
             paros_df = pd.read_csv(file,header = 0)
             p_mb = np.nanmean(paros_df['p'])
-            p_Pa = np.nanmean(paros_df['p']*100)
+            p_Pa = np.nanmean(paros_df['p']*100) #convert to Pascals from millibars (hectopascals)
             paros1_Pa_mean.append(p_Pa)
             paros1_mb_mean.append(p_mb)
             print(filename)
         elif filename.startswith("L2"):
             paros_df = pd.read_csv(file,header = 0)
             p_mb = np.nanmean(paros_df['p'])
-            p_Pa = np.nanmean(paros_df['p']*100)
+            p_Pa = np.nanmean(paros_df['p']*100) #convert to Pascals from millibars (hectopascals)
             paros2_Pa_mean.append(p_Pa)
             paros2_mb_mean.append(p_mb)
             print(filename)
         elif filename.startswith("L3"):
             paros_df = pd.read_csv(file,header = 0)
             p_mb = np.nanmean(paros_df['p'])
-            p_Pa = np.nanmean(paros_df['p']*100)
+            p_Pa = np.nanmean(paros_df['p']*100) #convert to Pascals from millibars (hectopascals)
             paros3_Pa_mean.append(p_Pa)
             paros3_mb_mean.append(p_mb)
             print(filename)
@@ -69,3 +81,4 @@ paros_df['p2_avg [mb]'] = paros2_mb_mean
 paros_df['p3_avg [mb]'] = paros3_mb_mean
 
 paros_df.to_csv(save_path+"parosAvg_combinedAnalysis.csv")
+print('done saving file')

@@ -3,8 +3,19 @@
 Created on Wed Sep 27 15:34:07 2023
 
 @author: oak
+
+
+NOTE: this file needs to be run on the remote desktop.
+
+This file is used to create empty (NaN) files for periods of data that are either missing or corrupt                                                                                        
+
+INPUT files:
+    see below for specific missing files
+OUPUT files:
+    same name as input files, but with a line fill of NaNs
 """
 
+#%%
 """
 missing files:
 4/18: (26 - 42)

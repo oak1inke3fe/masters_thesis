@@ -3,7 +3,28 @@
 """
 Created on Fri Oct 20 15:02:34 2023
 
-@author: oak
+@author: oaklin keefe
+
+
+This file is used to despike the sonic observations using a Hampel filter.
+
+INPUT files:
+    s1_turbulenceTerms_andMore_combined.csv
+    s2_turbulenceTerms_andMore_combined.csv
+    s3_turbulenceTerms_andMore_combined.csv
+    s4_turbulenceTerms_andMore_combined.csv
+    
+We also set:
+    base_index= 3959 as the last point in the spring deployment to separate spring and fall datasets so the hampel filter is not 
+    corrupted by data that is not in consecutive time sequence.
+
+    
+OUTPUT files:
+    despiked_s1_turbulenceTerms_andMore_combined.csv
+    despiked_s2_turbulenceTerms_andMore_combined.csv
+    despiked_s3_turbulenceTerms_andMore_combined.csv
+    despiked_s4_turbulenceTerms_andMore_combined.csv
+
 """
 #%%
 
@@ -21,6 +42,9 @@ sonic_file1 = "s1_turbulenceTerms_andMore_combined.csv"
 sonic1_df = pd.read_csv(file_path+sonic_file1)
 sonic1_df = sonic1_df.drop(['Unnamed: 0'], axis=1)
 # print(sonic1_df.columns)
+
+#rename the columns to be the same for each dataframe so that the hampel filter loop is easier to execute
+
 sonic1_df = sonic1_df.rename(columns={'Ubar_s1': 'Ubar', 
                                       'U_horiz_s1': 'U_horiz',
                                       'U_streamwise_s1':'U_streamwise',
@@ -81,6 +105,7 @@ print('done reading files and renaming columns')
 #%%
 break_index = 3959
 
+#create a spring df, and make sure the indexing starts at zero by resetting the index
 sonic1_df_spring = sonic1_df[:break_index+1]
 sonic1_df_spring = sonic1_df_spring.reset_index(drop = True)
 sonic2_df_spring = sonic2_df[:break_index+1]
@@ -96,7 +121,7 @@ sonics_df_arr_spring = [sonic1_df_spring,
                         sonic3_df_spring,
                         sonic4_df_spring]
 
-print('done with creating fall dataframes')
+print('done with creating spring dataframes')
 
 sonic1_df_despiked_spring = pd.DataFrame()
 sonic2_df_despiked_spring = pd.DataFrame()
@@ -139,12 +164,13 @@ for i in range(len(sonics_df_arr_spring)):
         print(column_name)
         print('sonic '+str(i+1))
         # L_despiked_2times = L_outlier_in_Ts2
-    # L_coare_despike = L_despiked_2times
-print('done SPRING')
+
+print('done SPRING hampel')
 
 
 
 #%%
+#create a fall df, and make sure the indexing starts at zero by resetting the index
 sonic1_df_fall = sonic1_df[break_index+1:]
 sonic1_df_fall = sonic1_df_fall.reset_index(drop = True)
 sonic2_df_fall = sonic2_df[break_index+1:]
@@ -196,10 +222,11 @@ for i in range(len(sonics_df_arr_fall)):
         print(column_name)
         print('sonic '+str(i+1))
         # L_despiked_2times = L_outlier_in_Ts2
-    # L_coare_despike = L_despiked_2times
-print('done FALL')
+
+print('done FALL hampel')
 
 #%%
+# save new despiked values/dataframes to new files separated by spring/fall deployment
 sonic1_df_despiked_spring.to_csv(file_path + 'despiked_s1_turbulenceTerms_andMore_spring.csv')
 sonic2_df_despiked_spring.to_csv(file_path + 'despiked_s2_turbulenceTerms_andMore_spring.csv')
 sonic3_df_despiked_spring.to_csv(file_path + 'despiked_s3_turbulenceTerms_andMore_spring.csv')
@@ -210,6 +237,7 @@ sonic2_df_despiked_fall.to_csv(file_path + 'despiked_s2_turbulenceTerms_andMore_
 sonic3_df_despiked_fall.to_csv(file_path + 'despiked_s3_turbulenceTerms_andMore_fall.csv')
 sonic4_df_despiked_fall.to_csv(file_path + 'despiked_s4_turbulenceTerms_andMore_fall.csv')
 
+# combine new spring/fall despiked values/dataframes to one combined dataframe
 sonic1_df_despiked_combined = pd.concat([sonic1_df_despiked_spring,sonic1_df_despiked_fall], axis = 0)
 sonic1_df_despiked_combined['new_index'] = np.arange(0, len(sonic1_df_despiked_combined))
 sonic1_df_despiked_combined = sonic1_df_despiked_combined.set_index('new_index')
@@ -223,6 +251,7 @@ sonic4_df_despiked_combined = pd.concat([sonic4_df_despiked_spring,sonic4_df_des
 sonic4_df_despiked_combined['new_index'] = np.arange(0, len(sonic4_df_despiked_combined))
 sonic4_df_despiked_combined = sonic4_df_despiked_combined.set_index('new_index')
 
+# save new combined despiked values/dataframes
 sonic1_df_despiked_combined.to_csv(file_path + 'despiked_s1_turbulenceTerms_andMore_combined.csv')
 sonic2_df_despiked_combined.to_csv(file_path + 'despiked_s2_turbulenceTerms_andMore_combined.csv')
 sonic3_df_despiked_combined.to_csv(file_path + 'despiked_s3_turbulenceTerms_andMore_combined.csv')
@@ -231,6 +260,8 @@ sonic4_df_despiked_combined.to_csv(file_path + 'despiked_s4_turbulenceTerms_andM
 print('done with saving despiked files')
 
 #%%
+# Plot some before and after of the original and despiked variabled at each sonic level to make sure it worked
+
 plt.figure()
 plt.plot(sonic1_df['UpWp_bar'], label = 'orig.', color = 'blue')
 plt.plot(sonic1_df_despiked_combined['UpWp_bar'], label = 'despiked', color = 'navy')
@@ -255,7 +286,6 @@ plt.plot(sonic4_df_despiked_combined['UpWp_bar'], label = 'despiked', color = 'b
 plt.legend()
 plt.title("sonic 4: Comparing original and Despiked <u'w'>")
 
-#%%
 plt.figure()
 plt.plot(sonic1_df['Ubar'], label = 'orig.', color = 'blue')
 plt.plot(sonic1_df_despiked_combined['Ubar'], label = 'despiked', color = 'navy')

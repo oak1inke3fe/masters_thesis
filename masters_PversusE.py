@@ -2,7 +2,25 @@
 """
 Created on Tue Feb 14 12:36:06 2023
 
-@author: oak
+@author: oaklin keefe
+
+
+This file is used to analyze the production, dissipation, buoyancy, and wave-coherent pw terms of the TKE budget equation.
+
+INPUT files:
+    prodTerm_combinedAnalysis.csv
+    epsU_terms_combinedAnalysis_MAD_k_UoverZbar.csv
+    buoy_terms_combinedAnalysis.csv
+    z_airSide_allSpring.csv
+    z_airSide_allFall.csv
+    ZoverL_combinedAnalysis.csv
+    usr_combinedAnalysis.csv
+    
+    
+    
+OUTPUT files:
+    Only figures:
+        
 
 """
 #%%

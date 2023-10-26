@@ -2,7 +2,28 @@
 """
 Created on Wed Oct 11 14:04:24 2023
 
-@author: oak
+@author: oaklin keefe
+
+This file is used to plot our data against the universal function curves from Edson 2013.
+
+INPUT files:
+    prodTerm_combinedAnalysis.csv
+    despiked_s1_turbulenceTerms_andMore_combined.csv
+    despiked_s2_turbulenceTerms_andMore_combined.csv
+    despiked_s3_turbulenceTerms_andMore_combined.csv
+    despiked_s4_turbulenceTerms_andMore_combined.csv
+    buoy_terms_combinedAnalysis.csv
+    z_airSide_allSpring.csv
+    z_airSide_allFall.csv
+    ZoverL_combinedAnalysis.csv
+    usr_combinedAnalysis.csv
+    rhoAvg_combinedAnalysis.csv
+    
+    
+OUTPUT files:
+    Only figures:
+        
+
 """
 
 #%%

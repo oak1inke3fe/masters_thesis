@@ -2,12 +2,34 @@
 """
 Created on Mon Sep 11 11:25:22 2023
 
-@author: oak
+@author: oaklin keefe
+
+
+
+This file is used to calculate rate of TKE production using the direct covariance observational method.
+
+INPUT files:
+    despiked_s1_turbulenceTerms_andMore_combined.csv
+    despiked_s2_turbulenceTerms_andMore_combined.csv
+    despiked_s3_turbulenceTerms_andMore_combined.csv
+    despiked_s4_turbulenceTerms_andMore_combined.csv
+    zAvg_fromCTD_allSpring.csv
+    zAvg_fromCTD_allFall.csv
+
+    
+OUTPUT files:
+    Ubar_CombinedAnalysis.csv
+    UpWp_bar_CombinedAnalysis.csv
+    UpWp_bar_Ubar_combinedAnalysis.csv
+    prodTerm_combinedAnalysis.csv
+    
+    Prod_LI_posOnly_combinedAnalysis.png
+    Prod_LII_posOnly_combinedAnalysis.png
+    Prod_LIII_posOnly_combinedAnalysis.png
+    
+    
+    
 """
-
-
-# Spring Deployment = 0-4205
-# Fall Deployment = 4206-8666
 
 
 #%%
@@ -102,8 +124,8 @@ prod_newDF = pd.DataFrame()
 prod_newDF['prod_I'] = prod_LI_new
 prod_newDF['prod_II'] = prod_LII_new
 prod_newDF['prod_III'] = prod_LIII_new
-# prod_newDF.to_csv(test_filepath+"prod_new.csv")
-# prod_newDF.to_csv(file_path+"prodTerm_combined_Analysis_dontUse.csv")
+
+# prod_newDF.to_csv(file_path+"prodTerm_combinedAnalysis.csv")
 
 #%%
 plt.figure()

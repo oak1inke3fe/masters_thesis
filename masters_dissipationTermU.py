@@ -2,7 +2,32 @@
 """
 Created on Mon Sep 11 12:08:04 2023
 
-@author: oak
+@author: oaklin keefe
+
+NOTE: this file needs to be run on the remote desktop.
+
+This file is used to calculate the rate of TKE dissipation using the inertial subrange method.
+
+INPUT files:
+    sonic files from /Level1_align-despike-interp/ folder
+    z_airSide_allSpring.csv
+    z_airSide_allFall.csv
+    
+    
+We also set:
+    alpha = 0.53 (when working with U and not W)
+    alpha = c1 = c1_prime
+
+    
+OUTPUT files:
+    Puu_exampleSpectra.png
+    epsU_terms_sonic1_MAD_k_UoverZbar.csv
+    epsU_terms_sonic2_MAD_k_UoverZbar.csv
+    epsU_terms_sonic3_MAD_k_UoverZbar.csv
+    epsU_terms_sonic4_MAD_k_UoverZbar.csv
+    epsU_terms_combinedAnalysis_MAD_k_UoverZbar
+    
+    
 """
 
 
@@ -14,11 +39,9 @@ import pandas as pd
 import math
 import scipy.signal as signal
 import matplotlib.pyplot as plt
-import time
 import datetime
 
 print('done with imports')
-# smbclient.listdir(r"smb://zippel-nas.local/bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/")
 
 #%%
 # plot_savePath = r"smb://zippel-nas.local/bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/plots/"
@@ -29,7 +52,7 @@ print('done with imports')
 
 filepath = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
 
-plot_savePath = r'~/BB_ASIT_repository/PlotsAndFigures/'
+plot_savePath = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/plots/'
 print('done with filepath')
 
 #%%
@@ -86,7 +109,7 @@ print('done with despike_this function')
 #######################################################################################
 # Function for interpolating the RMY sensor (freq = 32 Hz)
 def interp_sonics123(df_sonics123):
-    sonics123_xnew = np.arange(0, (32*60*20))   # this will be the number of points per file based
+    sonics123_xnew = np.arange(0, (32*60*20))   # 32 Hz * 60 sec/min * 20 min / file
     df_align_interp= df_sonics123.reindex(sonics123_xnew).interpolate(limit_direction='both')
     return df_align_interp
 #######################################################################################
@@ -98,7 +121,7 @@ print('done with interp_sonics123 simple function')
 #######################################################################################
 # Function for interpolating the Gill sensor (freq = 20 Hz)
 def interp_sonics4(df_sonics4):
-    sonics4_xnew = np.arange(0, (20*60*20))   # this will be the number of points per file based
+    sonics4_xnew = np.arange(0, (20*60*20))   # 20 Hz * 60 sec/min * 20 min / file
     df_align_interp_s4= df_sonics4.reindex(sonics4_xnew).interpolate(limit_direction='both')
     return df_align_interp_s4
 #######################################################################################

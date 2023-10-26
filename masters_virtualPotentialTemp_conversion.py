@@ -4,7 +4,22 @@
 """
 Created on Fri May  5 17:42:19 2023
 
-@author: oak
+@author: oaklin keefe
+
+This file is used to calculate the virtual potential temperature which we use later in ???? AH I DONT KNOW????
+
+INPUT files:
+    despiked_s1_turbulenceTerms_andMore_combined.csv
+    despiked_s2_turbulenceTerms_andMore_combined.csv
+    despiked_s3_turbulenceTerms_andMore_combined.csv
+    despiked_s4_turbulenceTerms_andMore_combined.csv
+    parosAvg_combinedAnalysis.csv
+
+    
+OUTPUT files:
+    thetaV_combinedAnalysis.csv
+        
+        
 """
 
 #%%

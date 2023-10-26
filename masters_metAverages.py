@@ -3,7 +3,21 @@
 """
 Created on Wed Oct  5 14:17:58 2022
 
-@author: OAKLIN KEEFE
+@author: oaklin keefe
+
+
+NOTE: this file needs to be run on the remote desktop.
+
+This file is used to calculate the 20min file averages of the port5 meteorological variables:
+    temp, relative humidity, air pressure, shortwave radiation, longwave radiation
+
+INPUT files:
+    port5/sonic 5 files from /Level1_align-despike-interp/ folder
+
+    
+OUTPUT files:
+    metAvg_CombinedAnalysis.csv
+    
 """
 
 # This code is for getting all the variables we need for COARE that come from
@@ -17,8 +31,7 @@ import os
 import numpy as np
 import pandas as pd
 import natsort
-# import pyrsktools
-import matplotlib.pyplot as plt
+
 print('done with imports')
 #%%
 filepath = r"/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level1_align-despike-interp/"
@@ -37,16 +50,9 @@ for root, dirnames, filenames in os.walk(filepath): #this is for looping through
     for filename in natsort.natsorted(filenames):
         file = os.path.join(root, filename)
         filename_only = filename[:-6]
-        # path_save = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level2_analysis\port5/"
+
         if filename.startswith('mNode_Port5'):
-        #     # Yday, Batt V, Tpan, Tair1, Tair2,  TIR, Pair, RH1, RH2, Solar, IR, IR ratio, Fix, GPS, Nsat
-        #     # EX lines of data:
-        #     # 106.4999,12.02,10.18,9.63,9.75,10.8,1053,75.83,75.53,323.1,-83.8,0.646,0,0,0
-        #     # 106.4999,12.02,10.18,9.69,9.78,10.8,1053,75.83,75.26,323.1,-83.9,0.646,0,0,0
-            # filename_only = filename[:-4]
-            # path_save = r"E:\ASIT-research\BB-ASIT\Level1_align-despike-interp\port5/"
             met_df = pd.read_csv(file, index_col=None)
-            # met_20MinMean = met_df.groupby(np.arange(len(met_df))//(1*60*20)).mean()
             t1 = met_df['T1'].mean()            
             t2 = met_df['T2'].mean()
             rh1 = met_df['RH1'].mean()
@@ -85,10 +91,10 @@ met_avg_df['sw_dn']=sw_dn_avg
 met_avg_df['lw_dn']=lw_dn_avg
 met_avg_df['t1 [C]']=t1_avg
 met_avg_df['t2 [C]']=t2_avg
-met_avg_df['t1 [K]']=t1_avg+273.15
-met_avg_df['t2 [K]']=t2_avg+273.15
+met_avg_df['t1 [K]']=t1_avg+273.15      #convert to Kelvin
+met_avg_df['t2 [K]']=t2_avg+273.15      #convert to Kelvin
 met_avg_df['p_air [mb]']=p_air_avg
-met_avg_df['p_air [Pa]']=p_air_avg/100
+met_avg_df['p_air [Pa]']=p_air_avg/100  #convert to Pascals
 
 
 print('done with creating dataframe of all averaged met variables')

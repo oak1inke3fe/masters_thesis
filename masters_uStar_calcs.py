@@ -3,7 +3,18 @@
 """
 Created on Mon Oct 23 13:07:04 2023
 
-@author: oak
+@author: oaklin keefe
+This file is used to calculate ustar, (u*) also known as friction velocity.
+
+INPUT files:
+    despiked_s1_turbulenceTerms_andMore_combined.csv
+    despiked_s2_turbulenceTerms_andMore_combined.csv
+    despiked_s3_turbulenceTerms_andMore_combined.csv
+    despiked_s4_turbulenceTerms_andMore_combined.csv
+    
+OUTPUT files:
+    usr_combinedAnalysis.csv
+        
 """
 #%%
 
@@ -58,3 +69,7 @@ plt.figure()
 plt.plot(usr_s1, label = "u*_{s1} = $(<u'w'>^{2} + <v'w'>^{2})^{1/4}$")
 plt.legend()
 plt.title('U*')
+
+
+print('done with calculaitng ustar and plotting it.')
+

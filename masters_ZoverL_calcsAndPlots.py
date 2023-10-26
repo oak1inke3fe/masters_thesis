@@ -2,7 +2,22 @@
 """
 Created on Fri May  5 15:39:58 2023
 
-@author: oak
+@author: oaklin keefe
+
+This file is used to calculate monin obukhov mixing lengthscale, L, and then determine a stability parameter z/L (zeta)
+
+INPUT files:
+    despiked_s1_turbulenceTerms_andMore_combined.csv
+    despiked_s2_turbulenceTerms_andMore_combined.csv
+    despiked_s3_turbulenceTerms_andMore_combined.csv
+    despiked_s4_turbulenceTerms_andMore_combined.csv
+    prodTerm_combinedAnalysis.csv
+    z_air_side_combinedAnalysis.csv
+    thetaV_combinedAnalysis.csv
+    
+OUTPUT files:
+    thetaV_combinedAnalysis.csv
+    
 """
 
 #%%
@@ -188,7 +203,7 @@ USTAR_df['usr_s1'] = np.array(usr_s1)
 USTAR_df['usr_s2'] = np.array(usr_s2)
 USTAR_df['usr_s3'] = np.array(usr_s3)
 USTAR_df['usr_s4'] = np.array(usr_s4)
-USTAR_df.to_csv(file_path + 'usr_combinedAnalysis.csv')
+# USTAR_df.to_csv(file_path + 'usr_combinedAnalysis.csv') #we already have another file where we do this
 
 plt.figure()
 plt.plot(usr_s1, label = "u*_{s1} = $(<u'w'>^{2} + <v'w'>^{2})^{1/4}$")

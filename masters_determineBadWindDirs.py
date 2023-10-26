@@ -3,7 +3,38 @@
 """
 Created on Fri Oct 20 14:05:49 2023
 
-@author: oak
+@author: oaklin keefe
+
+NOTE: step one of this file needs to be run on the remote desktop (the step where it says "for first time running").
+
+This file is used to determine "bad wind directions" where the wind direcion may cause turbulence to be formed from interaction with the tower or
+other tower components and that is unrelated to the flow if the tower was not present.
+
+INPUT files:
+    sonics files from Level1_align-despike-interp files (for first time running)
+    despiked_s1_turbulenceTerms_andMore_combined.csv
+    despiked_s2_turbulenceTerms_andMore_combined.csv
+    despiked_s3_turbulenceTerms_andMore_combined.csv
+    despiked_s4_turbulenceTerms_andMore_combined.csv
+    date_combinedAnalysis.csv
+    
+    
+We also set:
+    base_index= 3959 as the last point in the spring deployment to separate spring and fall datasets so the hampel filter is not 
+    corrupted by data that is not in consecutive time sequence.
+
+    
+OUTPUT files:
+    alpha_combinedAnalysis.csv (this is a file with all the wind directions between -180,+180 for the full spring/fall deployment. 0 degrees is
+                                coming from the E, +/-180 is coming from the W, +90 is coming from the N, -90 is coming from the S)
+    windDir_withBadFlags_combinedAnalysis.csv (this has teh adjusted alpha such that 0 degrees is N, 90 E, 180 S, 270 W; it also has binary flags
+                                               for when a wind direction is blowing through or near the tower)
+    WindRose_spring.png
+    WindRose_fall.png
+    WindRose_combinedAnalysis.png
+
+    
+    
 """
 
 
@@ -12,12 +43,9 @@ Created on Fri Oct 20 14:05:49 2023
 
 import numpy as np
 import pandas as pd
-import math
 import os
 import natsort
-from scipy import interpolate
 import matplotlib.pyplot as plt
-import windrose
 from windrose import WindroseAxes
 
 print('done with imports')
@@ -77,16 +105,16 @@ print('done')
 #%%
 file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
 
-sonic_file1 = "s1_turbulenceTerms_andMore_combined.csv"
+sonic_file1 = "despiked_s1_turbulenceTerms_andMore_combined.csv"
 sonic1_df = pd.read_csv(file_path+sonic_file1)
 
-sonic_file2 = "s2_turbulenceTerms_andMore_combined.csv"
+sonic_file2 = "despiked_s2_turbulenceTerms_andMore_combined.csv"
 sonic2_df = pd.read_csv(file_path+sonic_file2)
 
-sonic_file3 = "s3_turbulenceTerms_andMore_combined.csv"
+sonic_file3 = "despiked_s3_turbulenceTerms_andMore_combined.csv"
 sonic3_df = pd.read_csv(file_path+sonic_file3)
 
-sonic_file4 = "s4_turbulenceTerms_andMore_combined.csv"
+sonic_file4 = "despiked_s4_turbulenceTerms_andMore_combined.csv"
 sonic4_df = pd.read_csv(file_path+sonic_file4)
 
 

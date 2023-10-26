@@ -2,39 +2,35 @@
 """
 Created on Thu Sep 14 15:48:32 2023
 
-@author: oak
+@author: oaklin keefe
+
+NOTE: this file needs to be run on the remote desktop.
+
+This file is used to create a file of julien dates for COARE, and then a file of normal date formats to be used for other files
+
+INPUT files:
+    port1/sonic1 files from /Level1_errorLinesRemoved/ folder
+
+OUTPUT files:
+    jd_combinedAnalysis.csv
+    date_combinedAnalysis.csv
+    
 """
 
 
 #%%
 import numpy as np
 import pandas as pd
-# from pandas import rolling_median
 import os
-import matplotlib.pyplot as plt
 import natsort
-# import statistics
-import time
-import datetime
-import math
-from hampel import hampel
-# from scipy import interpolate
-# import re
-# import scipy.signal as signal
-# import pickle5 as pickle
-# os.chdir(r'E:\mNode_test2folders\test')
+
 print('done with imports')
 #%%
 # filepath = r"Z:\combined_analysis\OaklinCopyMNode\code_pipeline\Level1_errorLinesRemoved"
 filepath = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level1_errorLinesRemoved/'
 filename_generalDate = []
 filename_port1 = []
-# filename_port2 = []
-# filename_port3 = []
-# filename_port4 = []
-# filename_port5 = []
-# filename_port6 = []
-# filename_port7 = []
+
 for root, dirnames, filenames in os.walk(filepath): #this is for looping through files that are in a folder inside another folder
     for filename in natsort.natsorted(filenames):
         file = os.path.join(root, filename)
@@ -44,18 +40,7 @@ for root, dirnames, filenames in os.walk(filepath): #this is for looping through
             filename_port1.append(filename_only)
             filename_generalDate.append(filename_general_name_only)
             print(filename_general_name_only)
-        # if filename.startswith("mNode_Port2"):
-        #     filename_port2.append(filename_only)
-        # if filename.startswith("mNode_Port3"):
-        #     filename_port3.append(filename_only)
-        # if filename.startswith("mNode_Port4"):
-        #     filename_port4.append(filename_only)
-        # if filename.startswith("mNode_Port5"):
-        #     filename_port5.append(filename_only)
-        # if filename.startswith("mNode_Port6"):
-        #     filename_port6.append(filename_only)
-        # if filename.startswith("mNode_Port7"):
-        #     filename_port7.append(filename_only)
+
         else:
             continue
 #%%
@@ -110,7 +95,6 @@ jd_df['old_date'] = filename_generalDate
 path_save_jd = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
 jd_df.to_csv(path_save_jd + 'jd_combinedAnalysis.csv')
 print('done')
-#%%
 print(jd_df.head(16))
 
 #%%
