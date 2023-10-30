@@ -53,57 +53,58 @@ print('done with imports')
 
 #%% For first time running
 
-alpha_s1 = []
-alpha_s2 = []
-alpha_s3 = []
-alpha_s4 = []
+# alpha_s1 = []
+# alpha_s2 = []
+# alpha_s3 = []
+# alpha_s4 = []
 
-# filepath = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level1_align-despike-interp/"
-filepath = r"/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level1_align-despike-interp/"
-for root, dirnames, filenames in os.walk(filepath): #this is for looping through files that are in a folder inside another folder
-    for filename in natsort.natsorted(filenames):
-        file = os.path.join(root, filename)
-        filename_only = filename[:-6]
+# # filepath = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level1_align-despike-interp/"
+# filepath = r"/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level1_align-despike-interp/"
+# for root, dirnames, filenames in os.walk(filepath): #this is for looping through files that are in a folder inside another folder
+#     for filename in natsort.natsorted(filenames):
+#         file = os.path.join(root, filename)
+#         filename_only = filename[:-6]
         
-        if filename.startswith("mNode_Port1"):
-            df = pd.read_csv(file)
-            # alpha = np.nanmean(df['alpha']) #we don't need to do this... see next line
-            alpha = df['alpha'][1] #align wind already did a proper wind average, and the alpha column shold be the same number so we can just take on entry to represent the whole
-            alpha_s1.append(alpha)
-            print(filename_only)
-        if filename.startswith("mNode_Port2"):
-            df = pd.read_csv(file)
-            alpha = df['alpha'][1] 
-            alpha_s2.append(alpha)
-            print(filename_only)
-        if filename.startswith("mNode_Port3"):
-            df = pd.read_csv(file)
-            alpha = df['alpha'][1] 
-            alpha_s3.append(alpha)
-            print(filename_only)
-        if filename.startswith("mNode_Port4"):
-            df = pd.read_csv(file)
-            alpha = df['alpha'][1] 
-            alpha_s4.append(alpha)
-            print(filename_only)
-        else:
-            continue
+#         if filename.startswith("mNode_Port1"):
+#             df = pd.read_csv(file)
+#             # alpha = np.nanmean(df['alpha']) #we don't need to do this... see next line
+#             alpha = df['alpha'][1] #align wind already did a proper wind average, and the alpha column shold be the same number so we can just take on entry to represent the whole
+#             alpha_s1.append(alpha)
+#             print(filename_only)
+#         if filename.startswith("mNode_Port2"):
+#             df = pd.read_csv(file)
+#             alpha = df['alpha'][1] 
+#             alpha_s2.append(alpha)
+#             print(filename_only)
+#         if filename.startswith("mNode_Port3"):
+#             df = pd.read_csv(file)
+#             alpha = df['alpha'][1] 
+#             alpha_s3.append(alpha)
+#             print(filename_only)
+#         if filename.startswith("mNode_Port4"):
+#             df = pd.read_csv(file)
+#             alpha = df['alpha'][1] 
+#             alpha_s4.append(alpha)
+#             print(filename_only)
+#         else:
+#             continue
 
 
-alpha_df = pd.DataFrame()
-alpha_df['alpha_s1'] = alpha_s1
-alpha_df['alpha_s2'] = alpha_s2
-alpha_df['alpha_s3'] = alpha_s3
-alpha_df['alpha_s4'] = alpha_s4
+# alpha_df = pd.DataFrame()
+# alpha_df['alpha_s1'] = alpha_s1
+# alpha_df['alpha_s2'] = alpha_s2
+# alpha_df['alpha_s3'] = alpha_s3
+# alpha_df['alpha_s4'] = alpha_s4
 
-# file_save_path = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level4/"
-file_save_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
-alpha_df.to_csv(file_save_path + "alpha_combinedAnalysis.csv")
+# # file_save_path = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level4/"
+# file_save_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
+# alpha_df.to_csv(file_save_path + "alpha_combinedAnalysis.csv")
 
-print('done')
+# print('done')
 
 #%%
-file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
+# file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
+file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
 
 sonic_file1 = "despiked_s1_turbulenceTerms_andMore_combined.csv"
 sonic1_df = pd.read_csv(file_path+sonic_file1)
@@ -118,18 +119,19 @@ sonic_file4 = "despiked_s4_turbulenceTerms_andMore_combined.csv"
 sonic4_df = pd.read_csv(file_path+sonic_file4)
 
 
-# alpha_df = pd.read_csv(file_path+"alpha_combinedAnalysis.csv")
+alpha_df = pd.read_csv(file_path+"alpha_combinedAnalysis.csv")
 
 time_arr = np.arange(0,len(alpha_df))
 
 date_df = pd.read_csv(file_path + "date_combinedAnalysis.csv")
 print(date_df.columns)
+print(date_df['datetime'][10])
 
 #%%
 alpha_df['time'] = time_arr
-alpha_df['date'] = date_df['datetime']
+alpha_df['datetime'] = date_df['datetime']
 
-
+print(alpha_df.columns)
 #%%
 #This step to see if the sonics were facing the same way
 
@@ -163,7 +165,7 @@ plt.title('Fall Deployment')
 
 break_index = 3959 #(length of spring is 3960, index is 3959)
 
-
+#making slight adjustments here to make them uniform to sonic 4 after rotating to true north
 adjusted_a_s1_spring = np.array(alpha_df['alpha_s1'][:break_index+1])+260
 adjusted_a_s2_spring = np.array(alpha_df['alpha_s2'][:break_index+1])+264
 adjusted_a_s3_spring = np.array(alpha_df['alpha_s3'][:break_index+1])+262
@@ -188,6 +190,8 @@ plt.scatter(alpha_df['time'], adjusted_a_s4, color = 'b', label = 's4')
 plt.hlines(y=360, xmin=0, xmax=len(alpha_df), color = 'k')
 plt.hlines(y=0, xmin=0, xmax=len(alpha_df), color = 'k')
 plt.legend()
+plt.xlim(0, 3959)
+plt.title('Spring Deployment')
 
 
 fig = plt.figure()
@@ -198,7 +202,8 @@ plt.scatter(alpha_df['time'], adjusted_a_s4, color = 'b', label = 's4')
 plt.hlines(y=360, xmin=0, xmax=len(alpha_df), color = 'k')
 plt.hlines(y=0, xmin=0, xmax=len(alpha_df), color = 'k')
 plt.legend()
-plt.xlim(3959,8279)
+plt.xlim(3959, 8279)
+plt.title('Fall Deployment')
 
 # adjusted_a_s1 = np.array(adjusted_a_s1)-55
 # adjusted_a_s2 = np.array(adjusted_a_s2)-55
@@ -215,6 +220,7 @@ plt.xlim(3959,8279)
 # plt.legend()
 
 #%%
+#here we adjust to a 0-360 degree circle, with 0 degrees as true north
 adjusted_arr = [adjusted_a_s1, adjusted_a_s2, adjusted_a_s3, adjusted_a_s4]
 
 for arr in adjusted_arr:
@@ -244,27 +250,22 @@ plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s4'], color = 'b', label 
 plt.legend()
 plt.xlim(0,3959)
 # plt.ylim(300,350)
-plt.title('Spring Deployment')
+plt.title('Spring Deployment Adjusted to 360')
 
-print(adjusted_alpha_df['alpha_s4'][1620]-adjusted_alpha_df['alpha_s1'][1620])
-print(adjusted_alpha_df['alpha_s4'][1620]-adjusted_alpha_df['alpha_s2'][1620])
-print(adjusted_alpha_df['alpha_s4'][1620]-adjusted_alpha_df['alpha_s3'][1620])
-#%%
 fig = plt.figure()
 plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s1'], color = 'r', label = 's1')
 plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s2'], color = 'orange', label = 's2')
 plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s3'], color = 'g', label = 's3')
 plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s4'], color = 'b', label = 's4')
 plt.legend()
-plt.xlim(3960,8279)
-# plt.ylim(235,239)
-plt.title('Fall Deployment')
-# okay looks to be within 5deg of sonic 4
+plt.xlim(3959,8279)
+# plt.ylim(300,350)
+plt.title('Fall Deployment Adjusted to 360')
 
 #%%
 ax = WindroseAxes.from_ax()
-ax.bar(adjusted_alpha_df['alpha_s4'], sonic4_df['Ubar_s4'], bins=np.arange(3, 18, 3), normed = True)
-ax.set_title('Wind Velocity [$ms^{-1}$]', fontsize=20)
+ax.bar(adjusted_alpha_df['alpha_s4'], sonic4_df['Ubar'], bins=np.arange(3, 18, 3), normed = True)
+ax.set_title('Wind Velocity Combined Analysis [$ms^{-1}$]', fontsize=20)
 ax.set_legend(bbox_to_anchor=(0.9, -0.1),fontsize=20)
 #%% This is for flagging the bad wind directions
 # sonic_head_arr = [1.27, 1.285, 1.23]
@@ -325,27 +326,14 @@ good_flag_3 = np.concatenate([good_flag_3_spring, good_flag_3_fall], axis=0)
 good_flag_4 = np.concatenate([good_flag_4_spring, good_flag_4_fall], axis=0)
 
 print('done')
-#%%
-#compare everything to eachother?? NO DON"T DO THIS... do the part below it
-#if they agree, keep the value from sonic 1 (shouldn't matter which value you keep because they are the same)
-#if they don't match (1 true and 1 false) set to false (as in a "bad" wind dir)
-# good_flag_all = np.where((good_flag_1==good_flag_2)&
-#                          (good_flag_1==good_flag_3)&
-#                          (good_flag_1==good_flag_4), good_flag_1,"False")
-# potentially_good_flag_all = np.where((potentially_good_flag_1==potentially_good_flag_2)&
-#                                      (potentially_good_flag_1==potentially_good_flag_3)&
-#                                      (potentially_good_flag_1==potentially_good_flag_4), good_flag_1,"False")
 
-#just use values from sonic 4 which should be unobstructed (YES DO THIS)
-# good_flag_all = good_flag_4
-## potentially_good_flag_all = potentially_good_flag_4
 #%%
 adjusted_alpha_df['good_wind_dir'] = np.array(good_flag_4)
 # adjusted_alpha_df['offshore_NtoW'] = np.array(offshore_NtoW_flag_4)
 # adjusted_alpha_df['onshore_WtoS'] = np.array(onshore_WtoS_flag_4)
 
 adjusted_alpha_df['time'] = alpha_df['time']
-adjusted_alpha_df['date'] = alpha_df['date']       
+adjusted_alpha_df['datetime'] = alpha_df['datetime']       
 adjusted_alpha_df.to_csv(file_path+"windDir_withBadFlags_combinedAnalysis.csv")
 print('done')
 
@@ -357,50 +345,39 @@ for name, group in groups_good:
     plt.plot(group['time'], group['alpha_s4'], marker='o', linestyle='', markersize=2, label=name)
 # for name, group in groups_meh:
     # plt.plot(group['time'], group['alpha_s4'], marker='o', linestyle='', markersize=2, label=name)
-plt.title("Bad wind directions = False")
 plt.xlabel('time')
 plt.ylabel('wind direction (deg)')
-plt.legend()
+plt.vlines(x=3959, ymin = 0, ymax=360, color = 'k', label = 'break')
+plt.legend(loc = 'lower left')
+plt.title("Wind Dir. (Bad wind directions = False)")
 #%%
 ax = WindroseAxes.from_ax()
-ax.bar(adjusted_alpha_df['alpha_s4'][:break_index+1], sonic4_df['Ubar_s4'][:break_index+1], bins=np.arange(3, 18, 3), normed = True)
+ax.bar(adjusted_alpha_df['alpha_s4'][:break_index+1], sonic4_df['Ubar'][:break_index+1], bins=np.arange(3, 18, 3), normed = True)
 ax.set_title('Wind Rose Soinc 4 Spring Dataset')
 ax.set_legend(bbox_to_anchor=(0.9, -0.1))
 fig.savefig('WindRose_spring.png', dpi = 300)
 
 ax = WindroseAxes.from_ax()
-ax.bar(adjusted_alpha_df['alpha_s4'][break_index+1:], sonic4_df['Ubar_s4'][break_index+1:], bins=np.arange(3, 18, 3), normed = True)
+ax.bar(adjusted_alpha_df['alpha_s4'][break_index+1:], sonic4_df['Ubar'][break_index+1:], bins=np.arange(3, 18, 3), normed = True)
 ax.set_title('Wind Rose Soinc 4 Fall Dataset')
 ax.set_legend(bbox_to_anchor=(0.9, -0.1))
 fig.savefig('WindRose_fall.png', dpi = 300)
 
 ax = WindroseAxes.from_ax()
-ax.bar(adjusted_alpha_df['alpha_s4'], sonic4_df['Ubar_s4'], bins=np.arange(3, 18, 3), normed = True)
+ax.bar(adjusted_alpha_df['alpha_s4'], sonic4_df['Ubar'], bins=np.arange(3, 18, 3), normed = True)
 ax.set_title('Wind Rose Soinc 4 Combined Datasets')
 ax.set_legend(bbox_to_anchor=(0.9, -0.1))
 fig.savefig('WindRose_combinedAnalysis.png', dpi = 300)
 
 print('figures saved')
-#%%
-fig = plt.figure()
-
-plt.plot(adjusted_alpha_df['time'], adjusted_alpha_df['alpha_s4'], color = 'skyblue', label = 's4')
-plt.plot(adjusted_alpha_df['time'], adjusted_alpha_df['alpha_s3'], color = 'silver', label = 's3')
-plt.plot(adjusted_alpha_df['time'], adjusted_alpha_df['alpha_s2'], color = 'darkorange', label = 's2')
-plt.plot(adjusted_alpha_df['time'], adjusted_alpha_df['alpha_s1'], color = 'darkgreen', label = 's1')
-
-plt.legend()
-plt.ylim(0,360)
-plt.title('Wind Direction')
-plt.ylabel('wind direction (deg)')
 
 
 #%% make plts based on wind directions 
 # test on singular range first in one deployment
 
 sonic_df_arr = [sonic1_df[:break_index+1], sonic2_df[:break_index+1], sonic3_df[:break_index+1], sonic4_df[:break_index+1],]
-lower = 110
-upper = 130
+lower = 100
+upper = 110
 print(lower, upper)
 
 restricted_arr = np.where((lower <= adjusted_alpha_df['alpha_s4'][:break_index+1]) & (adjusted_alpha_df['alpha_s4'][:break_index+1] < upper),adjusted_alpha_df['alpha_s4'][:break_index+1],np.nan)
@@ -416,22 +393,22 @@ restricted_wd_df_sonic4 = sonic_df_arr[3][mask_restricted_arr]
 restricted_alpha_df = adjusted_alpha_df[:break_index+1][mask_restricted_arr]
 
 print('restricted dfs made')
-#%%
 
-ax1 = WindroseAxes.from_ax()
-ax1.bar(restricted_alpha_df['alpha_s4'][:break_index+1], restricted_wd_df_sonic4['Ubar_s4'][:break_index+1], bins=np.arange(3, 18, 3), normed = True)
-ax1.set_title('Wind Rose Soinc 4: wind range ('+str(lower)+", "+str(upper)+")")
-ax1.set_legend(bbox_to_anchor=(0.9, -0.1))
 
-vert_array_mean = [np.nanmean(restricted_wd_df_sonic1['Ubar_s1']), 
-                   np.nanmean(restricted_wd_df_sonic2['Ubar_s2']), 
-                   np.nanmean(restricted_wd_df_sonic3['Ubar_s3']), 
-                   np.nanmean(restricted_wd_df_sonic4['Ubar_s4'])]
+# ax1 = WindroseAxes.from_ax()
+# ax1.bar(restricted_alpha_df['alpha_s4'][:break_index+1], restricted_wd_df_sonic4['Ubar'][:break_index+1], bins=np.arange(3, 18, 3), normed = True)
+# ax1.set_title('Wind Rose Soinc 4: wind range ('+str(lower)+", "+str(upper)+")")
+# ax1.set_legend(bbox_to_anchor=(0.9, -0.1))
+
+vert_array_mean = [np.nanmean(restricted_wd_df_sonic1['Ubar']), 
+                   np.nanmean(restricted_wd_df_sonic2['Ubar']), 
+                   np.nanmean(restricted_wd_df_sonic3['Ubar']), 
+                   np.nanmean(restricted_wd_df_sonic4['Ubar'])]
 # vert_mean_df['wd_'+str(lower)+"_"+str(upper-1)] = np.array(vert_array_mean)
-vert_array_median = [np.nanmedian(restricted_wd_df_sonic1['Ubar_s1']), 
-                     np.nanmedian(restricted_wd_df_sonic2['Ubar_s2']), 
-                     np.nanmedian(restricted_wd_df_sonic3['Ubar_s3']), 
-                     np.nanmedian(restricted_wd_df_sonic4['Ubar_s4'])]
+vert_array_median = [np.nanmedian(restricted_wd_df_sonic1['Ubar']), 
+                     np.nanmedian(restricted_wd_df_sonic2['Ubar']), 
+                     np.nanmedian(restricted_wd_df_sonic3['Ubar']), 
+                     np.nanmedian(restricted_wd_df_sonic4['Ubar'])]
 # vert_median_df['wd_'+str(lower)+"_"+str(upper-1)] = np.array(vert_array_median)
 
 z_avg_arr_spring = [1.842, 4.537, 7.332, 9.747]
@@ -633,7 +610,7 @@ ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 color = 'navy'
 ax2.set_xlabel('time')
 ax2.set_ylabel('wind speed [m/s]', color=color)
-ax2.plot(alpha['time'], sonic4_df['Ubar_s4'], color=color)
+ax2.plot(adjusted_alpha_df['time'], sonic4_df['Ubar_s4'], color=color)
 ax2.axhline(y=10, color='navy', linestyle='--')
 ax2.tick_params(axis='y', labelcolor=color)
 

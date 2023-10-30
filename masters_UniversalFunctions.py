@@ -39,7 +39,8 @@ kappa = 0.40
 print('done with setting gravity (g = -9.81) and von-karman (kappa = 4)')
 
 #%%
-file_path = r"/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/"
+# file_path = r"/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/"
+file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
 prod_df = pd.read_csv(file_path+"prodTerm_combinedAnalysis.csv")
 prod_df = prod_df.drop(['Unnamed: 0'], axis=1)
 
@@ -90,9 +91,9 @@ Eps_df = Eps_df.drop(['Unnamed: 0'], axis=1)
 # tke_transport_df = pd.read_csv(file_path + "tke_transport_allFall.csv")
 # tke_transport_df = tke_transport_df.drop(['Unnamed: 0'], axis=1)
 
-# # windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_144to196.csv")
+windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_combinedAnalysis.csv")
 # windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_120to196.csv")
-# windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
+windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
 
 
 zL_df = pd.read_csv(file_path+'ZoverL_combinedAnalysis.csv')
@@ -135,29 +136,29 @@ oct_storm = False
 
 # print('done with setting up  october 2-4 wind event dataframes')
 #%% Get rid of bad wind directions first
-# all_windDirs = True
-# onshore = False
-# offshore = False
+all_windDirs = True
+onshore = False
+offshore = False
 
-# index_array = np.arange(len(windDir_df))
-# windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, index_array)
-# mask_goodWindDir = np.isin(windDir_df['new_index_arr'],index_array)
+index_array = np.arange(len(windDir_df))
+windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, index_array)
+mask_goodWindDir = np.isin(windDir_df['new_index_arr'],index_array)
 
-# windDir_df[mask_goodWindDir] = np.nan
+windDir_df[mask_goodWindDir] = np.nan
 
-# prod_df[mask_goodWindDir] = np.nan
-# Eps_df[mask_goodWindDir] = np.nan
-# sonic1_df[mask_goodWindDir] = np.nan
-# sonic2_df[mask_goodWindDir] = np.nan
-# sonic3_df[mask_goodWindDir] = np.nan
-# sonic4_df[mask_goodWindDir] = np.nan
+prod_df[mask_goodWindDir] = np.nan
+Eps_df[mask_goodWindDir] = np.nan
+sonic1_df[mask_goodWindDir] = np.nan
+sonic2_df[mask_goodWindDir] = np.nan
+sonic3_df[mask_goodWindDir] = np.nan
+sonic4_df[mask_goodWindDir] = np.nan
 # tke_transport_df[mask_goodWindDir] = np.nan
-# z_df[mask_goodWindDir] = np.nan
-# zL_df[mask_goodWindDir] = np.nan
-# rho_df[mask_goodWindDir] = np.nan
+z_df[mask_goodWindDir] = np.nan
+zL_df[mask_goodWindDir] = np.nan
+rho_df[mask_goodWindDir] = np.nan
 # wave_df[mask_goodWindDir] = np.nan
 
-# print('done with setting up  good wind direction only dataframes')
+print('done with setting up  good wind direction only dataframes')
 
 #%%
 # If we just want to examine the high wind event from Oct2-4, 2022, use the following mask:
@@ -245,26 +246,26 @@ oct_storm = False
 # wave_df[mask_onshoreWindDir] = np.nan
 
 #%% zL correlation
-# r_zL_all = zL_df.corr()
-# print(r_zL_all)
+r_zL_all = zL_df.corr()
+print(r_zL_all)
 
 
 
 #%%
 # figure titles based on wind directions
-# if all_windDirs == True:
-#     title_windDir = 'All wind directions; '
-#     wave_df_save_name = '_allGoodWindDirs_'
-# elif onshore == True:
-#     title_windDir = 'Onshore winds; '
-#     wave_df_save_name = '_onshoreWindDirs_'
-# elif offshore == True:
-#     title_windDir = 'Offshore winds; '
-#     wave_df_save_name = '_offshoreWindDirs_'
-# if oct_storm == True:
-#     oct_addition = "Oct 2-4: "
-# else:
-#     oct_addition = ''
+if all_windDirs == True:
+    title_windDir = 'All wind directions; '
+    wave_df_save_name = '_allGoodWindDirs_'
+elif onshore == True:
+    title_windDir = 'Onshore winds; '
+    wave_df_save_name = '_onshoreWindDirs_'
+elif offshore == True:
+    title_windDir = 'Offshore winds; '
+    wave_df_save_name = '_offshoreWindDirs_'
+if oct_storm == True:
+    oct_addition = "Oct 2-4: "
+else:
+    oct_addition = ''
 #%%
 
 # wave_df.to_csv(file_path+"waveData"+wave_df_save_name+"allFall.csv")
