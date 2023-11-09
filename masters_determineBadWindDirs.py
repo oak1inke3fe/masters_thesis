@@ -166,15 +166,16 @@ plt.title('Fall Deployment')
 break_index = 3959 #(length of spring is 3960, index is 3959)
 
 #making slight adjustments here to make them uniform to sonic 4 after rotating to true north
-adjusted_a_s1_spring = np.array(alpha_df['alpha_s1'][:break_index+1])+260
-adjusted_a_s2_spring = np.array(alpha_df['alpha_s2'][:break_index+1])+264
-adjusted_a_s3_spring = np.array(alpha_df['alpha_s3'][:break_index+1])+262
-adjusted_a_s4_spring = np.array(alpha_df['alpha_s4'][:break_index+1])+270
+adjusted_a_s1_spring = np.array(alpha_df['alpha_s1'][:break_index+1])+260-180
+adjusted_a_s2_spring = np.array(alpha_df['alpha_s2'][:break_index+1])+264-180
+adjusted_a_s3_spring = np.array(alpha_df['alpha_s3'][:break_index+1])+262-180
+adjusted_a_s4_spring = np.array(alpha_df['alpha_s4'][:break_index+1])+270-180
 
-adjusted_a_s1_fall = np.array(alpha_df['alpha_s1'][break_index+1:])+270
-adjusted_a_s2_fall = np.array(alpha_df['alpha_s2'][break_index+1:])+270
-adjusted_a_s3_fall = np.array(alpha_df['alpha_s3'][break_index+1:])+270
-adjusted_a_s4_fall = np.array(alpha_df['alpha_s4'][break_index+1:])+180
+adjusted_a_s1_fall = np.array(alpha_df['alpha_s1'][break_index+1:])+270-180
+adjusted_a_s2_fall = np.array(alpha_df['alpha_s2'][break_index+1:])+270-180
+adjusted_a_s3_fall = np.array(alpha_df['alpha_s3'][break_index+1:])+270-180
+adjusted_a_s4_fall = np.array(alpha_df['alpha_s4'][break_index+1:])+180-180
+
 
 adjusted_a_s1 = np.concatenate([adjusted_a_s1_spring, adjusted_a_s1_fall], axis = 0)
 adjusted_a_s2 = np.concatenate([adjusted_a_s2_spring, adjusted_a_s2_fall], axis = 0)
@@ -240,25 +241,40 @@ adjusted_alpha_df['alpha_s3'] = adjusted_a_s3
 adjusted_alpha_df['alpha_s4'] = adjusted_a_s4
 # adjusted_alpha_df['time'] = alpha_df['time']
 # adjusted_alpha_df['date'] = alpha_df['date']
-
+adjusted_alpha_df.to_csv(file_path+"windDir_IncludingBad_combinedAnalysis.csv")
 #%%
-fig = plt.figure()
-plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s1'], color = 'r', label = 's1')
-plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s2'], color = 'orange', label = 's2')
-plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s3'], color = 'g', label = 's3')
-plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s4'], color = 'b', label = 's4')
+#compare adjustment to period when we know the wind was consistently from the SW and
+#check the output is from the SW
+#here we will pick May 14 1800 [index 2142] where the wind was from the SSW-SW
+plt.figure()
+plt.plot(adjusted_alpha_df['alpha_s1'][:break_index+1], label ='s1', color = 'r')
+plt.plot(adjusted_alpha_df['alpha_s2'][:break_index+1], label ='s2', color = 'orange')
+plt.plot(adjusted_alpha_df['alpha_s3'][:break_index+1], label ='s3', color = 'g')
+plt.plot(adjusted_alpha_df['alpha_s4'][:break_index+1], label ='s4', color = 'b')
 plt.legend()
-plt.xlim(0,3959)
-# plt.ylim(300,350)
-plt.title('Spring Deployment Adjusted to 360')
+plt.xlim(2140,2150)
+plt.title ('checking flow is from the SSW-SW')
 
+# fig = plt.figure()
+# plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s1'], color = 'r', label = 's1')
+# plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s2'], color = 'orange', label = 's2')
+# plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s3'], color = 'g', label = 's3')
+# plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s4'], color = 'b', label = 's4')
+# plt.legend()
+# plt.xlim(0,3959)
+# # plt.ylim(300,350)
+# plt.title('Spring Deployment Adjusted to 360')
+#%%
+#compare adjustment to period when we know the wind was consistently from the NE and
+#check the output is from the NE
+#here we will pick Oct 02 1400 [index 4650] where the wind was from the NE
 fig = plt.figure()
 plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s1'], color = 'r', label = 's1')
 plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s2'], color = 'orange', label = 's2')
 plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s3'], color = 'g', label = 's3')
 plt.scatter(alpha_df['time'], adjusted_alpha_df['alpha_s4'], color = 'b', label = 's4')
 plt.legend()
-plt.xlim(3959,8279)
+plt.xlim(4650,4800)
 # plt.ylim(300,350)
 plt.title('Fall Deployment Adjusted to 360')
 
@@ -267,25 +283,37 @@ ax = WindroseAxes.from_ax()
 ax.bar(adjusted_alpha_df['alpha_s4'], sonic4_df['Ubar'], bins=np.arange(3, 18, 3), normed = True)
 ax.set_title('Wind Velocity Combined Analysis [$ms^{-1}$]', fontsize=20)
 ax.set_legend(bbox_to_anchor=(0.9, -0.1),fontsize=20)
-#%% This is for flagging the bad wind directions
-# sonic_head_arr = [1.27, 1.285, 1.23]
-# sonic_min = np.min(sonic_head_arr)
-# b = 0.641
-# c = 0.641+sonic_min
-# A = 60
-# a_len = math.sqrt(b**2+c**2-(2*b*c*math.cos(A*math.pi/180)))
-# angle_offset_rad = math.asin(b*math.sin(A*math.pi/180)/a_len)
-# angle_offset = angle_offset_rad*180/math.pi
-# print("angle offset = " + str(angle_offset))
-# angle_start= 125-angle_offset
-# angle_end = 125
 
-# angle_start= 144
-angle_start_spring= 120
-angle_end_spring = 196
+#%% this is original method of flagging bad wind directions by setting a pre-set range of bad wind directions
+sonic_head_arr = [1.27, 1.285, 1.23]
+sonic_min = np.min(sonic_head_arr)
+b = 0.641
+c = 0.641+sonic_min
+A = 60
+import math
+a_len = math.sqrt(b**2+c**2-(2*b*c*math.cos(A*math.pi/180)))
+angle_offset_rad = math.asin(b*math.sin(A*math.pi/180)/a_len)
+angle_offset = angle_offset_rad*180/math.pi
+print("angle offset = " + str(angle_offset))
+angle_start= 125-angle_offset
+angle_end = 125
 
-angle_start_fall = 120
-angle_end_fall = 196
+print(angle_start)
+print(angle_end)
+#%%
+
+# angle_start_spring= 120
+# angle_end_spring = 196
+angle_start_spring= 100
+angle_end_spring = 130
+
+# angle_camera_start_spring = 20
+# angle_camera_end_spring = 80
+
+# angle_start_fall = 120
+# angle_end_fall = 196
+angle_start_fall = 100
+angle_end_fall = 130
 
 print("SPRING: bad angle start = " + str(angle_start_spring))
 print("SPRING bad angle end = " + str(angle_end_spring))
@@ -314,6 +342,7 @@ good_flag_1_spring = np.where((adjusted_a_s1_copy_spring >= angle_start_spring)&
 good_flag_2_spring = np.where((adjusted_a_s2_copy_spring >= angle_start_spring)&(adjusted_a_s2_copy_spring <= angle_end_spring), 'False', good_flag_spring)
 good_flag_3_spring = np.where((adjusted_a_s3_copy_spring >= angle_start_spring)&(adjusted_a_s3_copy_spring <= angle_end_spring), 'False', good_flag_spring)
 good_flag_4_spring = np.where((adjusted_a_s4_copy_spring >= angle_start_spring)&(adjusted_a_s4_copy_spring <= angle_end_spring), 'False', good_flag_spring)
+# good_flag_4_spring = np.where(((adjusted_a_s4_copy_spring >= angle_start_spring)&(adjusted_a_s4_copy_spring <= angle_end_spring)) | ((adjusted_a_s4_copy_spring >= angle_camera_start_spring)&(adjusted_a_s4_copy_spring <= angle_camera_end_spring)), 'False', good_flag_spring)
 
 good_flag_1_fall = np.where((adjusted_a_s1_copy_fall >= angle_start_fall)&(adjusted_a_s1_copy_fall <= angle_end_fall), 'False', good_flag_fall)
 good_flag_2_fall = np.where((adjusted_a_s2_copy_fall >= angle_start_fall)&(adjusted_a_s2_copy_fall <= angle_end_fall), 'False', good_flag_fall)
@@ -327,18 +356,85 @@ good_flag_4 = np.concatenate([good_flag_4_spring, good_flag_4_fall], axis=0)
 
 print('done')
 
-#%%
 adjusted_alpha_df['good_wind_dir'] = np.array(good_flag_4)
+print('done adding good flag array to df')
+
+#%% This is for flagging the bad wind directions by calling a direction "bad" if it deviates from sonic4 by more than 15 degrees
+test_badWindDir_s1 = []
+test_badWindDir_s2 = []
+test_badWindDir_s3 = []
+test_badWindDir_s4 = []
+original_badWindDir_s4 = adjusted_alpha_df['alpha_s4']
+# for i in range(len(adjusted_alpha_df[break_index+1])):
+#     if np.abs(adjusted_alpha_df['alpha_s4'][i] - adjusted_alpha_df['alpha_s1'][i]) > 15:
+#         test_badWindDir_s1_i = 'False'
+#     else:
+#         test_badWindDir_s1_i = adjusted_alpha_df['alpha_s1'][i]
+#     test_badWindDir_s1.append(test_badWindDir_s1_i)
+    
+# for i in range(len(adjusted_alpha_df[break_index+1])):
+#     if np.abs(adjusted_alpha_df['alpha_s4'][i] - adjusted_alpha_df['alpha_s2'][i]) > 15:
+#         test_badWindDir_s2_i = 'False'
+#     else:
+#         test_badWindDir_s2_i = adjusted_alpha_df['alpha_s2'][i]
+#     test_badWindDir_s2.append(test_badWindDir_s2_i)
+import math
+for i in range(len(adjusted_alpha_df)):
+    if math.isnan(adjusted_alpha_df['alpha_s4'][i]) == False:
+        if np.abs(adjusted_alpha_df['alpha_s4'][i] - adjusted_alpha_df['alpha_s3'][i]) > 15:
+            test_badWindDir_s4_i = 'False'
+        else:
+            test_badWindDir_s4_i = 'True'
+    else:
+        if np.abs(adjusted_alpha_df['alpha_s2'][i] - adjusted_alpha_df['alpha_s3'][i]) > 15:
+            test_badWindDir_s4_i = 'False'
+        else:
+            test_badWindDir_s4_i = 'True'
+    test_badWindDir_s4.append(test_badWindDir_s4_i)
+
+plt.figure()
+plt.scatter(np.arange(len(test_badWindDir_s4)), test_badWindDir_s4)
+plt.title('when s3 is within 15 deg of s4 or s2 if s4 is nan; spring')
+
+adjusted_alpha_df['windDir_within_15_deg'] = np.array(test_badWindDir_s4)
+# adjusted_alpha_df['offshore_NtoW'] = np.array(offshore_NtoW_flag_4)
+# adjusted_alpha_df['onshore_WtoS'] = np.array(onshore_WtoS_flag_4)
+#%%
+final_good_windDir = []
+for i in range(len(adjusted_alpha_df)):
+    if adjusted_alpha_df['windDir_within_15_deg'][i] == 'True':
+        if adjusted_alpha_df['good_wind_dir'][i] == 'True':
+            final_good_windDir_i = 'True'
+        else:
+           final_good_windDir_i = 'False'
+    else:
+        final_good_windDir_i = 'False'
+    final_good_windDir.append(final_good_windDir_i)
+
+adjusted_alpha_df['windDir_final'] = np.array(final_good_windDir)       
+
+#%%
+adjusted_alpha_df['time'] = alpha_df['time']
+adjusted_alpha_df['datetime'] = alpha_df['datetime']       
+# adjusted_alpha_df.to_csv(file_path+"windDir_withBadFlags_combinedAnalysis.csv")
+adjusted_alpha_df.to_csv(file_path+"windDir_withBadFlags_100to130_wCameraFlags_combinedAnalysis.csv")
+#%%
+
+
+# adjusted_alpha_df['good_wind_dir'] = np.array(good_flag_4)
+adjusted_alpha_df['good_wind_dir_springCameras'] = np.array(good_flag_4)
 # adjusted_alpha_df['offshore_NtoW'] = np.array(offshore_NtoW_flag_4)
 # adjusted_alpha_df['onshore_WtoS'] = np.array(onshore_WtoS_flag_4)
 
 adjusted_alpha_df['time'] = alpha_df['time']
 adjusted_alpha_df['datetime'] = alpha_df['datetime']       
-adjusted_alpha_df.to_csv(file_path+"windDir_withBadFlags_combinedAnalysis.csv")
+# adjusted_alpha_df.to_csv(file_path+"windDir_withBadFlags_combinedAnalysis.csv")
+adjusted_alpha_df.to_csv(file_path+"windDir_withBadFlags_wCameraFlags_combinedAnalysis.csv")
 print('done')
 
 #%%
-groups_good = adjusted_alpha_df.groupby('good_wind_dir')
+# groups_good = adjusted_alpha_df.groupby('good_wind_dir')
+groups_good = adjusted_alpha_df.groupby('good_wind_dir_springCameras')
 # groups_meh = adjusted_alpha_df.groupby('potential_good_wind_dir')
 plt.figure()
 for name, group in groups_good:
@@ -348,6 +444,7 @@ for name, group in groups_good:
 plt.xlabel('time')
 plt.ylabel('wind direction (deg)')
 plt.vlines(x=3959, ymin = 0, ymax=360, color = 'k', label = 'break')
+plt.xlim(2000,2200)
 plt.legend(loc = 'lower left')
 plt.title("Wind Dir. (Bad wind directions = False)")
 #%%

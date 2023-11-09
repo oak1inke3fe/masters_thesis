@@ -42,7 +42,8 @@ print('done with imports')
 #%%
 
 # file_path = r"Z:\combined_analysis\OaklinCopyMNode\code_pipeline\Level4/"
-file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
+# file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
+file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
 # file_sonic1 = "meanQuantities_sonic1.csv"
 file_sonic1 = "despiked_s1_turbulenceTerms_andMore_combined.csv"
 sonic1_mean_df = pd.read_csv(file_path+file_sonic1)
