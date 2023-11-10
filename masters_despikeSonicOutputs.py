@@ -36,8 +36,8 @@ import matplotlib.pyplot as plt
 print('done with imports')
 
 #%%
-file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
-
+# file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
+file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
 sonic_file1 = "s1_turbulenceTerms_andMore_combined.csv"
 sonic1_df = pd.read_csv(file_path+sonic_file1)
 sonic1_df = sonic1_df.drop(['Unnamed: 0'], axis=1)
@@ -102,6 +102,45 @@ sonic4_df = sonic4_df.rename(columns={'Ubar_s4': 'Ubar',
                                       'WpEp_bar_s4':'WpEp_bar',
                                       'TKE_bar_s4':'TKE_bar'})
 print('done reading files and renaming columns')
+
+#%%
+plt.figure()
+plt.plot(sonic1_df['Ubar'], label = 's1')
+plt.plot(sonic2_df['Ubar'], label = 's2')
+plt.plot(sonic3_df['Ubar'], label = 's3')
+plt.plot(sonic4_df['Ubar'], label = 's4')
+plt.legend()
+plt.ylim(0,5) #this is to see if we included values < 2m/s
+plt.title('Ubar before hampel despike')
+
+
+# From the plot above, we see we have included variable wind speeds (less than 2m/s)
+# so here, we will get rid of values because they are variable wind speeds
+index_array = np.arange(len(sonic1_df))
+sonic1_df['new_index_arr'] = np.where((sonic1_df['Ubar'])> 2, np.nan, index_array)
+sonic2_df['new_index_arr'] = np.where((sonic2_df['Ubar'])> 2, np.nan, index_array)
+sonic3_df['new_index_arr'] = np.where((sonic3_df['Ubar'])> 2, np.nan, index_array)
+sonic4_df['new_index_arr'] = np.where((sonic4_df['Ubar'])> 2, np.nan, index_array)
+
+mask_viableWindSpeed_s1 = np.isin(sonic1_df['new_index_arr'],index_array)
+mask_viableWindSpeed_s2 = np.isin(sonic2_df['new_index_arr'],index_array)
+mask_viableWindSpeed_s3 = np.isin(sonic3_df['new_index_arr'],index_array)
+mask_viableWindSpeed_s4 = np.isin(sonic4_df['new_index_arr'],index_array)
+
+sonic1_df[mask_viableWindSpeed_s1] = np.nan
+sonic2_df[mask_viableWindSpeed_s2] = np.nan
+sonic3_df[mask_viableWindSpeed_s3] = np.nan
+sonic4_df[mask_viableWindSpeed_s4] = np.nan
+
+#now we will plot again to see if our mask worked
+plt.figure()
+plt.plot(sonic1_df['Ubar'], label = 's1')
+plt.plot(sonic2_df['Ubar'], label = 's2')
+plt.plot(sonic3_df['Ubar'], label = 's3')
+plt.plot(sonic4_df['Ubar'], label = 's4')
+plt.legend()
+plt.ylim(0,5) #this is to see if we included values < 2m/s
+plt.title('Ubar before hampel despike, excluding variable wind speeds')
 #%%
 break_index = 3959
 
