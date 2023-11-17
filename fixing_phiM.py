@@ -33,6 +33,17 @@ sonic3_df = pd.read_csv(file_path + 'despiked_s3_turbulenceTerms_andMore_combine
 sonic4_df = pd.read_csv(file_path + 'despiked_s4_turbulenceTerms_andMore_combined.csv')
 
 plt.figure()
+plt.plot(np.array(sonic1_df['Ubar']), label = 's1')
+plt.plot(np.array(sonic2_df['Ubar']), label = 's2')
+plt.plot(np.array(sonic3_df['Ubar']), label = 's3')
+plt.plot(np.array(sonic4_df['Ubar']), label = 's4')
+plt.title('Ubar timeseries; check no negative values')
+plt.legend()
+plt.xlabel('index')
+plt.ylabel('U [m/s]')
+
+
+plt.figure()
 plt.plot(np.array(sonic3_df['Ubar'])[1500:3000], label = 's3')
 plt.plot(np.array(sonic4_df['Ubar'])[1500:3000], label = 's4')
 plt.plot(np.array(sonic4_df['Ubar'])[1500:3000]-np.array(sonic3_df['Ubar'])[1500:3000], label = 's4-s3')
@@ -67,8 +78,10 @@ Eps_df = Eps_df.drop(['Unnamed: 0'], axis=1)
 # tke_transport_df = tke_transport_df.drop(['Unnamed: 0'], axis=1)
 
 # windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_combinedAnalysis.csv")
-windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_100to130_wCameraFlags_combinedAnalysis.csv")
+# windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_100to130_wCameraFlags_combinedAnalysis.csv")
 # windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_120to196.csv")
+# windDir_df = pd.read_csv(file_path + "windDir_keep090250s_075260f_combinedAnalysis.csv")
+windDir_df = pd.read_csv(file_path + "windDir_IncludingBad_wS4rotation_combinedAnalysis.csv")
 windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
 
 
@@ -116,52 +129,52 @@ all_windDirs = True
 onshore = False
 offshore = False
 
-plt.figure()
-plt.scatter(np.arange(len(windDir_df)),windDir_df['alpha_s4'])
-plt.title('wind dir (s4) before mask')
+# plt.figure()
+# plt.scatter(np.arange(len(windDir_df)),windDir_df['alpha_s4'])
+# plt.title('wind dir (s4) before mask')
 
-index_array = np.arange(len(windDir_df))
-# windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, index_array)
-# windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir_springCameras'])==True, np.nan, index_array)
-windDir_df['new_index_arr'] = np.where((windDir_df['windDir_final'])==True, np.nan, index_array)
-mask_goodWindDir = np.isin(windDir_df['new_index_arr'],index_array)
+# index_array = np.arange(len(windDir_df))
+# # windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, index_array)
+# # windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir_springCameras'])==True, np.nan, index_array)
+# windDir_df['new_index_arr'] = np.where((windDir_df['windDir_final'])==True, np.nan, index_array)
+# mask_goodWindDir = np.isin(windDir_df['new_index_arr'],index_array)
 
-windDir_df[mask_goodWindDir] = np.nan
-plt.figure()
-plt.scatter(np.arange(len(windDir_df[:break_index+1])),windDir_df['alpha_s1'][:break_index+1])
-plt.scatter(np.arange(len(windDir_df[:break_index+1])),windDir_df['alpha_s4'][:break_index+1], color = 'g')
+# windDir_df[mask_goodWindDir] = np.nan
+# plt.figure()
+# plt.scatter(np.arange(len(windDir_df[:break_index+1])),windDir_df['alpha_s1'][:break_index+1])
+# plt.scatter(np.arange(len(windDir_df[:break_index+1])),windDir_df['alpha_s4'][:break_index+1], color = 'g')
+# # plt.xlim(1340,1400)
+# # plt.vlines(x=1230,ymin=0,ymax=360)
+# # plt.vlines(x=1260,ymin=0,ymax=360)
+# # plt.vlines(x=1278,ymin=0,ymax=360)
+# plt.title('wind dir (s4) after mask')
+
+# prod_df[mask_goodWindDir] = np.nan
+# Eps_df[mask_goodWindDir] = np.nan
+# sonic1_df[mask_goodWindDir] = np.nan
+# sonic2_df[mask_goodWindDir] = np.nan
+# sonic3_df[mask_goodWindDir] = np.nan
+# sonic4_df[mask_goodWindDir] = np.nan
+# # tke_transport_df[mask_goodWindDir] = np.nan
+# z_df[mask_goodWindDir] = np.nan
+# zL_df[mask_goodWindDir] = np.nan
+# rho_df[mask_goodWindDir] = np.nan
+# # wave_df[mask_goodWindDir] = np.nan
+
+# print('done with setting up  good wind direction only dataframes')
+
+# plt.figure()
+# plt.plot(np.array(sonic3_df['Ubar'][:break_index+1])-np.array(sonic2_df['Ubar'][:break_index+1]), label = 's3-s2', color = 'darkorange')
+# plt.plot(np.array(sonic4_df['Ubar'][:break_index+1])-np.array(sonic3_df['Ubar'][:break_index+1]), label = 's4-s3', color = 'blue')
+# # plt.plot(np.array(sonic2_df['Ubar'][:break_index+1])-np.array(sonic1_df['Ubar'][:break_index+1]), label = 's2-s1', color = 'green')
+# plt.scatter(np.arange(break_index+1), windDir_df['alpha_s1'][:break_index+1], color = 'gray')
+# plt.hlines(y=0,xmin=0,xmax=break_index+1, color = 'k')
+# plt.ylim(-2,5)
 # plt.xlim(1340,1400)
-# plt.vlines(x=1230,ymin=0,ymax=360)
-# plt.vlines(x=1260,ymin=0,ymax=360)
-# plt.vlines(x=1278,ymin=0,ymax=360)
-plt.title('wind dir (s4) after mask')
-
-prod_df[mask_goodWindDir] = np.nan
-Eps_df[mask_goodWindDir] = np.nan
-sonic1_df[mask_goodWindDir] = np.nan
-sonic2_df[mask_goodWindDir] = np.nan
-sonic3_df[mask_goodWindDir] = np.nan
-sonic4_df[mask_goodWindDir] = np.nan
-# tke_transport_df[mask_goodWindDir] = np.nan
-z_df[mask_goodWindDir] = np.nan
-zL_df[mask_goodWindDir] = np.nan
-rho_df[mask_goodWindDir] = np.nan
-# wave_df[mask_goodWindDir] = np.nan
-
-print('done with setting up  good wind direction only dataframes')
-
-plt.figure()
-plt.plot(np.array(sonic3_df['Ubar'][:break_index+1])-np.array(sonic2_df['Ubar'][:break_index+1]), label = 's3-s2', color = 'darkorange')
-plt.plot(np.array(sonic4_df['Ubar'][:break_index+1])-np.array(sonic3_df['Ubar'][:break_index+1]), label = 's4-s3', color = 'blue')
-# plt.plot(np.array(sonic2_df['Ubar'][:break_index+1])-np.array(sonic1_df['Ubar'][:break_index+1]), label = 's2-s1', color = 'green')
-plt.scatter(np.arange(break_index+1), windDir_df['alpha_s1'][:break_index+1], color = 'gray')
-plt.hlines(y=0,xmin=0,xmax=break_index+1, color = 'k')
-plt.ylim(-2,5)
-plt.xlim(1340,1400)
-# plt.vlines(x=1230,ymin=-2,ymax=5)
-# plt.vlines(x=1260,ymin=-2,ymax=5)
-# plt.vlines(x=1278,ymin=-2,ymax=5)
-plt.legend()
+# # plt.vlines(x=1230,ymin=-2,ymax=5)
+# # plt.vlines(x=1260,ymin=-2,ymax=5)
+# # plt.vlines(x=1278,ymin=-2,ymax=5)
+# plt.legend()
 
 
 

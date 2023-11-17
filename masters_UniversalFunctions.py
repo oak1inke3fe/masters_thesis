@@ -92,8 +92,10 @@ Eps_df = Eps_df.drop(['Unnamed: 0'], axis=1)
 # tke_transport_df = pd.read_csv(file_path + "tke_transport_allFall.csv")
 # tke_transport_df = tke_transport_df.drop(['Unnamed: 0'], axis=1)
 
-windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_combinedAnalysis.csv")
+# windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_combinedAnalysis.csv")
 # windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_120to196.csv")
+# windDir_df = pd.read_csv(file_path + "windDir_keep090250s_075260f_combinedAnalysis.csv")
+windDir_df = pd.read_csv(file_path + "windDir_IncludingBad_wS4rotation_combinedAnalysis.csv")
 windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
 
 
@@ -141,25 +143,25 @@ all_windDirs = True
 onshore = False
 offshore = False
 
-index_array = np.arange(len(windDir_df))
-windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, index_array)
-mask_goodWindDir = np.isin(windDir_df['new_index_arr'],index_array)
+# index_array = np.arange(len(windDir_df))
+# windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==False, np.nan, index_array)
+# mask_goodWindDir = np.isin(windDir_df['new_index_arr'],index_array)
 
-windDir_df[mask_goodWindDir] = np.nan
+# windDir_df[mask_goodWindDir] = np.nan
 
-prod_df[mask_goodWindDir] = np.nan
-Eps_df[mask_goodWindDir] = np.nan
-sonic1_df[mask_goodWindDir] = np.nan
-sonic2_df[mask_goodWindDir] = np.nan
-sonic3_df[mask_goodWindDir] = np.nan
-sonic4_df[mask_goodWindDir] = np.nan
-# tke_transport_df[mask_goodWindDir] = np.nan
-z_df[mask_goodWindDir] = np.nan
-zL_df[mask_goodWindDir] = np.nan
-rho_df[mask_goodWindDir] = np.nan
-# wave_df[mask_goodWindDir] = np.nan
+# prod_df[mask_goodWindDir] = np.nan
+# Eps_df[mask_goodWindDir] = np.nan
+# sonic1_df[mask_goodWindDir] = np.nan
+# sonic2_df[mask_goodWindDir] = np.nan
+# sonic3_df[mask_goodWindDir] = np.nan
+# sonic4_df[mask_goodWindDir] = np.nan
+# # tke_transport_df[mask_goodWindDir] = np.nan
+# z_df[mask_goodWindDir] = np.nan
+# zL_df[mask_goodWindDir] = np.nan
+# rho_df[mask_goodWindDir] = np.nan
+# # wave_df[mask_goodWindDir] = np.nan
 
-print('done with setting up  good wind direction only dataframes')
+# print('done with setting up  good wind direction only dataframes')
 
 #%%
 # If we just want to examine the high wind event from Oct2-4, 2022, use the following mask:
@@ -310,6 +312,8 @@ WpTp_bar_LIII = -1*(np.array(sonic3_df['WpTp_bar']+sonic4_df['WpTp_bar'])/2)
 '''
 NOTE: because coare defines their positive fluxes opposite of us, we'll multiply -1*<w'T'> so that the L's match up
 '''
+
+#%%
 usr_dc_df = pd.DataFrame()
 usr_dc_df['usr_s1'] = usr_s1
 usr_dc_df['usr_s2'] = usr_s2
@@ -318,41 +322,71 @@ usr_dc_df['usr_s4'] = usr_s4
 usr_dc_df['usr_LI'] = usr_LI
 usr_dc_df['usr_LII'] = usr_LII
 usr_dc_df['usr_LIII'] = usr_LIII
+usr_dc_df['usr_4_1'] = np.array(usr_s4+usr_s1)/2
+usr_dc_df['usr_3_1'] = np.array(usr_s3+usr_s1)/2
+usr_dc_df['usr_4_2'] = np.array(usr_s4+usr_s2)/2
 # usr_dc_df.to_csv(file_path+"usr_dc_allFall.csv")
+
+#%%
 dz_LI_spring = 2.695  #sonic 2- sonic 1: spring APRIL 2022 deployment
 dz_LII_spring = 2.795 #sonic 3- sonic 2: spring APRIL 2022 deployment
 dz_LIII_spring = 2.415 #sonic 4- sonic 3: spring APRIL 2022 deployment
+dz_4_1_spring = 7.904 #sonic 4 - sonic 1: spring APRIL 2022 deployment
+dz_3_1_spring = 5.490 #sonic 3 - sonic 1: spring APRIL 2022 deployment
+dz_4_2_spring = 5.21 #sonic 4 - sonic 3: spring APRIL 2022 deployment
+
 dz_LI_fall = 1.8161  #sonic 2- sonic 1: FALL SEPT 2022 deployment
 dz_LII_fall = 3.2131 #sonic 3- sonic 2: FALL SEPT 2022 deployment
 dz_LIII_fall = 2.468 #sonic 4- sonic 3: FALL SEPT 2022 deployment
+dz_4_1_fall = 7.4972 #sonic 4 - sonic 1: FALL SEPT 2022 deployment
+dz_3_1_fall = 5.0292 #sonic 3 - sonic 1: FALL SEPT 2022 deployment
+dz_4_2_fall = 5.6811 #sonic 4 - sonic 2: FALL SEPT 2022 deployment
 
 break_index = 3959 #index is 3959, full length is 3960
 
 z_LI_spring = z_df_spring['z_sonic1']+(0.5*dz_LI_spring)
 z_LII_spring  = z_df_spring['z_sonic2']+(0.5*dz_LII_spring)
 z_LIII_spring  = z_df_spring['z_sonic3']+(0.5*dz_LIII_spring)
+z_4_1_spring = z_df_spring['z_sonic1']+(0.5*dz_4_1_spring)
+z_3_1_spring = z_df_spring['z_sonic1']+(0.5*dz_3_1_spring)
+z_4_2_spring = z_df_spring['z_sonic2']+(0.5*dz_4_2_spring)
 
 z_LI_fall = z_df_fall['z_sonic1']+(0.5*dz_LI_fall)
 z_LII_fall = z_df_fall['z_sonic2']+(0.5*dz_LII_fall)
 z_LIII_fall = z_df_fall['z_sonic3']+(0.5*dz_LIII_fall)
+z_4_1_fall = z_df_fall['z_sonic1']+(0.5*dz_4_1_fall)
+z_3_1_fall = z_df_fall['z_sonic1']+(0.5*dz_3_1_fall)
+z_4_2_fall = z_df_fall['z_sonic2']+(0.5*dz_4_2_fall)
 
 z_LI = np.concatenate([z_LI_spring, z_LI_fall], axis = 0)
 z_LII = np.concatenate([z_LII_spring, z_LII_fall], axis = 0)
 z_LIII = np.concatenate([z_LIII_spring, z_LIII_fall], axis = 0)
+z_4_1 = np.concatenate([z_4_1_spring, z_4_1_fall], axis = 0)
+z_3_1 = np.concatenate([z_3_1_spring, z_3_1_fall], axis = 0)
+z_4_2 = np.concatenate([z_4_2_spring, z_4_2_fall], axis = 0)
 
 
 
 dUbardz_LI_spring = np.array(sonic2_df['Ubar'][:break_index+1]-sonic1_df['Ubar'][:break_index+1])/dz_LI_spring 
 dUbardz_LII_spring  = np.array(sonic3_df['Ubar'][:break_index+1]-sonic2_df['Ubar'][:break_index+1])/dz_LII_spring 
 dUbardz_LIII_spring  = np.array(sonic4_df['Ubar'][:break_index+1]-sonic3_df['Ubar'][:break_index+1])/dz_LIII_spring 
+dUbardz_4_1_spring = np.array(sonic4_df['Ubar'][:break_index+1]-sonic1_df['Ubar'][:break_index+1])/dz_4_1_spring 
+dUbardz_3_1_spring = np.array(sonic3_df['Ubar'][:break_index+1]-sonic1_df['Ubar'][:break_index+1])/dz_3_1_spring 
+dUbardz_4_2_spring = np.array(sonic4_df['Ubar'][:break_index+1]-sonic2_df['Ubar'][:break_index+1])/dz_4_2_spring 
 
 dUbardz_LI_fall = np.array(sonic2_df['Ubar'][break_index+1:]-sonic1_df['Ubar'][break_index+1:])/dz_LI_fall
 dUbardz_LII_fall = np.array(sonic3_df['Ubar'][break_index+1:]-sonic2_df['Ubar'][break_index+1:])/dz_LII_fall
 dUbardz_LIII_fall = np.array(sonic4_df['Ubar'][break_index+1:]-sonic3_df['Ubar'][break_index+1:])/dz_LIII_fall
+dUbardz_4_1_fall = np.array(sonic4_df['Ubar'][break_index+1:]-sonic1_df['Ubar'][break_index+1:])/dz_4_1_fall
+dUbardz_3_1_fall = np.array(sonic3_df['Ubar'][break_index+1:]-sonic1_df['Ubar'][break_index+1:])/dz_3_1_fall
+dUbardz_4_2_fall = np.array(sonic4_df['Ubar'][break_index+1:]-sonic2_df['Ubar'][break_index+1:])/dz_4_2_fall
 
 dUbardz_LI = np.concatenate([dUbardz_LI_spring, dUbardz_LI_fall], axis = 0)
 dUbardz_LII = np.concatenate([dUbardz_LII_spring, dUbardz_LII_fall], axis = 0)
 dUbardz_LIII = np.concatenate([dUbardz_LIII_spring, dUbardz_LIII_fall], axis = 0)
+dUbardz_4_1 = np.concatenate([dUbardz_4_1_spring, dUbardz_4_1_fall], axis = 0)
+dUbardz_3_1 = np.concatenate([dUbardz_3_1_spring, dUbardz_3_1_fall], axis = 0)
+dUbardz_4_2 = np.concatenate([dUbardz_4_2_spring, dUbardz_4_2_fall], axis = 0)
 
 print('done with ustar, z/L, and dUbardz')
 ######################################################################
@@ -365,17 +399,26 @@ NOW WE ARE MOVING ON TO PHI_M CALCULATIONS
 phi_m_I_dc = kappa*np.array(z_LI)/(np.array(usr_LI))*(np.array(dUbardz_LI))
 phi_m_II_dc = kappa*np.array(z_LII)/(np.array(usr_LII))*(np.array(dUbardz_LII))
 phi_m_III_dc = kappa*np.array(z_LIII)/(np.array(usr_LIII))*(np.array(dUbardz_LIII))
+phi_m_4_1_dc = kappa*np.array(z_4_1)/(np.array(usr_dc_df['usr_4_1']))*(np.array(dUbardz_4_1))
+phi_m_3_1_dc = kappa*np.array(z_3_1)/(np.array(usr_dc_df['usr_3_1']))*(np.array(dUbardz_3_1))
+phi_m_4_2_dc = kappa*np.array(z_4_2)/(np.array(usr_dc_df['usr_4_2']))*(np.array(dUbardz_4_2))
 
 phi_m_dc_df = pd.DataFrame()
 phi_m_dc_df['z/L I'] = zL_df['zL_I_dc']
 phi_m_dc_df['z/L II'] = zL_df['zL_II_dc']
 phi_m_dc_df['z/L III'] = zL_df['zL_III_dc']
+phi_m_dc_df['z/L 4_1'] = (np.array(zL_df['zL_4_dc'])+np.array(zL_df['zL_1_dc']))/2
+phi_m_dc_df['z/L 3_1'] = (np.array(zL_df['zL_3_dc'])+np.array(zL_df['zL_1_dc']))/2
+phi_m_dc_df['z/L 4_2'] = (np.array(zL_df['zL_4_dc'])+np.array(zL_df['zL_2_dc']))/2
 # phi_m_dc_df['z/L I'] = zL_df['z/L I coare']
 # phi_m_dc_df['z/L II'] = zL_df['z/L II coare']
 # phi_m_dc_df['z/L III'] = zL_df['z/L III coare']
 phi_m_dc_df['phi_m I'] = phi_m_I_dc
 phi_m_dc_df['phi_m II'] = phi_m_II_dc
 phi_m_dc_df['phi_m III'] = phi_m_III_dc
+phi_m_dc_df['phi_m 4_1'] = phi_m_4_1_dc
+phi_m_dc_df['phi_m 3_1'] = phi_m_3_1_dc
+phi_m_dc_df['phi_m 4_2'] = phi_m_4_2_dc
 
 print('done with writing phi_m via D.C. method')
 print('done at line 358')
@@ -386,6 +429,7 @@ phi_m_I_dc_df = pd.DataFrame()
 phi_m_I_dc_df['z/L'] = zL_df['zL_I_dc']
 # phi_m_I_dc_df['z/L'] = zL_df['z/L I coare']
 phi_m_I_dc_df['phi_m'] = phi_m_I_dc
+phi_m_I_dc_df.to_csv(file_path + "phiM_I_dc.csv")
 #get rid of negative shear values
 phi_m_I_dc_df['phi_m_pos'] = np.where(phi_m_I_dc_df['phi_m']>=0,phi_m_I_dc_df['phi_m'],np.nan)
 mask_phi_m_I_dc_df = np.isin(phi_m_I_dc_df['phi_m_pos'], phi_m_I_dc_df['phi_m'])
@@ -395,10 +439,14 @@ phi_m_I_dc_df_final = phi_m_I_dc_df_final.sort_values(by='z/L')
 phi_m_I_dc_neg = phi_m_I_dc_df_final.loc[phi_m_I_dc_df_final['z/L']<=0]
 phi_m_I_dc_pos = phi_m_I_dc_df_final.loc[phi_m_I_dc_df_final['z/L']>=0]
 
+
+
+
 phi_m_II_dc_df = pd.DataFrame()
 phi_m_II_dc_df['z/L'] = zL_df['zL_II_dc']
 # phi_m_II_dc_df['z/L'] = zL_df['z/L II coare']
 phi_m_II_dc_df['phi_m'] = phi_m_II_dc
+phi_m_II_dc_df.to_csv(file_path + "phiM_II_dc.csv")
 #get rid of negative shear values
 phi_m_II_dc_df['phi_m_pos'] = np.where(phi_m_II_dc_df['phi_m']>=0,phi_m_II_dc_df['phi_m'],np.nan)
 mask_phi_m_II_dc_df = np.isin(phi_m_II_dc_df['phi_m_pos'], phi_m_II_dc_df['phi_m'])
@@ -408,10 +456,14 @@ phi_m_II_dc_df_final = phi_m_II_dc_df_final.sort_values(by='z/L')
 phi_m_II_dc_neg = phi_m_II_dc_df_final.loc[phi_m_II_dc_df['z/L']<=0]
 phi_m_II_dc_pos = phi_m_II_dc_df_final.loc[phi_m_II_dc_df['z/L']>=0]
 
+
+
+
 phi_m_III_dc_df = pd.DataFrame()
 phi_m_III_dc_df['z/L'] = zL_df['zL_III_dc']
 # phi_m_III_dc_df['z/L'] = zL_df['z/L III coare']
 phi_m_III_dc_df['phi_m'] = phi_m_III_dc
+phi_m_III_dc_df.to_csv(file_path + "phiM_III_dc.csv")
 #get rid of negative shear values
 phi_m_III_dc_df['phi_m_pos'] = np.where(phi_m_III_dc_df['phi_m']>=0,phi_m_III_dc_df['phi_m'],np.nan)
 mask_phi_m_III_dc_df = np.isin(phi_m_III_dc_df['phi_m_pos'], phi_m_III_dc_df['phi_m'])
@@ -421,6 +473,49 @@ phi_m_III_dc_df_final = phi_m_III_dc_df_final.sort_values(by='z/L')
 phi_m_III_dc_neg = phi_m_III_dc_df_final.loc[phi_m_III_dc_df['z/L']<=0]
 phi_m_III_dc_pos = phi_m_III_dc_df_final.loc[phi_m_III_dc_df['z/L']>=0]
 
+#%% #calculate phi_M for levels 4-1, 3-1, and 4-2
+phi_m_4_1_dc_df = pd.DataFrame()
+phi_m_4_1_dc_df['z/L'] = (np.array(zL_df['zL_4_dc'])+np.array(zL_df['zL_1_dc']))/2
+phi_m_4_1_dc_df['phi_m'] = phi_m_4_1_dc
+phi_m_4_1_dc_df.to_csv(file_path + "phiM_4_1_dc.csv")
+#get rid of negative shear values
+phi_m_4_1_dc_df['phi_m_pos'] = np.where(phi_m_4_1_dc_df['phi_m']>=0,phi_m_4_1_dc_df['phi_m'],np.nan)
+mask_phi_m_4_1_dc_df = np.isin(phi_m_4_1_dc_df['phi_m_pos'], phi_m_4_1_dc_df['phi_m'])
+phi_m_4_1_dc_df_final = phi_m_4_1_dc_df[mask_phi_m_4_1_dc_df]
+#separate into negative z/L and positive z/L
+phi_m_4_1_dc_df_final = phi_m_4_1_dc_df_final.sort_values(by='z/L')
+phi_m_4_1_dc_neg = phi_m_4_1_dc_df_final.loc[phi_m_4_1_dc_df_final['z/L']<=0]
+phi_m_4_1_dc_pos = phi_m_4_1_dc_df_final.loc[phi_m_4_1_dc_df_final['z/L']>=0]
+
+
+
+phi_m_3_1_dc_df = pd.DataFrame()
+phi_m_3_1_dc_df['z/L'] = (np.array(zL_df['zL_3_dc'])+np.array(zL_df['zL_1_dc']))/2
+phi_m_3_1_dc_df['phi_m'] = phi_m_3_1_dc
+phi_m_3_1_dc_df.to_csv(file_path + "phiM_3_1_dc.csv")
+#get rid of negative shear values
+phi_m_3_1_dc_df['phi_m_pos'] = np.where(phi_m_3_1_dc_df['phi_m']>=0,phi_m_3_1_dc_df['phi_m'],np.nan)
+mask_phi_m_3_1_dc_df = np.isin(phi_m_3_1_dc_df['phi_m_pos'], phi_m_3_1_dc_df['phi_m'])
+phi_m_3_1_dc_df_final = phi_m_3_1_dc_df[mask_phi_m_3_1_dc_df]
+#separate into negative z/L and positive z/L
+phi_m_3_1_dc_df_final = phi_m_3_1_dc_df_final.sort_values(by='z/L')
+phi_m_3_1_dc_neg = phi_m_3_1_dc_df_final.loc[phi_m_3_1_dc_df_final['z/L']<=0]
+phi_m_3_1_dc_pos = phi_m_3_1_dc_df_final.loc[phi_m_3_1_dc_df_final['z/L']>=0]
+
+
+
+phi_m_4_2_dc_df = pd.DataFrame()
+phi_m_4_2_dc_df['z/L'] = (np.array(zL_df['zL_4_dc'])+np.array(zL_df['zL_2_dc']))/2
+phi_m_4_2_dc_df['phi_m'] = phi_m_4_2_dc
+phi_m_4_2_dc_df.to_csv(file_path + "phiM_4_2_dc.csv")
+#get rid of negative shear values
+phi_m_4_2_dc_df['phi_m_pos'] = np.where(phi_m_4_2_dc_df['phi_m']>=0,phi_m_4_2_dc_df['phi_m'],np.nan)
+mask_phi_m_4_2_dc_df = np.isin(phi_m_4_2_dc_df['phi_m_pos'], phi_m_4_2_dc_df['phi_m'])
+phi_m_4_2_dc_df_final = phi_m_4_2_dc_df[mask_phi_m_4_2_dc_df]
+#separate into negative z/L and positive z/L
+phi_m_4_2_dc_df_final = phi_m_4_2_dc_df_final.sort_values(by='z/L')
+phi_m_4_2_dc_neg = phi_m_4_2_dc_df_final.loc[phi_m_4_2_dc_df_final['z/L']<=0]
+phi_m_4_2_dc_pos = phi_m_4_2_dc_df_final.loc[phi_m_4_2_dc_df_final['z/L']>=0]
 #%% COARE functional form for Phi_m
 
 coare_zL_neg = np.arange(-4,0,0.005)
@@ -501,7 +596,53 @@ plt.ylim(-4,4)
 plt.grid()
 plt.legend()
 
+#%% Phi_m plots levels 4-1, 3-1, 4-2
+ymin = -4
+ymax = 4
+xmin = -4
+xmax = 2
 
+plt.figure()
+plt.scatter(phi_m_4_1_dc_df_final['z/L'],phi_m_4_1_dc_df_final['phi_m'], color = 'gold', edgecolor = 'black', label ='$\phi_m(z/L)$ d.c. 4-1')
+plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE functional form')
+plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
+plt.xlabel("$z/L$")
+plt.ylabel('$\phi_m(z/L)$')
+plt.title('$\phi_m(z/L)$ Sonic 4 - Sonic 1, Combined Analysis')
+plt.xlim(xmin,xmax)
+plt.ylim(ymin,ymax)
+# plt.xscale('log')
+# plt.yscale('log')
+plt.grid()
+plt.legend()
+
+plt.figure()
+plt.scatter(phi_m_3_1_dc_df_final['z/L'],phi_m_3_1_dc_df_final['phi_m'], color = 'silver', edgecolor = 'black', label ='$\phi_m(z/L)$ d.c. 3-1')
+plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE functional form')
+plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
+plt.xlabel("$z/L$")
+plt.ylabel('$\phi_m(z/L)$')
+plt.title('$\phi_m(z/L)$ Sonic 3 - Sonic 1, Combined Analysis')
+plt.xlim(xmin,xmax)
+plt.ylim(ymin,ymax)
+# plt.xscale('log')
+# plt.yscale('log')
+plt.grid()
+plt.legend()
+
+plt.figure()
+plt.scatter(phi_m_4_2_dc_df_final['z/L'],phi_m_4_2_dc_df_final['phi_m'], color = 'tan', edgecolor = 'black', label ='$\phi_m(z/L)$ d.c. 4-2')
+plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE functional form')
+plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
+plt.xlabel("$z/L$")
+plt.ylabel('$\phi_m(z/L)$')
+plt.title('$\phi_m(z/L)$ Sonic 4 - Sonic 2, Combined Analysis')
+plt.xlim(xmin,xmax)
+plt.ylim(ymin,ymax)
+# plt.xscale('log')
+# plt.yscale('log')
+plt.grid()
+plt.legend()
 #%%
 # import binsreg
 
@@ -530,6 +671,9 @@ def binscatter(**kwargs):
 df_binEstimate_phi_m_I_dc = binscatter(x='z/L', y='phi_m', data=phi_m_I_dc_df_final, ci=(3,3), randcut=1)
 df_binEstimate_phi_m_II_dc = binscatter(x='z/L', y='phi_m', data=phi_m_II_dc_df_final, ci=(3,3), randcut=1)
 df_binEstimate_phi_m_III_dc = binscatter(x='z/L', y='phi_m', data=phi_m_III_dc_df_final, ci=(3,3), randcut=1)
+df_binEstimate_phi_m_4_1_dc = binscatter(x='z/L', y='phi_m', data=phi_m_4_1_dc_df_final, ci=(3,3), randcut=1)
+df_binEstimate_phi_m_3_1_dc = binscatter(x='z/L', y='phi_m', data=phi_m_3_1_dc_df_final, ci=(3,3), randcut=1)
+df_binEstimate_phi_m_4_2_dc = binscatter(x='z/L', y='phi_m', data=phi_m_4_2_dc_df_final, ci=(3,3), randcut=1)
 
 print('done with binning data')
 
@@ -585,6 +729,60 @@ plt.ylim(-0.5,3)
 plt.legend()
 # plt.savefig(plot_savePath + "binnedScatterplot_phiM_Puu.png",dpi=300)
 # plt.savefig(plot_savePath + "binnedScatterplot_phiM_Puu.pdf")
+
+#%% Phi_m binned scatterplot levels 4-1, 3-1, 4-2
+xmin = -2
+xmax = 1
+ymin = -0.5
+ymax = 3
+
+plt.figure()
+sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_4_1_dc, color = 'mediumaquamarine', label = "binned $\phi_{M}(z/L)$: 4-1")
+plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_4_1_dc, color = 'lightseagreen', ls='', lw=2, alpha=0.2)
+plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE functional form')
+plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
+plt.title(title_windDir + "sonic 4 - sonic 1: $phi_{M}(z/L) (DC)$")
+plt.xlim(xmin,xmax)
+plt.ylim(ymin,ymax)
+plt.legend()
+
+plt.figure()
+sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_3_1_dc, color = 'blue', label = "binned $\phi_{M}(z/L)$: 3-1")
+plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_3_1_dc, color = 'mediumblue', ls='', lw=2, alpha=0.2)
+plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE functional form')
+plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
+plt.title(title_windDir + "sonic 3 - sonic 1: $phi_{M}(z/L) (DC)$")
+plt.xlim(xmin,xmax)
+plt.ylim(ymin,ymax)
+plt.legend()
+
+plt.figure()
+sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_4_2_dc, color = 'lime', label = "binned $\phi_{M}(z/L)$: 4-2")
+plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_4_2_dc, color = 'seagreen', ls='', lw=2, alpha=0.2)
+plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE functional form')
+plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
+plt.title(title_windDir + "sonic 4 - sonic 2: $phi_{M}(z/L) (DC)$")
+plt.xlim(xmin,xmax)
+plt.ylim(ymin,ymax)
+plt.legend()
+#%%
+plt.figure()
+sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_4_1_dc, color = 'mediumaquamarine', label = "4-1")
+plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_4_1_dc, color = 'lightseagreen', ls='', lw=2, alpha=0.2, label = '4-1 error')
+sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_3_1_dc, color = 'blue', label = "3-1")
+plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_3_1_dc, color = 'mediumblue', ls='', lw=2, alpha=0.2, label = '3-1 error')
+sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_4_2_dc, color = 'lime', label = "4-2")
+plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_4_2_dc, color = 'seagreen', ls='', lw=2, alpha=0.2, label = '4-2 error')
+plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE eq. 34, 41')
+plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
+plt.title(oct_addition+ title_windDir + "$\phi_{M}(z/L) (DC)$")
+plt.xlim(xmin,xmax)
+plt.ylim(ymin,ymax)
+plt.legend()
+plt.savefig(plot_savePath + "binnedScatterplot_phiM_testDiffLevels_Puu.png",dpi=300)
+plt.savefig(plot_savePath + "binnedScatterplot_phiM_testDiffLevels_Puu.pdf")
+
+
 #%%
 
 
@@ -635,7 +833,9 @@ print('done at line 408')
 phi_eps_I_dc = (phi_eps_1_dc+phi_eps_2_dc)/2
 phi_eps_II_dc = (phi_eps_2_dc+phi_eps_3_dc)/2
 phi_eps_III_dc = (phi_eps_3_dc+phi_eps_4_dc)/2
-
+phi_eps_4_1_dc = (phi_eps_4_dc+phi_eps_1_dc)/2
+phi_eps_3_1_dc = (phi_eps_3_dc+phi_eps_1_dc)/2
+phi_eps_4_2_dc = (phi_eps_4_dc+phi_eps_2_dc)/2
 
 phi_eps_dc_df = pd.DataFrame()
 # phi_eps_dc_df['z/L I'] = np.array( phi_eps_1_dc_df['z/L'] + phi_eps_2_dc_df['z/L'] ) /2 
@@ -644,12 +844,18 @@ phi_eps_dc_df = pd.DataFrame()
 phi_eps_dc_df['z/L I'] = zL_df['zL_I_dc']
 phi_eps_dc_df['z/L II'] = zL_df['zL_II_dc']
 phi_eps_dc_df['z/L III'] = zL_df['zL_III_dc']
+phi_eps_dc_df['z/L 4_1'] = (np.array(zL_df['zL_4_dc'])+np.array(zL_df['zL_1_dc']))/2
+phi_eps_dc_df['z/L 3_1'] = (np.array(zL_df['zL_3_dc'])+np.array(zL_df['zL_1_dc']))/2
+phi_eps_dc_df['z/L 4_2'] = (np.array(zL_df['zL_4_dc'])+np.array(zL_df['zL_2_dc']))/2
 # phi_eps_dc_df['z/L I'] = zL_df['z/L I coare']
 # phi_eps_dc_df['z/L II'] = zL_df['z/L II coare']
 # phi_eps_dc_df['z/L III'] = zL_df['z/L III coare']
 phi_eps_dc_df['phi_eps I'] = phi_eps_I_dc
 phi_eps_dc_df['phi_eps II'] = phi_eps_II_dc
 phi_eps_dc_df['phi_eps III'] = phi_eps_III_dc
+phi_eps_dc_df['phi_eps 4_1'] = phi_eps_4_1_dc
+phi_eps_dc_df['phi_eps 3_1'] = phi_eps_3_1_dc
+phi_eps_dc_df['phi_eps 4_2'] = phi_eps_4_2_dc
 
 plt.figure()
 plt.plot(phi_eps_1_dc, label = 'dc 1')
@@ -657,7 +863,7 @@ plt.plot(phi_eps_2_dc, label = 'dc 2')
 plt.plot(phi_eps_3_dc, label = 'dc 3')
 plt.plot(phi_eps_4_dc, label = 'dc 4')
 plt.legend()
-plt.ylim(0,1000)
+# plt.ylim(0,1000)
 plt.title('Time Series $\phi_{\epsilon}$ DC')
 print('done at line 635')
 
@@ -666,9 +872,18 @@ plt.plot(phi_eps_I_dc, label = 'dc I')
 plt.plot(phi_eps_II_dc, label = 'dc II')
 plt.plot(phi_eps_III_dc, label = 'dc III')
 plt.legend()
-plt.ylim(0,1000)
+# plt.ylim(0,1000)
 plt.title('Time Series $\phi_{\epsilon}$ DC')
-print('done at line 644')
+
+plt.figure()
+plt.plot(phi_eps_4_1_dc, label = 'dc 4_1')
+plt.plot(phi_eps_3_1_dc, label = 'dc 3_1')
+plt.plot(phi_eps_4_2_dc, label = 'dc 4_2')
+plt.legend()
+# plt.ylim(0,1000)
+plt.title('Time Series $\phi_{\epsilon}$ DC')
+
+print('done at line 883')
 
 
 #%%
@@ -676,6 +891,7 @@ phi_eps_I_dc_df = pd.DataFrame()
 phi_eps_I_dc_df['z/L'] = zL_df['zL_I_dc']
 # phi_eps_I_dc_df['z/L'] = zL_df['z/L I coare']
 phi_eps_I_dc_df['phi_eps'] = phi_eps_I_dc
+phi_eps_I_dc_df.to_csv(file_path + "phiEps_I_dc.csv")
 
 phi_eps_I_dc_df_final = phi_eps_I_dc_df.sort_values(by='z/L')
 phi_eps_I_dc_neg = phi_eps_I_dc_df_final.loc[phi_eps_I_dc_df_final['z/L']<=0]
@@ -686,6 +902,7 @@ phi_eps_II_dc_df = pd.DataFrame()
 phi_eps_II_dc_df['z/L'] = zL_df['zL_II_dc']
 # phi_eps_II_dc_df['z/L'] = zL_df['z/L II coare']
 phi_eps_II_dc_df['phi_eps'] = phi_eps_II_dc
+phi_eps_II_dc_df.to_csv(file_path + "phiEps_II_dc.csv")
 
 phi_eps_II_dc_df_final = phi_eps_II_dc_df.sort_values(by='z/L')
 phi_eps_II_dc_neg = phi_eps_II_dc_df_final.loc[phi_eps_II_dc_df_final['z/L']<=0]
@@ -696,12 +913,43 @@ phi_eps_III_dc_df = pd.DataFrame()
 phi_eps_III_dc_df['z/L'] = zL_df['zL_III_dc']
 # phi_eps_III_dc_df['z/L'] = zL_df['z/L III coare']
 phi_eps_III_dc_df['phi_eps'] = phi_eps_III_dc
+phi_eps_III_dc_df.to_csv(file_path + "phiEps_III_dc.csv")
 
 phi_eps_III_dc_df_final = phi_eps_III_dc_df.sort_values(by='z/L')
 phi_eps_III_dc_neg = phi_eps_III_dc_df_final.loc[phi_eps_III_dc_df_final['z/L']<=0]
 phi_eps_III_dc_pos = phi_eps_III_dc_df_final.loc[phi_eps_III_dc_df_final['z/L']>=0]
 
-print('done at line 677')
+print('done at line 991')
+
+#%%
+phi_eps_4_1_dc_df = pd.DataFrame()
+phi_eps_4_1_dc_df['z/L'] = (np.array(zL_df['zL_4_dc'])+np.array(zL_df['zL_1_dc']))/2
+phi_eps_4_1_dc_df['phi_eps'] = phi_eps_4_1_dc
+phi_eps_4_1_dc_df.to_csv(file_path + "phiEps_4_1_dc.csv")
+#sort by pos and neg z/L values
+phi_eps_4_1_dc_df_final = phi_eps_4_1_dc_df.sort_values(by='z/L')
+phi_eps_4_1_dc_neg = phi_eps_4_1_dc_df_final.loc[phi_eps_4_1_dc_df_final['z/L']<=0]
+phi_eps_4_1_dc_pos = phi_eps_4_1_dc_df_final.loc[phi_eps_4_1_dc_df_final['z/L']>=0]
+
+
+phi_eps_3_1_dc_df = pd.DataFrame()
+phi_eps_3_1_dc_df['z/L'] = (np.array(zL_df['zL_3_dc'])+np.array(zL_df['zL_1_dc']))/2
+phi_eps_3_1_dc_df['phi_eps'] = phi_eps_3_1_dc
+phi_eps_3_1_dc_df.to_csv(file_path + "phiEps_3_1_dc.csv")
+#sort by pos and neg z/L values
+phi_eps_3_1_dc_df_final = phi_eps_3_1_dc_df.sort_values(by='z/L')
+phi_eps_3_1_dc_neg = phi_eps_3_1_dc_df_final.loc[phi_eps_3_1_dc_df_final['z/L']<=0]
+phi_eps_3_1_dc_pos = phi_eps_3_1_dc_df_final.loc[phi_eps_3_1_dc_df_final['z/L']>=0]
+
+
+phi_eps_4_2_dc_df = pd.DataFrame()
+phi_eps_4_2_dc_df['z/L'] = (np.array(zL_df['zL_4_dc'])+np.array(zL_df['zL_2_dc']))/2
+phi_eps_4_2_dc_df['phi_eps'] = phi_eps_4_2_dc
+phi_eps_4_2_dc_df.to_csv(file_path + "phiEps_4_2_dc.csv")
+#sort by pos and neg z/L values
+phi_eps_4_2_dc_df_final = phi_eps_4_2_dc_df.sort_values(by='z/L')
+phi_eps_4_2_dc_neg = phi_eps_4_2_dc_df_final.loc[phi_eps_4_2_dc_df_final['z/L']<=0]
+phi_eps_4_2_dc_pos = phi_eps_4_2_dc_df_final.loc[phi_eps_4_2_dc_df_final['z/L']>=0]
 
 #%% COARE functional form for Phi_epsilon
 eq40 = ((1-coare_zL_neg)/(1-7*coare_zL_neg))-coare_zL_neg
@@ -709,9 +957,8 @@ eq40_me = ((1-coare_zL_neg)/(1-14*coare_zL_neg))-coare_zL_neg
 eq42 = 1+(e-1)*coare_zL_pos
 
 print('done writing phi_eps as equations 40 and 42 for each sonic')
-print('done at line 708')
+print('done at line 957')
 
-#%%
 plt.figure()
 plt.plot(coare_zL_neg, -1*eq40, color = 'g', label = '-1*eq40') # we multiply by negative 1 just here to match Edson 98 plots
 plt.plot(coare_zL_neg, -1*eq40_me, color = 'r', label = '-1*eq40_me') # proposing my own function!
@@ -722,7 +969,7 @@ plt.grid()
 plt.legend()
 plt.title('$\phi_{\epsilon}$ functional form')
 
-print('done at line 721')
+print('done at line 969')
 
 #%% Phi_epsilon plots
 plt.figure()
@@ -768,6 +1015,53 @@ plt.yscale('log')
 plt.grid()
 plt.legend()
 
+#%% Phi_epsilon plots levels 4-1, 3-1, 4-2
+xmin = -4
+xmax = 2
+ymin = -4
+ymax = 4
+
+plt.figure()
+plt.scatter(phi_eps_4_1_dc_df_final['z/L'],phi_eps_4_1_dc_df_final['phi_eps'], color = 'mediumaquamarine', edgecolor = 'k', label ='$\phi_{\epsilon}(z/L)$ d.c. 4-1')
+plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=3, label = 'COARE functional form')
+# plt.plot(coare_zL_neg, eq40_me, color = 'r',linewidth=3, label = 'ME')
+plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=3)
+plt.xlabel("$z/L$")
+plt.ylabel('$\phi_{\epsilon}(z/L)$')
+plt.title('$\phi_{\epsilon}(z/L)$ sonics 4-1, Combined Analysis')
+plt.xlim(xmin,xmax)
+# plt.ylim(ymin,ymax)
+plt.yscale('log')
+plt.grid()
+plt.legend()
+
+plt.figure()
+plt.scatter(phi_eps_3_1_dc_df_final['z/L'],phi_eps_3_1_dc_df_final['phi_eps'], color = 'blue', edgecolor = 'k', label ='$\phi_{\epsilon}(z/L)$ d.c. 3-1')
+plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=3, label = 'COARE functional form')
+# plt.plot(coare_zL_neg, eq40_me, color = 'r',linewidth=3, label = 'ME')
+plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=3)
+plt.xlabel("$z/L$")
+plt.ylabel('$\phi_{\epsilon}(z/L)$')
+plt.title('$\phi_{\epsilon}(z/L)$ sonics 3-1, Combined Analysis')
+plt.xlim(xmin,xmax)
+# plt.ylim(ymin,ymax)
+plt.yscale('log')
+plt.grid()
+plt.legend()
+
+plt.figure()
+plt.scatter(phi_eps_4_2_dc_df_final['z/L'],phi_eps_4_2_dc_df_final['phi_eps'], color = 'lime', edgecolor = 'k', label ='$\phi_{\epsilon}(z/L)$ d.c. 4-2')
+plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=3, label = 'COARE functional form')
+# plt.plot(coare_zL_neg, eq40_me, color = 'r',linewidth=3, label = 'ME')
+plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=3)
+plt.xlabel("$z/L$")
+plt.ylabel('$\phi_{\epsilon}(z/L)$')
+plt.title('$\phi_{\epsilon}(z/L)$ sonics 4-2, Combined Analysis')
+plt.xlim(xmin,xmax)
+# plt.ylim(ymin,ymax)
+plt.yscale('log')
+plt.grid()
+plt.legend()
 
 #%%
 def binscatter(**kwargs):
@@ -795,8 +1089,9 @@ def binscatter(**kwargs):
 df_binEstimate_phi_eps_I_dc = binscatter(x='z/L', y='phi_eps', data=phi_eps_I_dc_df_final, ci=(3,3),randcut=1)
 df_binEstimate_phi_eps_II_dc = binscatter(x='z/L', y='phi_eps', data=phi_eps_II_dc_df_final, ci=(3,3),randcut=1)
 df_binEstimate_phi_eps_III_dc = binscatter(x='z/L', y='phi_eps', data=phi_eps_III_dc_df_final, ci=(3,3),randcut=1)
-
-
+df_binEstimate_phi_eps_4_1_dc = binscatter(x='z/L', y='phi_eps', data=phi_eps_4_1_dc_df_final, ci=(3,3),randcut=1)
+df_binEstimate_phi_eps_3_1_dc = binscatter(x='z/L', y='phi_eps', data=phi_eps_3_1_dc_df_final, ci=(3,3),randcut=1)
+df_binEstimate_phi_eps_4_2_dc = binscatter(x='z/L', y='phi_eps', data=phi_eps_4_2_dc_df_final, ci=(3,3),randcut=1)
 
 #%% Phi_epsilon binned scatterplots
 plt.figure()
@@ -857,6 +1152,67 @@ plt.yscale('log')
 plt.legend(loc = 'lower left',fontsize=7.5)
 plt.savefig(plot_savePath + "binnedScatterplot_phiEps_Puu.png",dpi=300)
 plt.savefig(plot_savePath + "binnedScatterplot_phiEps_Puu.pdf")
+
+#%% Phi_epsilon binned scatterplots levels 4-1, 3-1, 4-2
+ 
+plt.figure()
+sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_4_1_dc, color = 'mediumaquamarine', label = "binned $\phi_{\epsilon}(z/L)$: S 4-1")
+plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_4_1_dc, color = 'lightseagreen', ls='', lw=2, alpha=0.2)
+plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=2, label = 'COARE functional form')
+plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=2)
+# plt.plot(coare_zL_neg, eq40_me, color = 'yellow',linewidth=2, label = 'ME')
+plt.title(title_windDir + "sonic 4 - sonic 1: $phi_{\epsilon}(z/L) (DC)$")
+plt.xlim(xmin,xmax)
+# plt.ylim(ymin,ymax)
+plt.yscale('log')
+plt.legend()
+# plt.gca().invert_yaxis()
+
+plt.figure()
+sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_3_1_dc, color = 'blue', label = "binned $\phi_{\epsilon}(z/L)$: S 3-1")
+plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_3_1_dc, color = 'mediumblue', ls='', lw=2, alpha=0.2)
+plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=2, label = 'COARE functional form')
+plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=2)
+# plt.plot(coare_zL_neg, eq40_me, color = 'yellow',linewidth=2, label = 'ME')
+plt.title(title_windDir + "sonic 3 - sonic 1: $phi_{\epsilon}(z/L) (DC)$")
+plt.xlim(xmin,xmax)
+# plt.ylim(ymin,ymax)
+plt.yscale('log')
+plt.legend()
+# plt.gca().invert_yaxis()
+
+plt.figure()
+sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_4_2_dc, color = 'lime', label = "binned $\phi_{\epsilon}(z/L)$: S 4-2")
+plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_4_2_dc, color = 'seagreen', ls='', lw=2, alpha=0.2)
+plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=2, label = 'COARE functional form')
+plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=2)
+# plt.plot(coare_zL_neg, eq40_me, color = 'yellow',linewidth=2, label = 'ME')
+plt.title(title_windDir + "sonic 4 - sonic 2: $phi_{\epsilon}(z/L) (DC)$")
+plt.xlim(xmin,xmax)
+# plt.ylim(ymin,ymax)
+plt.yscale('log')
+plt.legend()
+# plt.gca().invert_yaxis()
+
+
+plt.figure()
+sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_4_1_dc, color = 'mediumaquamarine', label = "L 4-1")
+plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_4_1_dc, color = 'lightseagreen', ls='', lw=2, alpha=0.2, label = '4-1 error')
+sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_3_1_dc, color = 'blue', label = "L 3-1")
+plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_3_1_dc, color = 'mediumblue', ls='', lw=2, alpha=0.2, label = '3-1 error')
+sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_4_2_dc, color = 'lime', label = "L 4-2")
+plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_4_2_dc, color = 'seagreen', ls='', lw=2, alpha=0.2, label = '4-2 error')
+plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=3, label = 'Edson et al. (1998) eq. 40, 42')
+plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=3)
+# plt.plot(coare_zL_neg, eq40_me, color = 'blue',linewidth=2, label = 'My suggested new form')
+plt.title(oct_addition+ title_windDir + "$\phi_{\epsilon}(z/L) (DC)$")
+plt.xlim(xmin,xmax)
+# plt.ylim(ymin,ymax)
+plt.ylabel('$\phi_\epsilon$')
+plt.yscale('log')
+plt.legend(loc = 'lower left',fontsize=7.5)
+plt.savefig(plot_savePath + "binnedScatterplot_phiEps_testDiffLevels_Puu.png",dpi=300)
+plt.savefig(plot_savePath + "binnedScatterplot_phiEps_testDiffLevels_Puu.pdf")
 #%%
 
 ######################################################################
