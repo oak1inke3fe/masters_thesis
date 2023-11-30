@@ -60,7 +60,7 @@ sonic4_df = pd.read_csv(file_path+sonic_file4)
 windDir_includingBadDirs_file = "windDir_IncludingBad_wS4rotation_combinedAnalysis.csv"
 windDir_includingBad_df = pd.read_csv(file_path + windDir_includingBadDirs_file)
 
-windDir_file = "windDir_withBadFlags_110to155_within15degRequirement_combinedAnalysis.csv"
+windDir_file = "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv"
 windDir_df = pd.read_csv(file_path + windDir_file)
 
 date_file = "date_combinedAnalysis.csv"
@@ -71,9 +71,12 @@ zL_file = "ZoverL_combinedAnalysis.csv"
 zL_df = pd.read_csv(file_path + zL_file)
 zL_df.head(15)
 
-z_file = "z_air_side_combinedAnalysis.csv"
+z_file = "z_airSide_combinedAnalysis.csv"
 z_df = pd.read_csv(file_path + z_file)
 z_df.columns
+
+z0_file = 'z0_combinedAnalysis.csv'
+z0_df = pd.read_csv(file_path + z0_file)
 
 plt.figure()
 plt.plot(z_df['z_sonic4'])
@@ -101,7 +104,11 @@ zL_df[mask_goodWindDir] = np.nan
 
 z_df[mask_goodWindDir] = np.nan
 
+z0_df[mask_goodWindDir] = np.nan
+
 usr_df[mask_goodWindDir] = np.nan
+
+date_df[mask_goodWindDir] = np.nan
 
 print('done with setting up good wind direction only dataframes')
 
@@ -122,140 +129,215 @@ sonic4_df[mask_neutral_zL] = np.nan
 
 z_df[mask_neutral_zL] = np.nan
 
+z0_df[mask_neutral_zL] = np.nan
+
 usr_df[mask_neutral_zL] = np.nan
 
+date_df[mask_neutral_zL] = np.nan
+
 print('done with setting up near-neautral stability with good wind directions dataframes')
-
-#%% Copy the original (neutral and good wind direction applied) dataframes so we can do separate masks per deployment
-zL_df_spring_copy1 = zL_df.copy()
-zL_df_spring_copy2 = zL_df.copy()
-zL_df_fall_copy1 = zL_df.copy()
-zL_df_fall_copy2 = zL_df.copy()
-
-z_df_spring_copy1 = z_df.copy()
-z_df_spring_copy2 = z_df.copy()
-z_df_fall_copy1 = z_df.copy()
-z_df_fall_copy2 = z_df.copy()
-
-windDir_df_spring_copy1 = windDir_df.copy()
-windDir_df_spring_copy2 = windDir_df.copy()
-windDir_df_fall_copy1 = windDir_df.copy()
-windDir_df_fall_copy2 = windDir_df.copy()
-
-sonic1_df_spring_copy1 = sonic1_df.copy()
-sonic1_df_spring_copy2 = sonic1_df.copy()
-sonic1_df_fall_copy1 = sonic1_df.copy()
-sonic1_df_fall_copy2 = sonic1_df.copy()
-
-sonic2_df_spring_copy1 = sonic2_df.copy()
-sonic2_df_spring_copy2 = sonic2_df.copy()
-sonic2_df_fall_copy1 = sonic2_df.copy()
-sonic2_df_fall_copy2 = sonic2_df.copy()
-
-sonic3_df_spring_copy1 = sonic3_df.copy()
-sonic3_df_spring_copy2 = sonic3_df.copy()
-sonic3_df_fall_copy1 = sonic3_df.copy()
-sonic3_df_fall_copy2 = sonic3_df.copy()
-
-sonic4_df_spring_copy1 = sonic4_df.copy()
-sonic4_df_spring_copy2 = sonic4_df.copy()
-sonic4_df_fall_copy1 = sonic4_df.copy()
-sonic4_df_fall_copy2 = sonic4_df.copy()
-
-usr_df_spring_copy1 = usr_df.copy()
-usr_df_spring_copy2 = usr_df.copy()
-usr_df_fall_copy1 = usr_df.copy()
-usr_df_fall_copy2 = usr_df.copy()
 
 
 
 #%% Spring Copy 1
 
-sonic_df_arr = [sonic1_df_spring_copy1[:break_index+1], 
-                sonic2_df_spring_copy1[:break_index+1], 
-                sonic3_df_spring_copy1[:break_index+1], 
-                sonic4_df_spring_copy1[:break_index+1],]
-z_df_arr = [z_df_spring_copy1[:break_index+1],]
-usr_df_arr = [usr_df_spring_copy1[:break_index+1]]
-windDir_df_arr = [windDir_df_spring_copy1[:break_index+1]]
+sonic_df_arr = [sonic1_df[:break_index+1], 
+                sonic2_df[:break_index+1], 
+                sonic3_df[:break_index+1], 
+                sonic4_df[:break_index+1],]
+z_df_arr = [z_df[:break_index+1],]
+z0_df_arr = [z0_df[:break_index+1],]
+usr_df_arr = [usr_df[:break_index+1]]
+windDir_df_arr = [windDir_df[:break_index+1]]
+date_df_arr = [date_df[:break_index+1]]
 lower = 200
 upper = 250
 print(lower, upper)
 
-restricted_arr = np.where((lower <= windDir_df_spring_copy1['alpha_s4'][:break_index+1]) & (windDir_df_spring_copy1['alpha_s4'][:break_index+1] < upper), windDir_df_spring_copy1['alpha_s4'][:break_index+1],np.nan)
+restricted_arr = np.where((lower <= windDir_df['alpha_s4'][:break_index+1]) & (windDir_df['alpha_s4'][:break_index+1] < upper), windDir_df['alpha_s4'][:break_index+1],np.nan)
 print('restricted_arr made')
 
-mask_restricted_arr = np.isin(restricted_arr, np.array(windDir_df_spring_copy1['alpha_s4'][:break_index+1]))
+mask_restricted_arr = np.isin(restricted_arr, np.array(windDir_df['alpha_s4'][:break_index+1]))
 print('mask_restricted_arr made')
 
 restricted_wd_df_sonic1 = sonic_df_arr[0][mask_restricted_arr]
 # restricted_wd_df_sonic1['new_index'] = np.arange(len(restricted_wd_df_sonic1))
 restricted_wd_df_sonic1 = restricted_wd_df_sonic1.reset_index(drop=True)
+
 restricted_wd_df_sonic2 = sonic_df_arr[1][mask_restricted_arr]
 restricted_wd_df_sonic2 = restricted_wd_df_sonic2.reset_index(drop=True)
+
 restricted_wd_df_sonic3 = sonic_df_arr[2][mask_restricted_arr]
 restricted_wd_df_sonic3 = restricted_wd_df_sonic3.reset_index(drop=True)
+
 restricted_wd_df_sonic4 = sonic_df_arr[3][mask_restricted_arr]
 restricted_wd_df_sonic4 = restricted_wd_df_sonic4.reset_index(drop=True)
+
 restricted_wd_df_z = z_df_arr[0][mask_restricted_arr]
 restricted_wd_df_z = restricted_wd_df_z.reset_index(drop=True)
+
+restricted_wd_df_z0 = z0_df_arr[0][mask_restricted_arr]
+restricted_wd_df_z0 = restricted_wd_df_z0.reset_index(drop=True)
+
 restricted_wd_df_usr = usr_df_arr[0][mask_restricted_arr]
 restricted_wd_df_usr = restricted_wd_df_usr.reset_index(drop=True)
+
 restricted_wd_df_windDir = windDir_df_arr[0][mask_restricted_arr]
 restricted_wd_df_windDir = restricted_wd_df_windDir.reset_index(drop=True)
+
+restricted_wd_df_date = date_df_arr[0][mask_restricted_arr]
+restricted_wd_df_date = restricted_wd_df_date.reset_index(drop=True)
 print('restricted dfs made')
 
 
+z0_s1 = restricted_wd_df_z['z_sonic1']*np.exp(-1*restricted_wd_df_sonic1['Ubar']*0.4/restricted_wd_df_usr['usr_s1'])
+z0_s2 = restricted_wd_df_z['z_sonic2']*np.exp(-1*restricted_wd_df_sonic2['Ubar']*0.4/restricted_wd_df_usr['usr_s2'])
+z0_s3 = restricted_wd_df_z['z_sonic3']*np.exp(-1*restricted_wd_df_sonic3['Ubar']*0.4/restricted_wd_df_usr['usr_s3'])
+z0_s4 = restricted_wd_df_z['z_sonic4']*np.exp(-1*restricted_wd_df_sonic4['Ubar']*0.4/restricted_wd_df_usr['usr_s4'])
+
+restricted_wd_df_z0 = pd.DataFrame()
+restricted_wd_df_z0['z0_sonic1'] = np.array(z0_s1)
+restricted_wd_df_z0['z0_sonic2'] = np.array(z0_s2)
+restricted_wd_df_z0['z0_sonic3'] = np.array(z0_s3)
+restricted_wd_df_z0['z0_sonic4'] = np.array(z0_s4)
+
+plt.figure()
+plt.plot(restricted_wd_df_usr['usr_s1'])
+
 #%%
-for i in range(0,1):
+
+input_arr = np.arange(0,50,0.02)
+start = 310
+stop= 311
+
+alpha_s1 = restricted_wd_df_windDir['alpha_s1'][start]
+alpha_s2 = restricted_wd_df_windDir['alpha_s2'][start]
+alpha_s3 = restricted_wd_df_windDir['alpha_s3'][start]
+alpha_s4 = restricted_wd_df_windDir['alpha_s4'][start]
+usr_s1 = restricted_wd_df_usr['usr_s1'][start]
+usr_s2 = restricted_wd_df_usr['usr_s2'][start]
+usr_s3 = restricted_wd_df_usr['usr_s3'][start]
+usr_s4 = restricted_wd_df_usr['usr_s4'][start]
+z0_s1 = restricted_wd_df_z0['z0_sonic1'][start]
+z0_s2 = restricted_wd_df_z0['z0_sonic2'][start]
+z0_s3 = restricted_wd_df_z0['z0_sonic3'][start]
+z0_s4 = restricted_wd_df_z0['z0_sonic4'][start]
+
+
+textstr = '\n'.join((
+    r'$\alpha_{1}=%.2f$' % (alpha_s1, ),
+    r'$\alpha_{2}=%.2f$' % (alpha_s2, ),
+    r'$\alpha_{3}=%.2f$' % (alpha_s3, ),
+    r'$\alpha_{4}=%.2f$' % (alpha_s4, ),
+    r'$u_{*1}=%.2f$' % (usr_s1, ),
+    r'$u_{*2}=%.2f$' % (usr_s2, ),
+    r'$u_{*3}=%.2f$' % (usr_s3, ),
+    r'$u_{*4}=%.2f$' % (usr_s4, ),
+    r'$z0_{1}=%.2g$' % (z0_s1, ),
+    r'$z0_{2}=%.2g$' % (z0_s2, ),
+    r'$z0_{3}=%.2g$' % (z0_s3, ),
+    r'$z0_{4}=%.2g$' % (z0_s4, ),))
+
+fig1 = plt.figure(figsize=(8,5)) #figure object
+ax1 = fig1.gca() #axis object
+ax1.set_xlabel('$\overline{u} [m/s]$')
+ax1.set_ylabel('$z [m]$')
+# ax1.plot(np.log(np.arange(0,50)), np.arange(0,50), color = 'k')
+ax1.set_ylim(-0.5,12)
+ax1.set_xlim(2,15)
+fig1.suptitle('Vertical Profile for '+ str(int(restricted_wd_df_date['MM'][start]))+'-'+str(int(restricted_wd_df_date['DD'][start]))+'-'+str(int(restricted_wd_df_date['YYYY'][start])) + " "+str(int(restricted_wd_df_date['hh'][start]))+':'+str(int(restricted_wd_df_date['mm'][start])))
+for i in range(start, stop):
     # ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic1['Ubar'][i]/usr_df_fall_copy1['usr_s1'][i]), restricted_wd_df_z['z_sonic1'][i], color = 'red', label = 's1')
     # ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic2['Ubar'][i]/usr_df_fall_copy1['usr_s2'][i]), restricted_wd_df_z['z_sonic2'][i], color = 'darkorange', label = 's2')
     # ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic3['Ubar'][i]/usr_df_fall_copy1['usr_s3'][i]), restricted_wd_df_z['z_sonic3'][i], color = 'green', label = 's3')
     # ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic4['Ubar'][i]/usr_df_fall_copy1['usr_s4'][i]), restricted_wd_df_z['z_sonic4'][i], color = 'blue', label = 's4')
-    print('start')
     # uBar_arr_i = [0.0001*np.exp(0.4*restricted_wd_df_sonic1['Ubar'][i]/usr_df_fall_copy1['usr_s1'][i]), 0.0001*np.exp(0.4*restricted_wd_df_sonic2['Ubar'][i]/usr_df_fall_copy1['usr_s2'][i]), 0.0001*np.exp(0.4*restricted_wd_df_sonic3['Ubar'][i]/usr_df_fall_copy1['usr_s3'][i]), 0.0001*np.exp(0.4*restricted_wd_df_sonic4['Ubar'][i]/usr_df_fall_copy1['usr_s4'][i])]
+    # ax1.plot(np.log(np.arange(0,50,0.02))+restricted_wd_df_sonic4['Ubar'][i]-np.log(restricted_wd_df_z['z_sonic4'][i]), np.arange(0,50,0.02), color = 'k', label = 'log curve')
+    
     uBar_arr_i = [restricted_wd_df_sonic1['Ubar'][i], restricted_wd_df_sonic2['Ubar'][i], restricted_wd_df_sonic3['Ubar'][i], restricted_wd_df_sonic4['Ubar'][i]]
-    print(uBar_arr_i)
+    # uBar_arr_i = [np.array(restricted_wd_df_usr['usr_s1'][i]/0.4*np.log(restricted_wd_df_z['z_sonic1'][i]/restricted_wd_df_z0['z0_sonic1'][i])), 
+    #                 np.array(restricted_wd_df_usr['usr_s2'][i]/0.4*np.log(restricted_wd_df_z['z_sonic2'][i]/restricted_wd_df_z0['z0_sonic2'][i])),
+    #                 np.array(restricted_wd_df_usr['usr_s3'][i]/0.4*np.log(restricted_wd_df_z['z_sonic3'][i]/restricted_wd_df_z0['z0_sonic3'][i])), 
+    #                 np.array(restricted_wd_df_usr['usr_s4'][i]/0.4*np.log(restricted_wd_df_z['z_sonic4'][i]/restricted_wd_df_z0['z0_sonic4'][i])), ]
+    # uBarAdjusted_arr_i = [restricted_wd_df_usr['usr_s1'][i]/0.4*np.log(restricted_wd_df_z['z_sonic1'][i]/restricted_wd_df_z0['z0_sonic1'][i]), 
+    #                 restricted_wd_df_usr['usr_s2'][i]/0.4*np.log(restricted_wd_df_z['z_sonic2'][i]/restricted_wd_df_z0['z0_sonic2'][i]),
+    #                 restricted_wd_df_usr['usr_s3'][i]/0.4*np.log(restricted_wd_df_z['z_sonic3'][i]/restricted_wd_df_z0['z0_sonic3'][i]), 
+    #                 restricted_wd_df_usr['usr_s4'][i]/0.4*np.log(restricted_wd_df_z['z_sonic4'][i]/restricted_wd_df_z0['z0_sonic4'][i]), ]
+    z0_float_1 = restricted_wd_df_z0['z0_sonic1'][start]
+    z0_float_2 = restricted_wd_df_z0['z0_sonic2'][start]
+    z0_float_3 = restricted_wd_df_z0['z0_sonic3'][start]
+    z0_float_4 = restricted_wd_df_z0['z0_sonic4'][start]
+    uBarAdjusted_arr_i = [restricted_wd_df_usr['usr_s1'][i]/0.4*np.log(restricted_wd_df_z['z_sonic1'][i]/z0_float_1), 
+                    restricted_wd_df_usr['usr_s2'][i]/0.4*np.log(restricted_wd_df_z['z_sonic2'][i]/z0_float_2),
+                    restricted_wd_df_usr['usr_s3'][i]/0.4*np.log(restricted_wd_df_z['z_sonic3'][i]/z0_float_3), 
+                    restricted_wd_df_usr['usr_s4'][i]/0.4*np.log(restricted_wd_df_z['z_sonic4'][i]/z0_float_4), ]
+    # print(uBar_arr_i)
     zBar_arr_i = [restricted_wd_df_z['z_sonic1'][i], restricted_wd_df_z['z_sonic2'][i], restricted_wd_df_z['z_sonic3'][i], restricted_wd_df_z['z_sonic4'][i]]
-    print(zBar_arr_i)
-print('done')
-#%%
+    # print(zBar_arr_i)
+    ax1.scatter(uBar_arr_i, zBar_arr_i,color = 'cyan',edgecolor = 'navy', s=50, label = 'obs.')
+    ax1.scatter(uBarAdjusted_arr_i, zBar_arr_i,color = 'red',edgecolor = 'black', s=40, label = 'adjusted obs.')
+    # ax1.plot(uBar_arr_i, zBar_arr_i,color = 'navy')
+    ax1.plot((np.log(np.arange(0,50,0.02))+restricted_wd_df_sonic4['Ubar'][i]-np.log(restricted_wd_df_z['z_sonic4'][i])), np.arange(0,50,0.02), color = 'k', label = 'log curve')
+    # ax1.plot((np.log(np.arange(0,50,0.02))+(restricted_wd_df_usr['usr_s4'][i]/0.4*np.log(restricted_wd_df_z['z_sonic4'][i]/z0_float))-np.log(restricted_wd_df_z['z_sonic4'][i])), np.arange(0,50,0.02), color = 'red', label = 'log curve')
+    # ax1.plot(input_arr, np.exp(input_arr))
+    
+    props = dict(boxstyle='round', facecolor='lightgray', alpha=0.5)
+    ax1.text(0.80, 0.72, textstr, transform=ax1.transAxes, fontsize=8,
+            verticalalignment='top', bbox=props)
+    
+plt.legend(loc='upper right')
+fig1.savefig(plot_save_path + 'vertProfile_'+str(int(restricted_wd_df_date['MM'][start]))+'-'+str(int(restricted_wd_df_date['DD'][start]))+'-'+str(int(restricted_wd_df_date['YYYY'][start])) + "_"+str(int(restricted_wd_df_date['hh'][start]))+str(int(restricted_wd_df_date['mm'][start]))+'.png', dpi = 300)
+fig1.savefig(plot_save_path + 'vertProfile_'+str(int(restricted_wd_df_date['MM'][start]))+'-'+str(int(restricted_wd_df_date['DD'][start]))+'-'+str(int(restricted_wd_df_date['YYYY'][start])) + "_"+str(int(restricted_wd_df_date['hh'][start]))+str(int(restricted_wd_df_date['mm'][start]))+'.pdf')
+    # ax1.plot(np.log(np.arange(0,10)), np.arange(0,10), color = k)
+print('done saving plot')
+
+plt.show()
+
+
+
+ #%%
 fig1 = plt.figure() #figure object
 ax1 = fig1.gca() #axis object
 ax1.set_xlabel('$\overline{u} [m/s]$')
 ax1.set_ylabel('$z [m]$')
 # ax1.plot(np.log(np.arange(0,50)), np.arange(0,50), color = 'k')
-ax1.set_ylim(-0.5,11)
-ax1.set_xlim(-5,20)
-i = 50
-# ax1.scatter(restricted_wd_df_sonic1['Ubar'][i], 0.0001*np.exp(0.4*restricted_wd_df_sonic1['Ubar'][i]/usr_df_fall_copy1['usr_s1'][i]), color = 'red', label = 's1')
-# ax1.scatter(restricted_wd_df_sonic2['Ubar'][i], 0.0001*np.exp(0.4*restricted_wd_df_sonic2['Ubar'][i]/usr_df_fall_copy1['usr_s2'][i]), color = 'darkorange', label = 's2')
-# ax1.scatter(restricted_wd_df_sonic3['Ubar'][i], 0.0001*np.exp(0.4*restricted_wd_df_sonic3['Ubar'][i]/usr_df_fall_copy1['usr_s3'][i]), color = 'green', label = 's3')
-# ax1.scatter(restricted_wd_df_sonic4['Ubar'][i], 0.0001*np.exp(0.4*restricted_wd_df_sonic4['Ubar'][i]/usr_df_fall_copy1['usr_s4'][i]), color = 'blue', label = 's4')
+ax1.set_ylim(-0.5,12)
+ax1.set_xlim(5,15)
 
-# ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic1['Ubar'][i]/usr_df_fall_copy1['usr_s1'][i]), restricted_wd_df_z['z_sonic1'][i], color = 'red', label = 's1')
-# ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic2['Ubar'][i]/usr_df_fall_copy1['usr_s2'][i]), restricted_wd_df_z['z_sonic2'][i], color = 'darkorange', label = 's2')
-# ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic3['Ubar'][i]/usr_df_fall_copy1['usr_s3'][i]), restricted_wd_df_z['z_sonic3'][i], color = 'green', label = 's3')
-# ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic4['Ubar'][i]/usr_df_fall_copy1['usr_s4'][i]), restricted_wd_df_z['z_sonic4'][i], color = 'blue', label = 's4')
 input_arr = np.arange(0,50,0.02)
+start = 20
+stop= 30
 
-for i in range(20,21):
+for i in range(start, stop):
     # ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic1['Ubar'][i]/usr_df_fall_copy1['usr_s1'][i]), restricted_wd_df_z['z_sonic1'][i], color = 'red', label = 's1')
     # ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic2['Ubar'][i]/usr_df_fall_copy1['usr_s2'][i]), restricted_wd_df_z['z_sonic2'][i], color = 'darkorange', label = 's2')
     # ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic3['Ubar'][i]/usr_df_fall_copy1['usr_s3'][i]), restricted_wd_df_z['z_sonic3'][i], color = 'green', label = 's3')
     # ax1.scatter(0.0001*np.exp(0.4*restricted_wd_df_sonic4['Ubar'][i]/usr_df_fall_copy1['usr_s4'][i]), restricted_wd_df_z['z_sonic4'][i], color = 'blue', label = 's4')
     # uBar_arr_i = [0.0001*np.exp(0.4*restricted_wd_df_sonic1['Ubar'][i]/usr_df_fall_copy1['usr_s1'][i]), 0.0001*np.exp(0.4*restricted_wd_df_sonic2['Ubar'][i]/usr_df_fall_copy1['usr_s2'][i]), 0.0001*np.exp(0.4*restricted_wd_df_sonic3['Ubar'][i]/usr_df_fall_copy1['usr_s3'][i]), 0.0001*np.exp(0.4*restricted_wd_df_sonic4['Ubar'][i]/usr_df_fall_copy1['usr_s4'][i])]
-    ax1.plot(np.log(np.arange(0,50,0.02))+restricted_wd_df_sonic4['Ubar'][i]-np.log(restricted_wd_df_z['z_sonic4'][i]), np.arange(0,50,0.02), color = 'k', label = 'log curve')
+    # ax1.plot(np.log(np.arange(0,50,0.02))+restricted_wd_df_sonic4['Ubar'][i]-np.log(restricted_wd_df_z['z_sonic4'][i]), np.arange(0,50,0.02), color = 'k', label = 'log curve')
     
     uBar_arr_i = [restricted_wd_df_sonic1['Ubar'][i], restricted_wd_df_sonic2['Ubar'][i], restricted_wd_df_sonic3['Ubar'][i], restricted_wd_df_sonic4['Ubar'][i]]
+    z0_float = restricted_wd_df_z0['z0_sonic4'][start]
+    uBarAdjusted_arr_i = [restricted_wd_df_usr['usr_s1'][i]/0.4*np.log(restricted_wd_df_z['z_sonic1'][i]/z0_float), 
+                          restricted_wd_df_usr['usr_s2'][i]/0.4*np.log(restricted_wd_df_z['z_sonic2'][i]/z0_float),
+                          restricted_wd_df_usr['usr_s3'][i]/0.4*np.log(restricted_wd_df_z['z_sonic3'][i]/z0_float), 
+                          restricted_wd_df_usr['usr_s4'][i]/0.4*np.log(restricted_wd_df_z['z_sonic4'][i]/z0_float), ]
     # print(uBar_arr_i)
     zBar_arr_i = [restricted_wd_df_z['z_sonic1'][i], restricted_wd_df_z['z_sonic2'][i], restricted_wd_df_z['z_sonic3'][i], restricted_wd_df_z['z_sonic4'][i]]
     # print(zBar_arr_i)
-    ax1.scatter(uBar_arr_i, zBar_arr_i,color = 'cyan',edgecolor = 'navy', s=50, label = 'observations')
-    ax1.plot(uBar_arr_i, zBar_arr_i,color = 'navy')
+    # ax1.scatter(uBarAdjusted_arr_i, zBar_arr_i,color = 'red',edgecolor = 'darkorange', s=50, label = 'observations')
+    ax1.scatter(uBar_arr_i, zBar_arr_i,color = 'cyan',edgecolor = 'navy', s=20, label = 'observations')
+    # ax1.plot(uBar_arr_i, zBar_arr_i,color = 'navy')
+    ax1.plot((np.log(np.arange(0,50,0.02))+restricted_wd_df_sonic4['Ubar'][i]-np.log(restricted_wd_df_z['z_sonic4'][i])), np.arange(0,50,0.02), color = 'navy', label = 'log curve')
+    # ax1.plot((np.log(np.arange(0,50,0.02))+(restricted_wd_df_usr['usr_s4'][i]/0.4*np.log(restricted_wd_df_z['z_sonic4'][i]/z0_float))-np.log(restricted_wd_df_z['z_sonic4'][i])), np.arange(0,50,0.02), color = 'red', label = 'log curve')
     # ax1.plot(input_arr, np.exp(input_arr))
-ax1.legend()
-    # ax1.plot(np.log(np.arange(0,10)), np.arange(0,10), color = k)
+# plt.legend()
+# fig1.savefig(plot_save_path + 'vertProfile_example.png', dpi = 300)
+# fig1.savefig(plot_save_path + 'vertProfile_example.pdf')
+    # ax1.plot(np.log(np.arange(0,10)), np.arange(0,10), color = k)   
+
+#%%
+"""
 #%%
 # ax1 = WindroseAxes.from_ax()
 # ax1.bar(restricted_alpha_df['alpha_s4'][:break_index+1], restricted_wd_df_sonic4['Ubar'][:break_index+1], bins=np.arange(3, 18, 3), normed = True)

@@ -42,8 +42,8 @@ print('done with setting gravity (g = -9.81) and von-karman (kappa = 4)')
 #%%
 # file_path = r"/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/"
 file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
-prod_df = pd.read_csv(file_path+"prodTerm_combinedAnalysis.csv")
-prod_df = prod_df.drop(['Unnamed: 0'], axis=1)
+# prod_df = pd.read_csv(file_path+"prodTerm_combinedAnalysis.csv")
+# prod_df = prod_df.drop(['Unnamed: 0'], axis=1)
 
 
 sonic1_df = pd.read_csv(file_path + 'despiked_s1_turbulenceTerms_andMore_combined.csv')
@@ -51,28 +51,23 @@ sonic2_df = pd.read_csv(file_path + 'despiked_s2_turbulenceTerms_andMore_combine
 sonic3_df = pd.read_csv(file_path + 'despiked_s3_turbulenceTerms_andMore_combined.csv')
 sonic4_df = pd.read_csv(file_path + 'despiked_s4_turbulenceTerms_andMore_combined.csv')
 
-Ubar_df = pd.DataFrame()
-Ubar_df['Ubar_s1']= sonic1_df['Ubar']
-Ubar_df['Ubar_s2']= sonic2_df['Ubar']
-Ubar_df['Ubar_s3']= sonic3_df['Ubar']
-Ubar_df['Ubar_s4']= sonic4_df['Ubar']*0.9
+# Ubar_df = pd.DataFrame()
+# Ubar_df['Ubar_s1']= sonic1_df['Ubar']
+# Ubar_df['Ubar_s2']= sonic2_df['Ubar']
+# Ubar_df['Ubar_s3']= sonic3_df['Ubar']
+# Ubar_df['Ubar_s4']= sonic4_df['Ubar']
 
-UpWp_bar_df = pd.DataFrame()
-UpWp_bar_df['UpWp_bar_s1']= sonic1_df['UpWp_bar']
-UpWp_bar_df['UpWp_bar_s2']= sonic2_df['UpWp_bar']
-UpWp_bar_df['UpWp_bar_s3']= sonic3_df['UpWp_bar']
-UpWp_bar_df['UpWp_bar_s4']= sonic4_df['UpWp_bar']
+# UpWp_bar_df = pd.DataFrame()
+# UpWp_bar_df['UpWp_bar_s1']= sonic1_df['UpWp_bar']
+# UpWp_bar_df['UpWp_bar_s2']= sonic2_df['UpWp_bar']
+# UpWp_bar_df['UpWp_bar_s3']= sonic3_df['UpWp_bar']
+# UpWp_bar_df['UpWp_bar_s4']= sonic4_df['UpWp_bar']
 
-UpWp_bar_Ubar_df = pd.DataFrame()
-UpWp_bar_Ubar_df['UpWp_bar_Ubar_s1'] = sonic1_df['Ubar']*sonic1_df['UpWp_bar']
-UpWp_bar_Ubar_df['UpWp_bar_Ubar_s2'] = sonic2_df['Ubar']*sonic2_df['UpWp_bar']
-UpWp_bar_Ubar_df['UpWp_bar_Ubar_s3'] = sonic3_df['Ubar']*sonic3_df['UpWp_bar']
-UpWp_bar_Ubar_df['UpWp_bar_Ubar_s4'] = sonic4_df['Ubar']*sonic4_df['UpWp_bar']
-
-# Ubar_df = pd.read_csv(file_path + 'Ubar_combinedAnalysis.csv')
-# UpWp_bar_df = pd.read_csv(file_path + 'UpWp_bar_combinedAnalysis.csv')
-# UpWp_bar_Ubar_df = pd.read_csv(file_path + 'UpWp_bar_Ubar_combinedAnalysis.csv')
-
+# UpWp_bar_Ubar_df = pd.DataFrame()
+# UpWp_bar_Ubar_df['UpWp_bar_Ubar_s1'] = sonic1_df['Ubar']*sonic1_df['UpWp_bar']
+# UpWp_bar_Ubar_df['UpWp_bar_Ubar_s2'] = sonic2_df['Ubar']*sonic2_df['UpWp_bar']
+# UpWp_bar_Ubar_df['UpWp_bar_Ubar_s3'] = sonic3_df['Ubar']*sonic3_df['UpWp_bar']
+# UpWp_bar_Ubar_df['UpWp_bar_Ubar_s4'] = sonic4_df['Ubar']*sonic4_df['UpWp_bar']
 
 
 z_df_spring = pd.read_csv(file_path + "z_airSide_allSpring.csv")
@@ -92,18 +87,19 @@ Eps_df = Eps_df.drop(['Unnamed: 0'], axis=1)
 # tke_transport_df = pd.read_csv(file_path + "tke_transport_allFall.csv")
 # tke_transport_df = tke_transport_df.drop(['Unnamed: 0'], axis=1)
 
-# windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_combinedAnalysis.csv")
-# windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_120to196.csv")
-# windDir_df = pd.read_csv(file_path + "windDir_keep090250s_075260f_combinedAnalysis.csv")
-windDir_df = pd.read_csv(file_path + "windDir_IncludingBad_wS4rotation_combinedAnalysis.csv")
-windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
 
+windDir_file = "windDir_withBadFlags_110to155_within15degRequirement_combinedAnalysis.csv"
+windDir_df = pd.read_csv(file_path + windDir_file)
+windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
 
 zL_df = pd.read_csv(file_path+'ZoverL_combinedAnalysis.csv')
 zL_df = zL_df.drop(['Unnamed: 0'], axis=1)
 
 rho_df = pd.read_csv(file_path + 'rhoAvg_combinedAnalysis.csv' )
 rho_df = rho_df.drop(['Unnamed: 0'], axis=1)
+
+usr_df = pd.read_csv(file_path + 'usr_combinedAnalysis.csv')
+usr_df = usr_df.drop(['Unnamed: 0'], axis=1)
 
 # usr_coare_df = pd.read_csv(file_path+"usr_coare_allFall.csv")
 # usr_coare_df = usr_coare_df.drop(['Unnamed: 0'], axis=1)
@@ -115,92 +111,37 @@ buoy_df = pd.read_csv(file_path+'buoy_terms_combinedAnalysis.csv')
 buoy_df = buoy_df.drop(['Unnamed: 0'], axis=1)
 
 oct_storm = False
-#%%
-# #for october 2-4 wind event
-# oct_storm = True
-# windDir_df['octStorm_index_arr'] = np.arange(len(windDir_df))
-# windDir_df['octStorm_new_index_arr'] = np.where((windDir_df['octStorm_index_arr']>=704)&(windDir_df['octStorm_index_arr']<=886), np.nan, windDir_df['octStorm_index_arr'])
 
-# mask_Oct_Storm = np.isin(windDir_df['octStorm_new_index_arr'],windDir_df['octStorm_index_arr'])
 
-# windDir_df[mask_Oct_Storm] = np.nan
-
-# prod_df[mask_Oct_Storm] = np.nan
-# Eps_df[mask_Oct_Storm] = np.nan
-# sonic1_df[mask_Oct_Storm] = np.nan
-# sonic2_df[mask_Oct_Storm] = np.nan
-# sonic3_df[mask_Oct_Storm] = np.nan
-# sonic4_df[mask_Oct_Storm] = np.nan
-# tke_transport_df[mask_Oct_Storm] = np.nan
-# z_df[mask_Oct_Storm] = np.nan
-# zL_df[mask_Oct_Storm] = np.nan
-# rho_df[mask_Oct_Storm] = np.nan
-# wave_df[mask_Oct_Storm] = np.nan
-
-# print('done with setting up  october 2-4 wind event dataframes')
-#%% Get rid of bad wind directions first
+#%% Mask the DFs to only keep the good wind directions
 all_windDirs = True
 onshore = False
 offshore = False
 
-# index_array = np.arange(len(windDir_df))
-# windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==False, np.nan, index_array)
-# mask_goodWindDir = np.isin(windDir_df['new_index_arr'],index_array)
+windDir_index_array = np.arange(len(windDir_df))
+windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, windDir_index_array)
+mask_goodWindDir = np.isin(windDir_df['new_index_arr'],windDir_index_array)
 
-# windDir_df[mask_goodWindDir] = np.nan
+windDir_df[mask_goodWindDir] = np.nan
 
-# prod_df[mask_goodWindDir] = np.nan
-# Eps_df[mask_goodWindDir] = np.nan
-# sonic1_df[mask_goodWindDir] = np.nan
-# sonic2_df[mask_goodWindDir] = np.nan
-# sonic3_df[mask_goodWindDir] = np.nan
-# sonic4_df[mask_goodWindDir] = np.nan
-# # tke_transport_df[mask_goodWindDir] = np.nan
-# z_df[mask_goodWindDir] = np.nan
-# zL_df[mask_goodWindDir] = np.nan
-# rho_df[mask_goodWindDir] = np.nan
-# # wave_df[mask_goodWindDir] = np.nan
+sonic1_df[mask_goodWindDir] = np.nan
+sonic2_df[mask_goodWindDir] = np.nan
+sonic3_df[mask_goodWindDir] = np.nan
+sonic4_df[mask_goodWindDir] = np.nan
 
-# print('done with setting up  good wind direction only dataframes')
+zL_df[mask_goodWindDir] = np.nan
 
-#%%
-# If we just want to examine the high wind event from Oct2-4, 2022, use the following mask:
-    
-# blank_index = np.arange(0,4395)
+z_df[mask_goodWindDir] = np.nan
 
-# prod_df['index_num'] = blank_index
-# Eps_df['index_num'] = blank_index
-# sonic1_df['index_num'] = blank_index
-# sonic2_df['index_num'] = blank_index
-# sonic3_df['index_num'] = blank_index
-# sonic4_df['index_num'] = blank_index
-# tke_transport_df['index_num'] = blank_index
-# zL_df['index_num'] = blank_index
-# z_df['index_num'] = blank_index
-# rho_df['index_num'] = blank_index
-# wave_df['index_num'] = blank_index
-# windDir_df['index_num'] = blank_index
+Eps_df[mask_goodWindDir] = np.nan
 
-# oct_start = 731+27
-# oct_end = 913+27
+rho_df[mask_goodWindDir] = np.nan
 
-# mask_prod = (prod_df['index_num'] >= oct_start) & (prod_df['index_num'] <= oct_end)
-# prod_df = prod_df.loc[mask_prod]
-# Eps_df = Eps_df.loc[mask_prod]
-# buoy_df = buoy_df.loc[mask_prod]
-# sonic1_df = sonic1_df.loc[mask_prod]
-# sonic2_df = sonic2_df.loc[mask_prod]
-# sonic3_df = sonic3_df.loc[mask_prod]
-# sonic4_df = sonic4_df.loc[mask_prod]
-# tke_transport_df = tke_transport_df.loc[mask_prod]
-# zL_df = zL_df.loc[mask_prod]
-# z_df = z_df.loc[mask_prod]
-# rho_df = rho_df.loc[mask_prod]
-# wave_df = wave_df.loc[mask_prod]
-# windDir_df = windDir_df.loc[mask_prod]
+buoy_df[mask_goodWindDir] = np.nan
 
-# # mask_buoy = (buoy_df['index_num'] >= oct_start) & (buoy_df['index_num'] <= oct_end)
-# # buoy_df = buoy_df.loc[mask_buoy]
+
+print('done with setting up good wind direction only dataframes')
+
 
 
 
@@ -248,12 +189,6 @@ offshore = False
 # zL_df[mask_onshoreWindDir] = np.nan
 # wave_df[mask_onshoreWindDir] = np.nan
 
-#%% zL correlation
-r_zL_all = zL_df.corr()
-print(r_zL_all)
-
-
-
 #%%
 # figure titles based on wind directions
 if all_windDirs == True:
@@ -271,42 +206,21 @@ else:
     oct_addition = ''
 #%%
 
-# wave_df.to_csv(file_path+"waveData"+wave_df_save_name+"allFall.csv")
-
-# usr_s1 = (1/rho_df['rho_bar_1'])*((sonic1_df['UpWp_bar'])**2+(sonic1_df['VpWp_bar'])**2)**(1/4)
-usr_s1 = ((sonic1_df['UpWp_bar'])**2+(sonic1_df['VpWp_bar'])**2)**(1/4)
-usr_s1_b = np.sqrt((sonic1_df['UpWp_bar'])+(sonic1_df['VpWp_bar']))
-usr_s1_c = -1*((sonic1_df['UpWp_bar']))+(sonic1_df['VpWp_bar'])
-usr_s1_df = pd.DataFrame()
-usr_s1_df['s1_a'] = usr_s1
-usr_s1_df['s1_b'] = usr_s1_b
-usr_s1_df['s1_c'] = usr_s1_c
-r_usr_s1_b = usr_s1_df.corr()
-print(r_usr_s1_b)
-# usr_s1 = (1/rho_df['rho_bar_1'])*(-1*(sonic1_df['UpWp_bar']))**(1/2)
-# usr_s1 = usr_coare_df['usr_sonic1']
-#%%
-usr_df = pd.read_csv(file_path + "usr_combinedAnalysis.csv")
-usr_s1 = usr_df['usr_s1']
-usr_s2 = usr_df['usr_s2']
-usr_s3 = usr_df['usr_s3']
-usr_s4 = usr_df['usr_s4']
-
-usr_LI = np.array(usr_s1+usr_s2)/2
+usr_LI = np.array(usr_df['usr_s1']+usr_df['usr_s2'])/2
 Tbar_LI = np.array(sonic1_df['Tbar']+sonic2_df['Tbar'])/2
 WpTp_bar_LI = -1*(np.array(sonic1_df['WpTp_bar']+sonic2_df['WpTp_bar'])/2)
 '''
 NOTE: because coare defines their positive fluxes opposite of us, we'll multiply -1*<w'T'> so that the L's match up
 '''
 
-usr_LII = np.array(usr_s2+usr_s3)/2
+usr_LII = np.array(usr_df['usr_s2']+usr_df['usr_s3'])/2
 Tbar_LII = np.array(sonic2_df['Tbar']+sonic3_df['Tbar'])/2
 WpTp_bar_LII = -1*(np.array(sonic2_df['WpTp_bar']+sonic3_df['WpTp_bar'])/2)
 '''
 NOTE: because coare defines their positive fluxes opposite of us, we'll multiply -1*<w'T'> so that the L's match up
 '''
 
-usr_LIII = np.array(usr_s3+usr_s4)/2
+usr_LIII = np.array(usr_df['usr_s3']+usr_df['usr_s4'])/2
 Tbar_LIII = np.array(sonic3_df['Tbar']+sonic4_df['Tbar'])/2
 WpTp_bar_LIII = -1*(np.array(sonic3_df['WpTp_bar']+sonic4_df['WpTp_bar'])/2)
 '''
@@ -315,16 +229,16 @@ NOTE: because coare defines their positive fluxes opposite of us, we'll multiply
 
 #%%
 usr_dc_df = pd.DataFrame()
-usr_dc_df['usr_s1'] = usr_s1
-usr_dc_df['usr_s2'] = usr_s2
-usr_dc_df['usr_s3'] = usr_s3
-usr_dc_df['usr_s4'] = usr_s4
+usr_dc_df['usr_s1'] = usr_df['usr_s1']
+usr_dc_df['usr_s2'] = usr_df['usr_s2']
+usr_dc_df['usr_s3'] = usr_df['usr_s3']
+usr_dc_df['usr_s4'] = usr_df['usr_s4']
 usr_dc_df['usr_LI'] = usr_LI
 usr_dc_df['usr_LII'] = usr_LII
 usr_dc_df['usr_LIII'] = usr_LIII
-usr_dc_df['usr_4_1'] = np.array(usr_s4+usr_s1)/2
-usr_dc_df['usr_3_1'] = np.array(usr_s3+usr_s1)/2
-usr_dc_df['usr_4_2'] = np.array(usr_s4+usr_s2)/2
+usr_dc_df['usr_4_1'] = np.array(usr_df['usr_s4']+usr_df['usr_s1'])/2
+usr_dc_df['usr_3_1'] = np.array(usr_df['usr_s3']+usr_df['usr_s1'])/2
+usr_dc_df['usr_4_2'] = np.array(usr_df['usr_s4']+usr_df['usr_s2'])/2
 # usr_dc_df.to_csv(file_path+"usr_dc_allFall.csv")
 
 #%%
@@ -421,7 +335,7 @@ phi_m_dc_df['phi_m 3_1'] = phi_m_3_1_dc
 phi_m_dc_df['phi_m 4_2'] = phi_m_4_2_dc
 
 print('done with writing phi_m via D.C. method')
-print('done at line 358')
+print('done at line 338')
 
 
 #%%
@@ -713,13 +627,13 @@ plt.xlim(-2,1)
 plt.ylim(-0.5,3)
 plt.legend()
 
-plt.figure()
+plt.figure(figsize=(6,5))
 sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_I_dc, color = 'dodgerblue', label = "L I")
 plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_I_dc, color = 'navy', ls='', lw=2, alpha=0.2, label = 'L I error')
-sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_II_dc, color = 'orange', label = "L II")
+sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_II_dc, color = 'darkorange', label = "L II")
 plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_II_dc, color = 'red', ls='', lw=2, alpha=0.2, label = 'L II error')
-sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_III_dc, color = 'seagreen', label = "L III")
-plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_III_dc, color = 'k', ls='', lw=2, alpha=0.2, label = 'L III error')
+# sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_III_dc, color = 'seagreen', label = "L III")
+# plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_III_dc, color = 'k', ls='', lw=2, alpha=0.2, label = 'L III error')
 plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE eq. 34, 41')
 plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
 plt.title(oct_addition+ title_windDir + "$\phi_{M}(z/L) (DC)$")
@@ -727,8 +641,8 @@ plt.title(oct_addition+ title_windDir + "$\phi_{M}(z/L) (DC)$")
 plt.xlim(-2,1)
 plt.ylim(-0.5,3)
 plt.legend()
-# plt.savefig(plot_savePath + "binnedScatterplot_phiM_Puu.png",dpi=300)
-# plt.savefig(plot_savePath + "binnedScatterplot_phiM_Puu.pdf")
+plt.savefig(plot_savePath + "binnedScatterplot_phiM_Puu.png",dpi=300)
+plt.savefig(plot_savePath + "binnedScatterplot_phiM_Puu.pdf")
 
 #%% Phi_m binned scatterplot levels 4-1, 3-1, 4-2
 xmin = -2
@@ -796,19 +710,19 @@ NOW WE ARE MOVING ON TO PHI_EPSILON
 #%% getting phi_epsilon
 # eps_s1 = Eps_df['eps_sonic1']
 eps_s1 = Eps_df['epsU_sonic1_MAD']
-phi_eps_1_dc = np.array(eps_s1)*kappa*np.array(z_df['z_sonic1'])/np.array(usr_s1**3)
+phi_eps_1_dc = np.array(eps_s1)*kappa*np.array(z_df['z_sonic1'])/np.array(usr_df['usr_s1']**3)
 
 # eps_s2 = Eps_df['eps_sonic2']
 eps_s2 = Eps_df['epsU_sonic2_MAD']
-phi_eps_2_dc = np.array(eps_s2)*kappa*np.array(z_df['z_sonic2'])/np.array(usr_s2**3)
+phi_eps_2_dc = np.array(eps_s2)*kappa*np.array(z_df['z_sonic2'])/np.array(usr_df['usr_s2']**3)
 
 # eps_s3 = Eps_df['eps_sonic3']
 eps_s3 = Eps_df['epsU_sonic3_MAD']
-phi_eps_3_dc = np.array(eps_s3)*kappa*np.array(z_df['z_sonic3'])/np.array(usr_s3**3)
+phi_eps_3_dc = np.array(eps_s3)*kappa*np.array(z_df['z_sonic3'])/np.array(usr_df['usr_s3']**3)
 
 # eps_s4 = Eps_df['eps_sonic4']
 eps_s4 = Eps_df['epsU_sonic4_MAD']
-phi_eps_4_dc = np.array(eps_s4)*kappa*np.array(z_df['z_sonic4'])/np.array(usr_s4**3)
+phi_eps_4_dc = np.array(eps_s4)*kappa*np.array(z_df['z_sonic4'])/np.array(usr_df['usr_s4']**3)
 
 phi_eps_1_dc_df = pd.DataFrame()
 # phi_eps_1_dc_df['z/L'] = (np.array(z_df['z_sonic1']))/np.array(L_dc_df['L_sonic1'])
@@ -1134,13 +1048,13 @@ plt.legend()
 # plt.gca().invert_yaxis()
 
 plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/Plots/'
-plt.figure()
+plt.figure(figsize=(6,5))
 sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_I_dc, color = 'dodgerblue', label = "L I")
 plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_I_dc, color = 'navy', ls='', lw=2, alpha=0.2, label = 'L I error')
 sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_II_dc, color = 'darkorange', label = "L II")
 plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_II_dc, color = 'red', ls='', lw=2, alpha=0.2, label = 'L II error')
-sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_III_dc, color = 'seagreen', label = "L III")
-plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_III_dc, color = 'k', ls='', lw=2, alpha=0.2, label = 'L III error')
+# sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_III_dc, color = 'seagreen', label = "L III")
+# plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_III_dc, color = 'k', ls='', lw=2, alpha=0.2, label = 'L III error')
 plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=3, label = 'Edson et al. (1998) eq. 40, 42')
 plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=3)
 # plt.plot(coare_zL_neg, eq40_me, color = 'blue',linewidth=2, label = 'My suggested new form')
@@ -1149,7 +1063,7 @@ plt.xlim(-4,2)
 # plt.ylim(-5,4)
 plt.ylabel('$\phi_\epsilon$')
 plt.yscale('log')
-plt.legend(loc = 'lower left',fontsize=7.5)
+plt.legend(loc = 'upper left')
 plt.savefig(plot_savePath + "binnedScatterplot_phiEps_Puu.png",dpi=300)
 plt.savefig(plot_savePath + "binnedScatterplot_phiEps_Puu.pdf")
 

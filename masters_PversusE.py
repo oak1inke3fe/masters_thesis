@@ -40,13 +40,14 @@ file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles
 # plot_savePath = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/plots/'
 plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/Plots/'
 
-
-windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_combinedAnalysis.csv")
+windDir_file = "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv"
+windDir_df = pd.read_csv(file_path + windDir_file)
 windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
 
 
-# pw_df = pd.read_csv(file_path + 'pw_waveCoherent_allFall.csv')
-# pw_df = pw_df.drop(['Unnamed: 0'], axis=1)
+pw_df = pd.read_csv(file_path + 'pw_combinedAnalysis.csv')
+pw_df = pw_df.drop(['Unnamed: 0'], axis=1)
+
 
 prod_df = pd.read_csv(file_path+'prodTerm_combinedAnalysis.csv')
 prod_df = prod_df.drop(['Unnamed: 0'], axis=1)
@@ -85,10 +86,9 @@ offshore = False
 # plt.scatter(zL_df.index, zL_df['z/L I dc'])
 # plt.yscale('log')
 
-
-index_array = np.arange(len(windDir_df))
-windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, index_array)
-mask_goodWindDir = np.isin(windDir_df['new_index_arr'],index_array)
+windDir_index_array = np.arange(len(windDir_df))
+windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, windDir_index_array)
+mask_goodWindDir = np.isin(windDir_df['new_index_arr'],windDir_index_array)
 
 windDir_df[mask_goodWindDir] = np.nan
 
@@ -97,8 +97,7 @@ eps_df[mask_goodWindDir] = np.nan
 buoy_df[mask_goodWindDir] = np.nan
 z_df[mask_goodWindDir] = np.nan
 zL_df[mask_goodWindDir] = np.nan
-windDir_df[mask_goodWindDir] = np.nan
-# pw_df[mask_goodWindDir] = np.nan
+pw_df[mask_goodWindDir] = np.nan
 
 print('done with setting up  good wind direction only dataframes')
 
@@ -115,21 +114,18 @@ plt.plot(prod_df['prod_I']*10, label = 'prod LI*10', color = 'black')
 plt.legend()
 plt.title('z/L and Prod BEFORE neutral mask')
 
-
-index_array = np.arange(len(zL_df))
-zL_df['new_index_arr'] = np.where((np.abs(zL_df['zL_I_dc'])<=0.5)&(np.abs(zL_df['zL_II_dc'])<=0.5), np.nan, index_array)
-# zL_df['new_index_arr'] = np.where((np.abs(zL_df['z/L II dc'])<=0.5), np.nan, index_array)
-
-mask_neutral_zL = np.isin(zL_df['new_index_arr'],index_array)
+zL_index_array = np.arange(len(zL_df))
+zL_df['new_index_arr'] = np.where((np.abs(zL_df['zL_I_dc'])<=0.5)&(np.abs(zL_df['zL_II_dc'])<=0.5), np.nan, zL_index_array)
+mask_neutral_zL = np.isin(zL_df['new_index_arr'],zL_index_array)
 
 zL_df[mask_neutral_zL] = np.nan
+
 eps_df[mask_neutral_zL] = np.nan
 prod_df[mask_neutral_zL] = np.nan
 buoy_df[mask_neutral_zL] = np.nan
 z_df[mask_neutral_zL] = np.nan
 windDir_df[mask_neutral_zL] = np.nan
-# pw_df[mask_neutral_zL] = np.nan
-
+pw_df[mask_neutral_zL] = np.nan
 
 
 plt.figure()
@@ -236,18 +232,18 @@ elif offshore == True:
 
 fig = plt.figure()
 plt.plot(p_minus_diss_I, label = 'dissipation deficit')
-# plt.plot(np.array(pw_df['d_dz_pw_theory_I']), label = '$T_{\widetilde{pw}}$')
+plt.plot(np.array(pw_df['d_dz_pw_theory_I']), label = '$T_{\widetilde{pw}}$')
 plt.legend()
 plt.ylim(-0.1,0.1)
-# plt.title(pw_timeseries_title + "Level I")
+plt.title(pw_timeseries_title + "Level I")
 plt.title(prod_eps_title + "Level I")
 
 fig = plt.figure()
 plt.plot(p_minus_diss_II, label = 'dissipation deficit')
-# plt.plot(np.array(pw_df['d_dz_pw_theory_II']), label = '$T_{\widetilde{pw}}$')
+plt.plot(np.array(pw_df['d_dz_pw_theory_II']), label = '$T_{\widetilde{pw}}$')
 plt.legend()
 plt.ylim(-0.1,0.1)
-# plt.title(pw_timeseries_title + "Level II")
+plt.title(pw_timeseries_title + "Level II")
 plt.title(prod_eps_title + "Level II")
 
 fig = plt.figure(figsize=(15,8))
@@ -261,6 +257,7 @@ plt.xlabel('time')
 plt.ylabel('$P-\epsilon$ [m^2/s^3]')
 plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis')
 plt.savefig(plot_savePath + "timeseries_neutralPvEps.png", dpi = 300)
+plt.savefig(plot_savePath + "timeseries_neutralPvEps.pdf")
 
 #%%
 plt.figure()
@@ -334,28 +331,29 @@ PplusB_minus_eps_df['LII'] = np.array(prodPLUSbuoy['P+B LII'])-np.array(eps_df['
 
 print('done with combining production and buoyancy')
 #%% dissipation deficit (with buoyancy) versus wave-coherent pw
-# fig = plt.figure(figsize=(5,5))
-# plt.plot([-0.1, 1], [-0.1, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
-# plt.plot([10**-6,1], [10**-7,0.1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
-# plt.plot([10**-6,0.1], [10**-5,1],color = 'k', linestyle = '--') #scale line by power of 10
-# plt.scatter(PplusB_minus_eps_df['LII'], np.array(pw_df['d_dz_pw_theory_II']), color = 'darkorange', edgecolor = 'red', label = 'level II')
-# plt.scatter(PplusB_minus_eps_df['LI'], np.array(pw_df['d_dz_pw_theory_I']), color = 'dodgerblue', edgecolor = 'navy',label = 'level I')
-# # plt.scatter(PplusB_minus_eps_df['LII'], np.array(pw_df['d_dz_pw_theory_II']), color = 'orange', edgecolor = 'red', )
+fig = plt.figure(figsize=(6,5))
+plt.plot([-0.1, 1], [-0.1, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
+plt.plot([10**-6,1], [10**-7,0.1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
+plt.plot([10**-6,0.1], [10**-5,1],color = 'k', linestyle = '--') #scale line by power of 10
+plt.scatter(PplusB_minus_eps_df['LII'], np.array(pw_df['d_dz_pw_theory_II']), color = 'darkorange', edgecolor = 'red', label = 'level II')
+plt.scatter(PplusB_minus_eps_df['LI'], np.array(pw_df['d_dz_pw_theory_I']), color = 'dodgerblue', edgecolor = 'navy',label = 'level I')
+# plt.scatter(PplusB_minus_eps_df['LII'], np.array(pw_df['d_dz_pw_theory_II']), color = 'orange', edgecolor = 'red', )
 
-# plt.xscale('log')
-# plt.yscale('log')
-# plt.xlabel('$P +B - \epsilon$ [$m^2s^{-3}$]')
-# plt.ylabel('$T_{\widetilde{pw}}$ [$m^2s^{-3}$]')
-# plt.title('Neutral Conditions: $P+B-\epsilon$ vs. $T_{\widetilde{pw}}$')
-# plt.legend()
-# plt.tight_layout()
-# # plt.savefig(plot_savePath + "WaveCoherent_vs_dissDeficit_scatterplot.png",dpi=300)
-# # plt.axis('square')
-# # plt.xlim(-0.0001,0.01)
-# # plt.ylim(-0.01,0.01)
-# print('done plotting P vs. Eps simple diss (new)')
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel('$P +B - \epsilon$ [$m^2s^{-3}$]')
+plt.ylabel('$T_{\widetilde{pw}}$ [$m^2s^{-3}$]')
+plt.title('Neutral Conditions: $P+B-\epsilon$ vs. $T_{\widetilde{pw}}$')
+plt.legend()
+plt.tight_layout()
+plt.savefig(plot_savePath + "scatter_PW_vs_dissDeficit.png",dpi=300)
+plt.savefig(plot_savePath + "scatter_PW_vs_dissDeficit.pdf")
+# plt.axis('square')
+# plt.xlim(-0.0001,0.01)
+# plt.ylim(-0.01,0.01)
+print('done plotting P vs. Eps simple diss (new)')
 
-# print('done with plotting dissipation deficit with buoyancy versus wave-coherent pw')
+print('done with plotting dissipation deficit with buoyancy versus wave-coherent pw')
 #%%
 # If we just want to examine the high wind event from Oct2-4, 2022, use the following mask:
 # return to old version of code for this.
@@ -529,7 +527,7 @@ fig = plt.figure(figsize=(6,6))
 plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
 # plt.plot([10**-6,10], [10**-7,1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
 # plt.plot([10**-6,1], [10**-5,10],color = 'k', linestyle = '--') #scale line by power of 10
-plt.scatter(prod_df['prod_III'][:break_index+1], eps_df['eps_LIII'][:break_index+1], color = 'seagreen', edgecolor = 'darkgreen', label = 'level III')
+# plt.scatter(prod_df['prod_III'][:break_index+1], eps_df['eps_LIII'][:break_index+1], color = 'seagreen', edgecolor = 'darkgreen', label = 'level III')
 plt.scatter(prod_df['prod_II'][:break_index+1], eps_df['eps_LII'][:break_index+1], color = 'darkorange', edgecolor = 'red',label = 'level II')
 plt.scatter(prod_df['prod_I'][:break_index+1], eps_df['eps_LI'][:break_index+1], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
 # plt.xlim(10**-3,1)
@@ -541,12 +539,13 @@ plt.ylabel('$\epsilon$ [$m^2s^{-3}$]')
 plt.title("SPRING: Neutral Conditions: $P$ vs. $\epsilon$")
 plt.legend(loc = 'lower right')
 ax = plt.gca() 
-plt.text(.05, .9, "Pearson's r L III ={:.3f}".format(r_spring_III), transform=ax.transAxes)
+# plt.text(.05, .9, "Pearson's r L III ={:.3f}".format(r_spring_III), transform=ax.transAxes)
 plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_spring_II), transform=ax.transAxes)
 plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_spring_I), transform=ax.transAxes)
 plt.axis('equal')
 plt.tight_layout()
 plt.savefig(plot_savePath + "scatterplot_PvEps_spring.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplot_PvEps_spring.pdf")
 print('done plotting P vs. Eps SPRING')
 
 
@@ -557,7 +556,7 @@ fig = plt.figure(figsize=(6,6))
 plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
 # plt.plot([10**-6,10], [10**-7,1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
 # plt.plot([10**-6,1], [10**-5,10],color = 'k', linestyle = '--') #scale line by power of 10
-plt.scatter(prod_df['prod_III'][break_index+1:], eps_df['eps_LIII'][break_index+1:], color = 'seagreen', edgecolor = 'darkgreen', label = 'level III')
+# plt.scatter(prod_df['prod_III'][break_index+1:], eps_df['eps_LIII'][break_index+1:], color = 'seagreen', edgecolor = 'darkgreen', label = 'level III')
 plt.scatter(prod_df['prod_II'][break_index+1:], eps_df['eps_LII'][break_index+1:], color = 'darkorange', edgecolor = 'red',label = 'level II')
 plt.scatter(prod_df['prod_I'][break_index+1:], eps_df['eps_LI'][break_index+1:], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
 # plt.xlim(10**-3,1)
@@ -569,12 +568,13 @@ plt.ylabel('$\epsilon$ [$m^2s^{-3}$]')
 plt.title("FALL: Neutral Conditions: $P$ vs. $\epsilon$")
 plt.legend(loc = 'lower right')
 ax = plt.gca() 
-plt.text(.05, .9, "Pearson's r L III ={:.3f}".format(r_fall_III), transform=ax.transAxes)
+# plt.text(.05, .9, "Pearson's r L III ={:.3f}".format(r_fall_III), transform=ax.transAxes)
 plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_fall_II), transform=ax.transAxes)
 plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_fall_I), transform=ax.transAxes)
 plt.axis('equal')
 plt.tight_layout()
 plt.savefig(plot_savePath + "scatterplot_PvEps_fall.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplot_PvEps_fall.pdf")
 print('done plotting P vs. Eps FALL')
 #%%
 # Timeseries (split into 2 plots for each deployment)
@@ -593,7 +593,7 @@ ax1.set_ylabel(r'$P-\epsilon$ [$m^{2}s^{-3}$]')
 ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax1.get_xticklabels(which='major'):
-    label.set(rotation=30, horizontalalignment='right')
+    label.set(rotation=0, horizontalalignment='center')
 ax2.plot(dates_arr[break_index+1:], p_minus_diss_I[break_index+1:], color = 'dodgerblue', label = 'L I')
 ax2.plot(dates_arr[break_index+1:], p_minus_diss_II[break_index+1:], color = 'darkorange', label = 'L II')
 ax2.legend(loc = 'lower left')
@@ -601,9 +601,85 @@ ax2.set_ylabel(r'$P-\epsilon$ [$m^{2}s^{-3}$]')
 ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax2.get_xticklabels(which='major'):
-    label.set(rotation=30, horizontalalignment='right')
+    label.set(rotation=0, horizontalalignment='center')
 fig.suptitle(r'$P-\epsilon$', fontsize=16)
 fig.savefig(plot_savePath + "timeseries_PvEps_combinedAnalysis.png",dpi=300)
+fig.savefig(plot_savePath + "timeseries_PvEps_combinedAnalysis.pdf")
+
+fig, (ax1, ax2) = plt.subplots(2,1, figsize=(15,4))
+ax1.plot(dates_arr[:break_index+1], PplusB_minus_eps_df['LI'][:break_index+1], color = 'dodgerblue', label = 'L I')
+ax1.plot(dates_arr[:break_index+1], PplusB_minus_eps_df['LII'][:break_index+1], color = 'darkorange', label = 'L II')
+ax1.legend(loc = 'lower left')
+# ax1.set_title('Level I')
+ax1.set_ylabel(r'$P+B-\epsilon$ [$m^{2}s^{-3}$]')
+ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax1.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+ax2.plot(dates_arr[break_index+1:], PplusB_minus_eps_df['LI'][break_index+1:], color = 'dodgerblue', label = 'L I')
+ax2.plot(dates_arr[break_index+1:], PplusB_minus_eps_df['LII'][break_index+1:], color = 'darkorange', label = 'L II')
+ax2.legend(loc = 'lower left')
+ax2.set_ylabel(r'$P+B-\epsilon$ [$m^{2}s^{-3}$]')
+ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax2.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+fig.suptitle(r'$P+B-\epsilon$', fontsize=16)
+fig.savefig(plot_savePath + "timeseries_PplusBvEps_combinedAnalysis.png",dpi=300)
+fig.savefig(plot_savePath + "timeseries_PplusBvEps_combinedAnalysis.pdf")
+
+#%%
+ymin = -0.7
+ymax = 0.7
+# same as above, but as scatter plots instead of lineplots
+fig, (ax1, ax2) = plt.subplots(2,1, figsize=(15,4))
+ax1.scatter(dates_arr[:break_index+1], p_minus_diss_I[:break_index+1], color = 'dodgerblue', edgecolor='navy', label = 'L I', s=15)
+ax1.scatter(dates_arr[:break_index+1], p_minus_diss_II[:break_index+1], color = 'darkorange', edgecolor='darkorange', label = 'L II', s=5)
+ax1.legend(loc = 'lower left')
+# ax1.set_title('Level I')
+ax1.set_ylabel(r'$P-\epsilon$ [$m^{2}s^{-3}$]')
+ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+ax1.set_ylim(ymin,ymax)
+for label in ax1.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+ax2.scatter(dates_arr[break_index+1:], p_minus_diss_I[break_index+1:], color = 'dodgerblue', edgecolor='navy', label = 'L I', s=15)
+ax2.scatter(dates_arr[break_index+1:], p_minus_diss_II[break_index+1:], color = 'darkorange', edgecolor='darkorange', label = 'L II', s=5)
+ax2.legend(loc = 'lower left')
+ax2.set_ylabel(r'$P-\epsilon$ [$m^{2}s^{-3}$]')
+ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+ax2.set_ylim(ymin,ymax)
+for label in ax2.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+fig.suptitle(r'$P-\epsilon$', fontsize=16)
+fig.savefig(plot_savePath + "timeseriesScatter_PvEps_combinedAnalysis.png",dpi=300)
+fig.savefig(plot_savePath + "timeseriesScatter__PvEps_combinedAnalysis.pdf")
+
+fig, (ax1, ax2) = plt.subplots(2,1, figsize=(15,4))
+ax1.scatter(dates_arr[:break_index+1], PplusB_minus_eps_df['LI'][:break_index+1], color = 'dodgerblue', edgecolor='navy', label = 'L I', s=15)
+ax1.scatter(dates_arr[:break_index+1], PplusB_minus_eps_df['LII'][:break_index+1], color = 'darkorange', edgecolor='darkorange', label = 'L II', s=5)
+ax1.legend(loc = 'lower left')
+# ax1.set_title('Level I')
+ax1.set_ylabel(r'$P+B-\epsilon$ [$m^{2}s^{-3}$]')
+ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+ax1.set_ylim(ymin,ymax)
+for label in ax1.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+ax2.scatter(dates_arr[break_index+1:], PplusB_minus_eps_df['LI'][break_index+1:], color = 'dodgerblue', edgecolor='navy', label = 'L I', s=15)
+ax2.scatter(dates_arr[break_index+1:], PplusB_minus_eps_df['LII'][break_index+1:], color = 'darkorange', edgecolor='darkorange', label = 'L II', s=5)
+ax2.legend(loc = 'lower left')
+ax2.set_ylabel(r'$P+B-\epsilon$ [$m^{2}s^{-3}$]')
+ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+ax2.set_ylim(ymin,ymax)
+for label in ax2.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+fig.suptitle(r'$P+B-\epsilon$', fontsize=16)
+fig.savefig(plot_savePath + "timeseriesScatter__PplusBvEps_combinedAnalysis.png",dpi=300)
+fig.savefig(plot_savePath + "timeseriesScatter__PplusBvEps_combinedAnalysis.pdf")
+
 
 #%%
 
@@ -632,7 +708,7 @@ fig = plt.figure(figsize = (6,6))
 plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
 # plt.plot([10**-6,10], [10**-7,1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
 # plt.plot([10**-6,1], [10**-5,10],color = 'k', linestyle = '--') #scale line by power of 10
-plt.scatter(prodPLUSbuoy['P+B LIII'], eps_df['eps_LIII'], color = 'seagreen', edgecolor = 'darkgreen', label = 'level III')
+# plt.scatter(prodPLUSbuoy['P+B LIII'], eps_df['eps_LIII'], color = 'seagreen', edgecolor = 'darkgreen', label = 'level III')
 plt.scatter(prodPLUSbuoy['P+B LII'], eps_df['eps_LII'], color = 'darkorange', edgecolor = 'red',label = 'level II')
 plt.scatter(prodPLUSbuoy['P+B LI'], eps_df['eps_LI'], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
 plt.xscale('log')
@@ -647,6 +723,7 @@ plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.tra
 plt.axis('equal')
 plt.tight_layout()
 plt.savefig(plot_savePath + "scatterplot_PplusBvEps_combinedAnalysis.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplot_PplusBvEps_combinedAnalysis.pdf")
 
 # scatterplot of spring conditions
 fig = plt.figure(figsize = (6,6))
@@ -654,7 +731,7 @@ fig = plt.figure(figsize = (6,6))
 plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
 # plt.plot([10**-6,10], [10**-7,1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
 # plt.plot([10**-6,1], [10**-5,10],color = 'k', linestyle = '--') #scale line by power of 10
-plt.scatter(prodPLUSbuoy['P+B LIII'][:break_index+1], eps_df['eps_LIII'][:break_index+1], color = 'seagreen', edgecolor = 'darkgreen',label = 'level III')
+# plt.scatter(prodPLUSbuoy['P+B LIII'][:break_index+1], eps_df['eps_LIII'][:break_index+1], color = 'seagreen', edgecolor = 'darkgreen',label = 'level III')
 plt.scatter(prodPLUSbuoy['P+B LII'][:break_index+1], eps_df['eps_LII'][:break_index+1], color = 'darkorange', edgecolor = 'red',label = 'level II')
 plt.scatter(prodPLUSbuoy['P+B LI'][:break_index+1], eps_df['eps_LI'][:break_index+1], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
 plt.xscale('log')
@@ -669,6 +746,7 @@ ax = plt.gca()
 plt.axis('equal')
 plt.tight_layout()
 plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Spring.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Spring.pdf")
 
 # scatterplot of fall conditions
 fig = plt.figure(figsize = (6,6))
@@ -676,7 +754,7 @@ fig = plt.figure(figsize = (6,6))
 plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
 # plt.plot([10**-6,10], [10**-7,1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
 # plt.plot([10**-6,1], [10**-5,10],color = 'k', linestyle = '--') #scale line by power of 10
-plt.scatter(prodPLUSbuoy['P+B LIII'][break_index+1:], eps_df['eps_LIII'][break_index+1:], color = 'seagreen', edgecolor = 'darkgreen',label = 'level III')
+# plt.scatter(prodPLUSbuoy['P+B LIII'][break_index+1:], eps_df['eps_LIII'][break_index+1:], color = 'seagreen', edgecolor = 'darkgreen',label = 'level III')
 plt.scatter(prodPLUSbuoy['P+B LII'][break_index+1:], eps_df['eps_LII'][break_index+1:], color = 'darkorange', edgecolor = 'red',label = 'level II')
 plt.scatter(prodPLUSbuoy['P+B LI'][break_index+1:], eps_df['eps_LI'][break_index+1:], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
 plt.xscale('log')
@@ -691,6 +769,7 @@ ax = plt.gca()
 plt.axis('equal')
 plt.tight_layout()
 plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Fall.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Fall.pdf")
 
 
 
