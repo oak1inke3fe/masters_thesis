@@ -1,11 +1,17 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 14 12:36:06 2023
+Created on Thu Nov 30 15:51:57 2023
 
 @author: oaklin keefe
 
 
-This file is used to analyze the production, dissipation, buoyancy, and wave-coherent pw terms of the TKE budget equation.
+This file is used to analyze the production, dissipation, buoyancy, and wave-coherent pw terms of the TKE budget equation for specific high-wind events
+with large dissipation deficits
+
+period 1:
+
+period 2:
 
 INPUT files:
     prodTerm_combinedAnalysis.csv
@@ -33,20 +39,15 @@ import matplotlib.pyplot as plt
 
 print('done with imports')
 #%%
-# file_path = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level4/"
-# file_path = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/'
+
 file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
-# plot_savePath = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level4\plots/"
-# plot_savePath = r'/run/user/1005/gvfs/smb-share:server=zippel-nas.local,share=bbasit/combined_analysis/OaklinCopyMNode/code_pipeline/Level4/plots/'
 plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/Plots/'
 
 sonic_file1 = "despiked_s1_turbulenceTerms_andMore_combined.csv"
 sonic1_df = pd.read_csv(file_path+sonic_file1)
 
-windDir_file = "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv"
-windDir_df = pd.read_csv(file_path + windDir_file)
+windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv")
 windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
-
 
 pw_df = pd.read_csv(file_path + 'pw_combinedAnalysis.csv')
 pw_df = pw_df.drop(['Unnamed: 0'], axis=1)
@@ -77,17 +78,45 @@ zL_df = zL_df.drop(['Unnamed: 0'], axis=1)
 usr_df = pd.read_csv(file_path + "usr_combinedAnalysis.csv")
 usr_df = usr_df.drop(['Unnamed: 0'], axis=1)
 
+date_df = pd.read_csv(file_path + "date_combinedAnalysis.csv")
+date_df = date_df.drop(['Unnamed: 0'], axis=1)
+
 
 print('done with setting up dataframes')
+
+
+#%%
+#add in epsilon variables per-level to dataframe 
+eps_LIII = (eps_df['eps_sonic3']+eps_df['eps_sonic4'])/2
+eps_LII = (eps_df['eps_sonic2']+eps_df['eps_sonic3'])/2
+eps_LI = (eps_df['eps_sonic1']+eps_df['eps_sonic2'])/2
+eps_df['eps_LIII'] = eps_LIII
+eps_df['eps_LII'] = eps_LII
+eps_df['eps_LI'] = eps_LI
+
+
+#add in buoyancy per-level variables to dataframe
+buoy_LIII = buoy_df['buoy_III']
+buoy_LII = buoy_df['buoy_II']
+buoy_LI = buoy_df['buoy_I']
+
+
+
+print('done with getting epsilon with LI,II,II and dfs and buoyancy LI, II, III into dfs')
+
+
 #%% Get rid of bad wind directions first
 all_windDirs = True
 onshore = False
 offshore = False
 
-# plt.figure()
-# plt.scatter(windDir_df.index, windDir_df['alpha_s1'])
-# plt.scatter(zL_df.index, zL_df['z/L I dc'])
-# plt.yscale('log')
+plt.figure()
+plt.scatter(windDir_df.index, windDir_df['alpha_s1'], color='gray',label='before')
+plt.title('Wind direction BEFORE mask')
+plt.xlabel('index')
+plt.ylabel('Wind direction [deg]')
+plt.legend(loc='lower right')
+plt.show()
 
 windDir_index_array = np.arange(len(windDir_df))
 windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, windDir_index_array)
@@ -102,21 +131,27 @@ z_df[mask_goodWindDir] = np.nan
 zL_df[mask_goodWindDir] = np.nan
 pw_df[mask_goodWindDir] = np.nan
 sonic1_df[mask_goodWindDir] = np.nan
+date_df[mask_goodWindDir] = np.nan
 
 print('done with setting up  good wind direction only dataframes')
 
 # plt.figure()
-# plt.scatter(windDir_df.index, windDir_df['alpha_s1'])
-# plt.scatter(zL_df.index, zL_df['z/L I dc'])
+plt.scatter(windDir_df.index, windDir_df['alpha_s1'], color = 'green',label = 'after')
+plt.title('Wind direction AFTER mask')
+plt.xlabel('index')
+plt.ylabel('Wind direction [deg]')
+plt.legend(loc='lower right')
 
 #%% set to near-neutral stability conditions
 
 plt.figure()
-# plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II')
+plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II', color = 'k')
 plt.scatter(zL_df.index, zL_df['zL_I_dc'], label = 'z/L level I', color = 'gray')
-plt.plot(prod_df['prod_I']*10, label = 'prod LI*10', color = 'black')
-plt.legend()
-plt.title('z/L and Prod BEFORE neutral mask')
+plt.title('z/L BEFORE neutral mask')
+plt.xlabel('index')
+plt.ylabel('z/L')
+plt.legend(loc='lower right')
+plt.show()
 
 zL_index_array = np.arange(len(zL_df))
 zL_df['new_index_arr'] = np.where((np.abs(zL_df['zL_I_dc'])<=0.5)&(np.abs(zL_df['zL_II_dc'])<=0.5), np.nan, zL_index_array)
@@ -131,20 +166,17 @@ z_df[mask_neutral_zL] = np.nan
 windDir_df[mask_neutral_zL] = np.nan
 pw_df[mask_neutral_zL] = np.nan
 sonic1_df[mask_neutral_zL] = np.nan
+date_df[mask_neutral_zL] = np.nan
 
 
 plt.figure()
-# plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II')
-plt.scatter(zL_df.index, zL_df['zL_I_dc'], label = 'z/L level I', color = 'gray')
-plt.plot(prod_df['prod_I']*10, label = 'prod LI*10', color = 'black')
-plt.legend()
-plt.title('z/L and Prod AFTER neutral mask')
-
-# plt.figure()
-# plt.scatter(zL_df.index, zL_df['z/L II dc'], label = 'level II')
-# plt.scatter(zL_df.index, zL_df['z/L I dc'], label = 'level I')
-# plt.legend()
-
+plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II',color = 'green')
+plt.scatter(zL_df.index, zL_df['zL_I_dc'], label = 'z/L level I', color = 'lightgreen')
+plt.title('z/L AFTER neutral mask')
+plt.xlabel('index')
+plt.ylabel('z/L')
+plt.legend(loc='lower right')
+plt.show()
 
 
 print('done with setting up near-neutral dataframes')
@@ -152,30 +184,35 @@ print('done with setting up near-neutral dataframes')
 #%% mask to s1 Ubar >=8m/s for higher confidence comparison to pw
 
 plt.figure()
-# plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II')
 plt.scatter(sonic1_df.index, sonic1_df['Ubar'], label = 'Ubar s1', color = 'gray')
-plt.legend()
 plt.title('Ubar BEFORE 8m/s restriction mask')
+plt.xlabel('index')
+plt.ylabel('Ubar')
+plt.legend(loc='lower right')
+plt.show()
 
 Ubar_index_array = np.arange(len(sonic1_df))
 sonic1_df['new_index_arr'] = np.where(sonic1_df['Ubar']>=8, np.nan, Ubar_index_array)
-mask_confidentPPW_byUbarRestriction = np.isin(sonic1_df['new_index_arr'],Ubar_index_array)
+mask_confidentPW_byUbarRestriction = np.isin(sonic1_df['new_index_arr'],Ubar_index_array)
 
-sonic1_df[mask_confidentPPW_byUbarRestriction]=np.nan
+sonic1_df[mask_confidentPW_byUbarRestriction]=np.nan
 
-zL_df[mask_confidentPPW_byUbarRestriction] = np.nan
-eps_df[mask_confidentPPW_byUbarRestriction] = np.nan
-prod_df[mask_confidentPPW_byUbarRestriction] = np.nan
-buoy_df[mask_confidentPPW_byUbarRestriction] = np.nan
-z_df[mask_confidentPPW_byUbarRestriction] = np.nan
-windDir_df[mask_confidentPPW_byUbarRestriction] = np.nan
-pw_df[mask_confidentPPW_byUbarRestriction] = np.nan
+zL_df[mask_confidentPW_byUbarRestriction] = np.nan
+eps_df[mask_confidentPW_byUbarRestriction] = np.nan
+prod_df[mask_confidentPW_byUbarRestriction] = np.nan
+buoy_df[mask_confidentPW_byUbarRestriction] = np.nan
+z_df[mask_confidentPW_byUbarRestriction] = np.nan
+windDir_df[mask_confidentPW_byUbarRestriction] = np.nan
+pw_df[mask_confidentPW_byUbarRestriction] = np.nan
+date_df[mask_confidentPW_byUbarRestriction] = np.nan
 
 plt.figure()
-# plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II')
-plt.scatter(sonic1_df.index, sonic1_df['Ubar'], label = 'Ubar s1', color = 'gray')
-plt.legend()
+plt.scatter(sonic1_df.index, sonic1_df['Ubar'], label = 'Ubar s1', color = 'g')
 plt.title('Ubar AFTER 8m/s restriction mask')
+plt.xlabel('index')
+plt.ylabel('Ubar')
+plt.legend(loc='lower right')
+plt.show()
 
 print('done with setting up Ubar restrictions to confident pw calcs')
 
@@ -219,30 +256,29 @@ print('done with setting up Ubar restrictions to confident pw calcs')
 # z_df = z_df[mask_onshoreWindDir]
 # pw_df = pw_df[mask_onshoreWindDir]
 
-#%%
-
-eps_LIII = (eps_df['eps_sonic3']+eps_df['eps_sonic4'])/2
-eps_LII = (eps_df['eps_sonic2']+eps_df['eps_sonic3'])/2
-eps_LI = (eps_df['eps_sonic1']+eps_df['eps_sonic2'])/2
-eps_df['eps_LIII'] = eps_LIII
-eps_df['eps_LII'] = eps_LII
-eps_df['eps_LI'] = eps_LI
-
-
-
-buoy_LIII = buoy_df['buoy_III']
-buoy_LII = buoy_df['buoy_II']
-buoy_LI = buoy_df['buoy_I']
-
-
-
-print('done with getting epsilon with LI,II,II and dfs and buoyancy dfs')
-
-#%% Production minus dissipation (dissipation deficit if result is +)
+#%% 
+# Production minus dissipation (dissipation deficit if result is +)
 p_minus_diss_I =  np.array(np.array(prod_df['prod_I'])-np.array(eps_df['eps_LI']))
 p_minus_diss_II =  np.array(np.array(prod_df['prod_II'])-np.array(eps_df['eps_LII']))
 p_minus_diss_III =  np.array(np.array(prod_df['prod_III'])-np.array(eps_df['eps_LIII']))
-print('done doing production minus dissipation')
+P_minus_eps_df = pd.DataFrame()
+P_minus_eps_df['LI'] = np.array(p_minus_diss_I)
+P_minus_eps_df['LII'] = np.array(p_minus_diss_II)
+P_minus_eps_df['LIII'] = np.array(p_minus_diss_III)
+print('done doing production minus dissipation and dataframe')
+
+# Production plus buoyancy 
+prodPLUSbuoy= pd.DataFrame()
+prodPLUSbuoy['P+B LI'] = np.array(prod_df['prod_I'])+np.array(buoy_LI)
+prodPLUSbuoy['P+B LII'] = np.array(prod_df['prod_II'])+np.array(buoy_LII)
+prodPLUSbuoy['P+B LIII'] = np.array(prod_df['prod_III'])+np.array(buoy_LIII)
+
+# Production plus buoyancy minus dissipation (dissipation deficit if result is +)
+PplusB_minus_eps_df = pd.DataFrame()
+PplusB_minus_eps_df['LI'] = np.array(prodPLUSbuoy['P+B LI'])-np.array(eps_df['eps_LI'])
+PplusB_minus_eps_df['LII'] = np.array(prodPLUSbuoy['P+B LII'])-np.array(eps_df['eps_LII'])
+
+print('done with combining production and buoyancy')
 
 #%%
 # figure titles based on wind directions
@@ -288,15 +324,137 @@ plt.legend()
 # plt.hlines(y=0, xmin=0,xmax=4395,color='k')
 # plt.xlim(700,860)
 plt.ylim(-0.2,0.2)
-plt.xlabel('time')
+plt.xlabel('time index')
 plt.ylabel('$P-\epsilon$ [m^2/s^3]')
-plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis')
-plt.savefig(plot_savePath + "timeseries_neutralPvEps.png", dpi = 300)
-plt.savefig(plot_savePath + "timeseries_neutralPvEps.pdf")
-# plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for $\overline{u}$ sonic1 >=8m/s')
-# plt.savefig(plot_savePath + "timeseries_neutralPvEps_pwUbarRestriction.png", dpi = 300)
-# plt.savefig(plot_savePath + "timeseries_neutralPvEps_pwUbarRestriction.pdf")
+# plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis')
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.png", dpi = 300)
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.pdf")
+plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for $\overline{u}$ sonic1 >=8m/s')
+plt.savefig(plot_savePath + "timeseries_neutralPvEps_pwUbarRestriction.png", dpi = 300)
+plt.savefig(plot_savePath + "timeseries_neutralPvEps_pwUbarRestriction.pdf")
 
+#%% Zoom in on period 1: may storm, indices [1609:1736+1] #this is when deficit at LI was primarily greater than deficit at LII 
+fig = plt.figure(figsize=(15,8))
+plt.plot(p_minus_diss_II, color = 'darkorange', label = 'L II')
+plt.plot(p_minus_diss_I, color = 'dodgerblue', label = 'L I')
+plt.legend()
+plt.hlines(y=0, xmin=0,xmax=5000,color='k')
+plt.vlines(x=1609, ymin=-1,ymax=1,color='k')
+plt.vlines(x=1736, ymin=-1,ymax=1,color='k')
+plt.ylim(-0.01,0.1)
+plt.xlim(1600,1745)
+plt.xlabel('time index')
+plt.ylabel('$P-\epsilon$ [m^2/s^3]')
+# plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis')
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.png", dpi = 300)
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.pdf")
+plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for Period1: May Storm')
+
+#%% Create new DF for period1
+sonic1_df_period1 = sonic1_df[1609:1736+1]
+sonic1_df_period1 = sonic1_df_period1.reset_index(drop=True)
+
+zL_df_period1 = zL_df[1609:1736+1]
+zL_df_period1 = zL_df_period1.reset_index(drop=True)
+
+eps_df_period1 = eps_df[1609:1736+1]
+eps_df_period1 = eps_df_period1.reset_index(drop=True)
+
+prod_df_period1 = prod_df[1609:1736+1]
+prod_df_period1 = prod_df_period1.reset_index(drop=True)
+
+buoy_df_period1 = buoy_df[1609:1736+1]
+buoy_df_period1 = buoy_df_period1.reset_index(drop=True)
+
+z_df_period1 = z_df[1609:1736+1]
+z_df_period1 = z_df_period1.reset_index(drop=True)
+
+windDir_df_period1 = windDir_df[1609:1736+1]
+windDir_df_period1 = windDir_df_period1.reset_index(drop=True)
+
+pw_df_period1 = pw_df[1609:1736+1]
+pw_df_period1 = pw_df_period1.reset_index(drop=True)
+
+date_df_period1 = date_df[1609:1736+1]
+date_df_period1 = date_df_period1.reset_index(drop=True)
+
+P_minus_eps_df_period1 = P_minus_eps_df[1609:1736+1]
+P_minus_eps_df_period1 = P_minus_eps_df_period1.reset_index(drop=True)
+
+prodPLUSbuoy_period1 = prodPLUSbuoy[1609:1736+1]
+prodPLUSbuoy_period1 = prodPLUSbuoy_period1.reset_index(drop=True)
+
+PplusB_minus_eps_df_period1 = PplusB_minus_eps_df[1609:1736+1]
+PplusB_minus_eps_df_period1 = PplusB_minus_eps_df_period1.reset_index(drop=True)
+
+print(len(sonic1_df_period1))
+#%% Zoom in on period 2: oct storm, indices [4591:4773+1] #this is when deficit at LI was primarily greater than deficit at LII 
+fig = plt.figure(figsize=(15,8))
+plt.plot(p_minus_diss_II, color = 'darkorange', label = 'L II')
+plt.plot(p_minus_diss_I, color = 'dodgerblue', label = 'L I')
+plt.legend()
+plt.hlines(y=0, xmin=0,xmax=5000,color='k')
+plt.vlines(x=4591, ymin=-1,ymax=1,color='k')
+plt.vlines(x=4773, ymin=-1,ymax=1,color='k')
+plt.ylim(-0.01,0.1)
+plt.xlim(4580,4784)
+plt.xlabel('time index')
+plt.ylabel('$P-\epsilon$ [m^2/s^3]')
+# plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis')
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.png", dpi = 300)
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.pdf")
+plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for Period2: October Storm')
+
+#%% Create new DF for period2
+sonic1_df_period2 = sonic1_df[4591:4773+1]
+sonic1_df_period2 = sonic1_df_period2.reset_index(drop=True)
+
+zL_df_period2 = zL_df[4591:4773+1]
+zL_df_period2 = zL_df_period2.reset_index(drop=True)
+
+eps_df_period2 = eps_df[4591:4773+1]
+eps_df_period2 = eps_df_period2.reset_index(drop=True)
+
+prod_df_period2 = prod_df[4591:4773+1]
+prod_df_period2 = prod_df_period2.reset_index(drop=True)
+
+buoy_df_period2 = buoy_df[4591:4773+1]
+buoy_df_period2 = buoy_df_period2.reset_index(drop=True)
+
+z_df_period2 = z_df[4591:4773+1]
+z_df_period2 = z_df_period2.reset_index(drop=True)
+
+windDir_df_period2 = windDir_df[4591:4773+1]
+windDir_df_period2 = windDir_df_period2.reset_index(drop=True)
+
+pw_df_period2 = pw_df[4591:4773+1]
+pw_df_period2 = pw_df_period2.reset_index(drop=True)
+
+date_df_period2 = date_df[4591:4773+1]
+date_df_period2 = date_df_period2.reset_index(drop=True)
+
+P_minus_eps_df_period2 = P_minus_eps_df[4591:4773+1]
+P_minus_eps_df_period2 = P_minus_eps_df_period2.reset_index(drop=True)
+
+prodPLUSbuoy_period2 = prodPLUSbuoy[4591:4773+1]
+prodPLUSbuoy_period2 = prodPLUSbuoy_period2.reset_index(drop=True)
+
+PplusB_minus_eps_df_period2 = PplusB_minus_eps_df[4591:4773+1]
+PplusB_minus_eps_df_period2 = PplusB_minus_eps_df_period2.reset_index(drop=True)
+
+print(len(sonic1_df_period2))
+
+#%%
+fig = plt.figure(figsize=(15,8))
+plt.plot(np.arange(len(windDir_df_period1)), windDir_df_period1['alpha_s4'], color = 'gray', label = 'period 1 (May)')
+plt.plot(np.arange(len(windDir_df_period2)), windDir_df_period2['alpha_s4'], color = 'k', label = 'period 2 (Oct)')
+plt.legend()
+plt.xlabel('time index')
+plt.ylabel('wind direction')
+# plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis')
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.png", dpi = 300)
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.pdf")
+plt.title('Neutral Conditions: Wind direction per period of high wind')
 #%%
 plt.figure()
 plt.scatter(zL_df['zL_II_dc'], p_minus_diss_II, color = 'orange', edgecolor = 'red', label = 'L II')

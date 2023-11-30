@@ -99,7 +99,7 @@ expand1_pw_df['d_dz_pw_theory_I']=pw_dI
 expand1_pw_df['d_dz_pw_theory_II']=pw_dII
 expand1_pw_df['datetime']=date_df['datetime']
 expand1_pw_df.to_csv(file_path + 'pw_combinedAnalysis.csv')
-
+expand1_pw_df.columns
 #%%
 plt.figure()
 plt.plot(pw_df['PW boom-1 [m^3/s^3]'])
