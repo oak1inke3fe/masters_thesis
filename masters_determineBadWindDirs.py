@@ -352,8 +352,12 @@ plt.plot(adjusted_a_s2, label ='s2', color = 'orange')
 plt.plot(adjusted_a_s3, label ='s3', color = 'g')
 plt.plot(adjusted_a_s4, label ='s4', color = 'b')
 plt.legend()
-plt.xlim(2140,2150)
-plt.title ('checking flow is from the SSW-SW')
+# plt.xlim(2140,2150)
+# plt.title ('checking flow is from the SSW-SW')
+plt.xlim(925,975)
+plt.ylim(300,360)
+plt.title ('checking difference between s4 and s1 directions \n at different points in time')
+
 
 # plt.figure()
 # plt.plot(alpha_df['alpha_s1'][:break_index+1], label ='s1', color = 'r')
@@ -426,13 +430,13 @@ adjusted_alpha_df_final.to_csv(file_path+"windDir_IncludingBad_wS4rotation_combi
 
 
 fig = plt.figure()
-plt.scatter(adjusted_alpha_df_final['time'], adjusted_alpha_df_final['alpha_s1'], color = 'r', label = 's1')
-plt.scatter(adjusted_alpha_df_final['time'], adjusted_alpha_df_final['alpha_s2'], color = 'orange', label = 's2')
-plt.scatter(adjusted_alpha_df_final['time'], adjusted_alpha_df_final['alpha_s3'], color = 'g', label = 's3')
-plt.scatter(adjusted_alpha_df_final['time'], adjusted_alpha_df_final['alpha_s4'], color = 'b', label = 's4')
+plt.plot(adjusted_alpha_df_final['time'], adjusted_alpha_df_final['alpha_s1'], color = 'r', label = 's1')
+plt.plot(adjusted_alpha_df_final['time'], adjusted_alpha_df_final['alpha_s2'], color = 'orange', label = 's2')
+plt.plot(adjusted_alpha_df_final['time'], adjusted_alpha_df_final['alpha_s3'], color = 'g', label = 's3')
+plt.plot(adjusted_alpha_df_final['time'], adjusted_alpha_df_final['alpha_s4'], color = 'b', label = 's4')
 plt.legend()
-plt.xlim(4650,4800)
-# plt.ylim(300,350)
+plt.xlim(4650,4680)
+plt.ylim(40,60)
 plt.title('Fall Deployment Adjusted to 360')
 #%%
 # fig, ax = plt.subplots(1,1)
@@ -536,7 +540,7 @@ a_len = math.sqrt(b**2+c**2-(2*b*c*math.cos(A*math.pi/180)))
 angle_offset_rad = math.asin(b*math.sin(A*math.pi/180)/a_len)
 angle_offset = angle_offset_rad*180/math.pi
 print("angle offset = " + str(angle_offset))
-angle_start= 125-angle_offset
+angle_start= 125+angle_offset
 angle_end = 125
 
 print(angle_start)
@@ -545,10 +549,10 @@ print(angle_end)
 
 
 angle_start_spring= 110
-angle_end_spring = 155 #bad angle range to get rid of (110-149)
+angle_end_spring = 160 #bad angle range to get rid of (110-149)
 
 angle_start_fall = 110
-angle_end_fall = 155 #bad angle range to get rid of (125-150)
+angle_end_fall = 160 #bad angle range to get rid of (125-150)
 
 print("SPRING: good angle start = " + str(angle_start_spring))
 print("SPRING good angle end = " + str(angle_end_spring))
@@ -562,9 +566,9 @@ adjusted_a_s4_copy = np.copy(adjusted_a_s4_wS4rotation)
 #%%
 plt.figure()
 plt.plot(adjusted_a_s1_copy)
-plt.plot(adjusted_a_s1_copy)
-plt.plot(adjusted_a_s1_copy)
-plt.plot(adjusted_a_s1_copy)
+plt.plot(adjusted_a_s2_copy)
+plt.plot(adjusted_a_s3_copy)
+plt.plot(adjusted_a_s4_copy)
 #%%
 adjusted_a_s1_copy_spring = np.array(adjusted_a_s1_wS4rotation[: break_index+1])
 adjusted_a_s2_copy_spring = np.array(adjusted_a_s2_wS4rotation[: break_index+1])
@@ -644,7 +648,7 @@ adjusted_alpha_df_final['windDir_final'] = np.array(final_good_windDir)
 adjusted_alpha_df_final['time'] = alpha_df['time']
 adjusted_alpha_df_final['datetime'] = alpha_df['datetime']       
 # adjusted_alpha_df.to_csv(file_path+"windDir_withBadFlags_combinedAnalysis.csv")
-adjusted_alpha_df_final.to_csv(file_path+"windDir_withBadFlags_110to155_within15degRequirement_combinedAnalysis.csv")
+adjusted_alpha_df_final.to_csv(file_path+"windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv")
 
 
 #%%
