@@ -9,7 +9,8 @@ Created on Tue Dec  5 09:32:10 2023
 This file is used to make timeseries plots of 
 
 INPUT files:
-    despiked_s3_turbulenceTerms_andMore_combined.csv
+    z0_combinedAnalysis.csv
+    dragCoefficient_combinedAnalysis.csv
     windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv
     date_combinedAnalysis.csv
     
