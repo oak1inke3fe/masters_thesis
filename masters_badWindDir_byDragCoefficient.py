@@ -24,7 +24,7 @@ date_df = pd.read_csv(file_path + "date_combinedAnalysis.csv")
 print(date_df.columns)
 print(date_df['datetime'][10])
 
-windDir_df = pd.read_csv(file_path + "windDir_IncludingBad_wS4rotation_combinedAnalysis.csv")
+windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv")
 # windDir_df = pd.read_csv(file_path + "windDir_keep090250s_075260f_combinedAnalysis.csv")
 windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
 
@@ -96,6 +96,12 @@ cd_s1 = (usr_s1**2)/(np.array(Ubar_s1)**2)
 cd_s2 = (usr_s2**2)/(np.array(Ubar_s2)**2)
 cd_s3 = (usr_s3**2)/(np.array(Ubar_s3)**2)
 cd_s4 = (usr_s4**2)/(np.array(Ubar_s4)**2)
+cd_df = pd.DataFrame()
+cd_df['cd_s1'] = np.array(cd_s1)
+cd_df['cd_s2'] = np.array(cd_s2)
+cd_df['cd_s3'] = np.array(cd_s3)
+cd_df['cd_s4'] = np.array(cd_s4)
+cd_df.to_csv(file_path + 'dragCoefficient_combinedAnalysis.csv')
 
 #%%
 fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, sharex=True, figsize=(8, 10))
