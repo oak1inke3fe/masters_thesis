@@ -27,9 +27,8 @@ OUTPUT files:
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
-# import scipy as sp
-# import seaborn as sns
+import binsreg
+import seaborn as sns
 
 print('done with imports')
 #%%
@@ -42,6 +41,15 @@ plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/Plots/'
 
 sonic_file1 = "despiked_s1_turbulenceTerms_andMore_combined.csv"
 sonic1_df = pd.read_csv(file_path+sonic_file1)
+sonic_file2 = "despiked_s2_turbulenceTerms_andMore_combined.csv"
+sonic2_df = pd.read_csv(file_path+sonic_file2)
+sonic_file3 = "despiked_s3_turbulenceTerms_andMore_combined.csv"
+sonic3_df = pd.read_csv(file_path+sonic_file3)
+
+windSpeed_df = pd.DataFrame()
+windSpeed_df['Ubar_LI'] = (sonic1_df['Ubar']+sonic2_df['Ubar'])/2
+windSpeed_df['Ubar_LII'] = (sonic2_df['Ubar']+sonic3_df['Ubar'])/2
+
 
 windDir_file = "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv"
 windDir_df = pd.read_csv(file_path + windDir_file)
@@ -102,6 +110,7 @@ z_df[mask_goodWindDir] = np.nan
 zL_df[mask_goodWindDir] = np.nan
 pw_df[mask_goodWindDir] = np.nan
 sonic1_df[mask_goodWindDir] = np.nan
+windSpeed_df[mask_goodWindDir] = np.nan
 
 print('done with setting up  good wind direction only dataframes')
 
@@ -131,7 +140,7 @@ z_df[mask_neutral_zL] = np.nan
 windDir_df[mask_neutral_zL] = np.nan
 pw_df[mask_neutral_zL] = np.nan
 sonic1_df[mask_neutral_zL] = np.nan
-
+windSpeed_df[mask_neutral_zL] = np.nan
 
 plt.figure()
 # plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II')
@@ -149,35 +158,6 @@ plt.title('z/L and Prod AFTER neutral mask')
 
 print('done with setting up near-neutral dataframes')
 
-#%% mask to s1 Ubar >=8m/s for higher confidence comparison to pw
-
-plt.figure()
-# plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II')
-plt.scatter(sonic1_df.index, sonic1_df['Ubar'], label = 'Ubar s1', color = 'gray')
-plt.legend()
-plt.title('Ubar BEFORE 8m/s restriction mask')
-
-Ubar_index_array = np.arange(len(sonic1_df))
-sonic1_df['new_index_arr'] = np.where(sonic1_df['Ubar']>=8, np.nan, Ubar_index_array)
-mask_confidentPPW_byUbarRestriction = np.isin(sonic1_df['new_index_arr'],Ubar_index_array)
-
-sonic1_df[mask_confidentPPW_byUbarRestriction]=np.nan
-
-zL_df[mask_confidentPPW_byUbarRestriction] = np.nan
-eps_df[mask_confidentPPW_byUbarRestriction] = np.nan
-prod_df[mask_confidentPPW_byUbarRestriction] = np.nan
-buoy_df[mask_confidentPPW_byUbarRestriction] = np.nan
-z_df[mask_confidentPPW_byUbarRestriction] = np.nan
-windDir_df[mask_confidentPPW_byUbarRestriction] = np.nan
-pw_df[mask_confidentPPW_byUbarRestriction] = np.nan
-
-plt.figure()
-# plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II')
-plt.scatter(sonic1_df.index, sonic1_df['Ubar'], label = 'Ubar s1', color = 'gray')
-plt.legend()
-plt.title('Ubar AFTER 8m/s restriction mask')
-
-print('done with setting up Ubar restrictions to confident pw calcs')
 
 #%% Offshore setting
 # all_windDirs = False
@@ -237,6 +217,19 @@ buoy_LI = buoy_df['buoy_I']
 
 
 print('done with getting epsilon with LI,II,II and dfs and buoyancy dfs')
+#%%
+fig = plt.figure(figsize=(15,8))
+plt.plot(prod_df['prod_II'], color = 'darkorange', label = 'L II')
+plt.plot(prod_df['prod_I'], color = 'dodgerblue', label = 'L I')
+plt.legend()
+# plt.hlines(y=0, xmin=0,xmax=4395,color='k')
+plt.xlim(1500,2000)
+plt.ylim(-0.1,0.33)
+plt.xlabel('time')
+plt.ylabel('$P$ [m^2/s^3]')
+plt.title('Neutral Conditions: $P$ Combined Analysis')
+# plt.title('Neutral Conditions: $P$, $-\epsilon$ Combined Analysis')
+
 
 #%% Production minus dissipation (dissipation deficit if result is +)
 p_minus_diss_I =  np.array(np.array(prod_df['prod_I'])-np.array(eps_df['eps_LI']))
@@ -286,16 +279,13 @@ plt.plot(p_minus_diss_II, color = 'darkorange', label = 'L II')
 plt.plot(p_minus_diss_I, color = 'dodgerblue', label = 'L I')
 plt.legend()
 # plt.hlines(y=0, xmin=0,xmax=4395,color='k')
-# plt.xlim(700,860)
+plt.xlim(1500,2000)
 plt.ylim(-0.2,0.2)
 plt.xlabel('time')
 plt.ylabel('$P-\epsilon$ [m^2/s^3]')
 plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis')
-plt.savefig(plot_savePath + "timeseries_neutralPvEps.png", dpi = 300)
-plt.savefig(plot_savePath + "timeseries_neutralPvEps.pdf")
-# plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for $\overline{u}$ sonic1 >=8m/s')
-# plt.savefig(plot_savePath + "timeseries_neutralPvEps_pwUbarRestriction.png", dpi = 300)
-# plt.savefig(plot_savePath + "timeseries_neutralPvEps_pwUbarRestriction.pdf")
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.png", dpi = 300)
+# plt.savefig(plot_savePath + "timeseries_neutralPvEps.pdf")
 
 #%%
 plt.figure()
@@ -368,36 +358,6 @@ PplusB_minus_eps_df['LI'] = np.array(prodPLUSbuoy['P+B LI'])-np.array(eps_df['ep
 PplusB_minus_eps_df['LII'] = np.array(prodPLUSbuoy['P+B LII'])-np.array(eps_df['eps_LII'])
 
 print('done with combining production and buoyancy')
-#%% dissipation deficit (with buoyancy) versus wave-coherent pw
-fig = plt.figure(figsize=(6,6))
-plt.plot([-0.1, 1], [-0.1, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
-plt.plot([10**-6,1], [10**-7,0.1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
-plt.plot([10**-6,0.1], [10**-5,1],color = 'k', linestyle = '--') #scale line by power of 10
-plt.scatter(PplusB_minus_eps_df['LII'], np.array(pw_df['d_dz_pw_theory_II']), color = 'darkorange', edgecolor = 'red', label = 'level II')
-plt.scatter(PplusB_minus_eps_df['LI'], np.array(pw_df['d_dz_pw_theory_I']), color = 'dodgerblue', edgecolor = 'navy',label = 'level I')
-# plt.scatter(PplusB_minus_eps_df['LII'], np.array(pw_df['d_dz_pw_theory_II']), color = 'orange', edgecolor = 'red', )
-
-plt.xscale('log')
-plt.yscale('log')
-plt.xlabel('$P +B - \epsilon$ [$m^2s^{-3}$]')
-plt.ylabel('$T_{\widetilde{pw}}$ [$m^2s^{-3}$]')
-plt.legend()
-plt.tight_layout()
-plt.title('Neutral Conditions: $P+B-\epsilon$ vs. $T_{\widetilde{pw}}$')
-plt.savefig(plot_savePath + "scatter_PW_vs_dissDeficit.png",dpi=300)
-plt.savefig(plot_savePath + "scatter_PW_vs_dissDeficit.pdf")
-# plt.title('Neutral Conditions: $P+B-\epsilon$ vs. $T_{\widetilde{pw}}$ \n for $\overline{u}$ sonic1 >=8m/s')
-# plt.savefig(plot_savePath + "scatter_PW_vs_dissDeficit_pwUbarRestriction.png",dpi=300)
-# plt.savefig(plot_savePath + "scatter_PW_vs_dissDeficit_pwUbarRestriction.pdf")
-# plt.axis('square')
-# plt.xlim(-0.0001,0.01)
-# plt.ylim(-0.01,0.01)
-print('done plotting P vs. Eps simple diss (new)')
-
-print('done with plotting dissipation deficit with buoyancy versus wave-coherent pw')
-#%%
-# If we just want to examine the high wind event from Oct2-4, 2022, use the following mask:
-# return to old version of code for this.
 
 #%%
 fig = plt.figure()
@@ -577,19 +537,17 @@ plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('$P$ [$m^2s^{-3}$]')
 plt.ylabel('$\epsilon$ [$m^2s^{-3}$]')
-# plt.title("SPRING: Neutral Conditions: $P$ vs. $\epsilon$")
-plt.title("SPRING: Neutral Conditions: $P$ vs. $\epsilon$ \n for $\overline{u}$ sonic1 >=8m/s")
+plt.title("SPRING: Neutral Conditions: $P$ vs. $\epsilon$")
 plt.legend(loc = 'lower right')
 ax = plt.gca() 
 # plt.text(.05, .9, "Pearson's r L III ={:.3f}".format(r_spring_III), transform=ax.transAxes)
-# plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_spring_II), transform=ax.transAxes)
-# plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_spring_I), transform=ax.transAxes)
+plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_spring_II), transform=ax.transAxes)
+plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_spring_I), transform=ax.transAxes)
 plt.axis('equal')
 plt.tight_layout()
-# plt.savefig(plot_savePath + "scatterplot_PvEps_spring.png",dpi=300)
-# plt.savefig(plot_savePath + "scatterplot_PvEps_spring.pdf")
-plt.savefig(plot_savePath + "scatterplot_PvEps_spring_pwUbarRestriction.png",dpi=300)
-plt.savefig(plot_savePath + "scatterplot_PvEps_spring_pwUbarRestriction.pdf")
+plt.savefig(plot_savePath + "scatterplot_PvEps_spring.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplot_PvEps_spring.pdf")
+
 print('done plotting P vs. Eps SPRING')
 
 
@@ -609,21 +567,18 @@ plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('$P$ [$m^2s^{-3}$]')
 plt.ylabel('$\epsilon$ [$m^2s^{-3}$]')
-# plt.title("FALL: Neutral Conditions: $P$ vs. $\epsilon$")
-plt.title("FALL: Neutral Conditions: $P$ vs. $\epsilon$ \n for $\overline{u}$ sonic1 >=8m/s")
+plt.title("FALL: Neutral Conditions: $P$ vs. $\epsilon$")
 plt.legend(loc = 'lower right')
 ax = plt.gca() 
 # plt.text(.05, .9, "Pearson's r L III ={:.3f}".format(r_fall_III), transform=ax.transAxes)
-# plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_fall_II), transform=ax.transAxes)
-# plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_fall_I), transform=ax.transAxes)
+plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_fall_II), transform=ax.transAxes)
+plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_fall_I), transform=ax.transAxes)
 ax.set_xlim(10**-5,1)
 ax.set_ylim(10**-5,1)
 plt.axis('equal')
 plt.tight_layout()
-# plt.savefig(plot_savePath + "scatterplot_PvEps_fall.png",dpi=300)
-# plt.savefig(plot_savePath + "scatterplot_PvEps_fall.pdf")
-plt.savefig(plot_savePath + "scatterplot_PvEps_fall_pwUbarRestriction.png",dpi=300)
-plt.savefig(plot_savePath + "scatterplot_PvEps_fall_pwUbarRestriction.pdf")
+plt.savefig(plot_savePath + "scatterplot_PvEps_fall.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplot_PvEps_fall.pdf")
 print('done plotting P vs. Eps FALL')
 #%%
 # Timeseries (split into 2 plots for each deployment)
@@ -762,66 +717,160 @@ plt.scatter(prodPLUSbuoy['P+B LII'], eps_df['eps_LII'], color = 'darkorange', ed
 plt.scatter(prodPLUSbuoy['P+B LI'], eps_df['eps_LI'], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
 plt.xscale('log')
 plt.yscale('log')
-plt.legend(loc = 'lower right')
+plt.legend(loc = 'upper left')
 plt.xlabel('$P\; +\; B$ [$m^2s^{-3}$]')
 plt.ylabel('$\epsilon$ [$m^2s^{-3}$]')
 plt.title('P+B vs. $\epsilon$')
 ax = plt.gca() 
-# plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_II_PB_str), transform=ax.transAxes)
-# plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.transAxes)
+# plt.text(.05, .8, "Pearson's r L II ={:.3f}".format(r_II_PB_str), transform=ax.transAxes) #this = 0.359
+# plt.text(.05, .75, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.transAxes)  #this =0.709
 plt.axis('equal')
 plt.tight_layout()
 plt.savefig(plot_savePath + "scatterplot_PplusBvEps_combinedAnalysis.png",dpi=300)
 plt.savefig(plot_savePath + "scatterplot_PplusBvEps_combinedAnalysis.pdf")
 
-# scatterplot of spring conditions
+
+#%%
 fig = plt.figure(figsize = (6,6))
 # fig= plt.figure()
 plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
 # plt.plot([10**-6,10], [10**-7,1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
 # plt.plot([10**-6,1], [10**-5,10],color = 'k', linestyle = '--') #scale line by power of 10
-# plt.scatter(prodPLUSbuoy['P+B LIII'][:break_index+1], eps_df['eps_LIII'][:break_index+1], color = 'seagreen', edgecolor = 'darkgreen',label = 'level III')
-plt.scatter(prodPLUSbuoy['P+B LII'][:break_index+1], eps_df['eps_LII'][:break_index+1], color = 'darkorange', edgecolor = 'red',label = 'level II')
-plt.scatter(prodPLUSbuoy['P+B LI'][:break_index+1], eps_df['eps_LI'][:break_index+1], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
-plt.xscale('log')
-plt.yscale('log')
-plt.legend(loc = 'lower right')
+# plt.scatter(prodPLUSbuoy['P+B LIII'], eps_df['eps_LIII'], color = 'seagreen', edgecolor = 'darkgreen', label = 'level III')
+plt.scatter(prodPLUSbuoy['P+B LII'], eps_df['eps_LII'], color = 'darkorange', edgecolor = 'red',label = 'level II')
+plt.scatter(prodPLUSbuoy['P+B LI'], eps_df['eps_LI'], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
+# plt.xscale('log')
+# plt.yscale('log')
+plt.legend(loc = 'upper left')
 plt.xlabel('$P\; +\; B$ [$m^2s^{-3}$]')
 plt.ylabel('$\epsilon$ [$m^2s^{-3}$]')
-plt.title('SPRING: P+B vs. $\epsilon$')
+plt.title('P+B vs. $\epsilon$')
 ax = plt.gca() 
-# plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_II_PB_str), transform=ax.transAxes)
-# plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.transAxes)
+# plt.text(.05, .8, "Pearson's r L II ={:.3f}".format(r_II_PB_str), transform=ax.transAxes) #this is 0.359
+# plt.text(.05, .75, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.transAxes)  #this is 0.709
 plt.axis('equal')
 plt.tight_layout()
-plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Spring.png",dpi=300)
-plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Spring.pdf")
 
-# scatterplot of fall conditions
+plt.xlim(0,1)
+plt.ylim(0,1)
+plt.savefig(plot_savePath + "scatterplotZoomOut_PplusBvEps_combinedAnalysis.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplotZoomOut_PplusBvEps_combinedAnalysis.pdf")
+
+
+#%%
+# # scatterplot of spring conditions
+# fig = plt.figure(figsize = (6,6))
+# # fig= plt.figure()
+# plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
+# # plt.plot([10**-6,10], [10**-7,1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
+# # plt.plot([10**-6,1], [10**-5,10],color = 'k', linestyle = '--') #scale line by power of 10
+# # plt.scatter(prodPLUSbuoy['P+B LIII'][:break_index+1], eps_df['eps_LIII'][:break_index+1], color = 'seagreen', edgecolor = 'darkgreen',label = 'level III')
+# plt.scatter(prodPLUSbuoy['P+B LII'][:break_index+1], eps_df['eps_LII'][:break_index+1], color = 'darkorange', edgecolor = 'red',label = 'level II')
+# plt.scatter(prodPLUSbuoy['P+B LI'][:break_index+1], eps_df['eps_LI'][:break_index+1], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
+# plt.xscale('log')
+# plt.yscale('log')
+# plt.legend(loc = 'upper left')
+# plt.xlabel('$P\; +\; B$ [$m^2s^{-3}$]')
+# plt.ylabel('$\epsilon$ [$m^2s^{-3}$]')
+# plt.title('SPRING: P+B vs. $\epsilon$')
+# ax = plt.gca() 
+# # plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_II_PB_str), transform=ax.transAxes)
+# # plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.transAxes)
+# plt.axis('equal')
+# plt.tight_layout()
+# plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Spring.png",dpi=300)
+# plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Spring.pdf")
+
+# # scatterplot of fall conditions
+# fig = plt.figure(figsize = (6,6))
+# # fig= plt.figure()
+# plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
+# # plt.plot([10**-6,10], [10**-7,1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
+# # plt.plot([10**-6,1], [10**-5,10],color = 'k', linestyle = '--') #scale line by power of 10
+# # plt.scatter(prodPLUSbuoy['P+B LIII'][break_index+1:], eps_df['eps_LIII'][break_index+1:], color = 'seagreen', edgecolor = 'darkgreen',label = 'level III')
+# plt.scatter(prodPLUSbuoy['P+B LII'][break_index+1:], eps_df['eps_LII'][break_index+1:], color = 'darkorange', edgecolor = 'red',label = 'level II')
+# plt.scatter(prodPLUSbuoy['P+B LI'][break_index+1:], eps_df['eps_LI'][break_index+1:], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
+# plt.xscale('log')
+# plt.yscale('log')
+# plt.legend(loc = 'upper left')
+# plt.xlabel('$P\; +\; B$ [$m^2s^{-3}$]')
+# plt.ylabel('$\epsilon$ [$m^2s^{-3}$]')
+# plt.title('FALL: P+B vs. $\epsilon$')
+# ax = plt.gca() 
+# # plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_II_PB_str), transform=ax.transAxes)
+# # plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.transAxes)
+# plt.axis('equal')
+# plt.tight_layout()
+# plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Fall.png",dpi=300)
+# plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Fall.pdf")
+
+#%%
+
+
+Level_I_df = pd.DataFrame()
+Level_I_df['P+B-Eps'] = np.array(PplusB_minus_eps_df['LI'])
+Level_I_df['Ubar'] = np.array(windSpeed_df['Ubar_LI'])
+Level_I_df['windDir'] = np.array(windDir_df['alpha_s2'])
+
+
+Level_II_df = pd.DataFrame()
+Level_II_df['P+B-Eps'] = np.array(PplusB_minus_eps_df['LII'])
+Level_II_df['Ubar'] = np.array(windSpeed_df['Ubar_LII'])
+Level_II_df['windDir'] = np.array(windDir_df['alpha_s3'])
+
+
+def binscatter(**kwargs):
+    # Estimate binsreg
+    est = binsreg.binsreg(**kwargs)
+    
+    # Retrieve estimates
+    df_est = pd.concat([d.dots for d in est.data_plot])
+    df_est = df_est.rename(columns={'x': kwargs.get("x"), 'fit': kwargs.get("y")})
+    
+    # Add confidence intervals
+    if "ci" in kwargs:
+        df_est = pd.merge(df_est, pd.concat([d.ci for d in est.data_plot]))
+        df_est = df_est.drop(columns=['x'])
+        df_est['ci'] = df_est['ci_r'] - df_est['ci_l']
+    
+    # Rename groups
+    if "by" in kwargs:
+        df_est['group'] = df_est['group'].astype(df_est[kwargs.get("by")].dtype)
+        df_est = df_est.rename(columns={'group': kwargs.get("by")})
+
+    return df_est
+
+# Estimate binsreg
+df_binEstimate_LI_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps',w=['windDir'], data=Level_I_df, ci=(3,3),randcut=1)
+df_binEstimate_LI_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_I_df, ci=(3,3),randcut=1)
+
+df_binEstimate_LII_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps',w=['windDir'], data=Level_II_df, ci=(3,3),randcut=1)
+df_binEstimate_LII_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_II_df, ci=(3,3),randcut=1)
+
+#%%
+# scatterplot of Production AND Buoyancy versus Dissipation: combined analysis
 fig = plt.figure(figsize = (6,6))
-# fig= plt.figure()
-plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
-# plt.plot([10**-6,10], [10**-7,1], color = 'k', linestyle = '--', label = '+\- O10') #scale line by power of 10
-# plt.plot([10**-6,1], [10**-5,10],color = 'k', linestyle = '--') #scale line by power of 10
-# plt.scatter(prodPLUSbuoy['P+B LIII'][break_index+1:], eps_df['eps_LIII'][break_index+1:], color = 'seagreen', edgecolor = 'darkgreen',label = 'level III')
-plt.scatter(prodPLUSbuoy['P+B LII'][break_index+1:], eps_df['eps_LII'][break_index+1:], color = 'darkorange', edgecolor = 'red',label = 'level II')
-plt.scatter(prodPLUSbuoy['P+B LI'][break_index+1:], eps_df['eps_LI'][break_index+1:], color = 'dodgerblue', edgecolor = 'navy', label = 'level I')
-plt.xscale('log')
-plt.yscale('log')
-plt.legend(loc = 'lower right')
-plt.xlabel('$P\; +\; B$ [$m^2s^{-3}$]')
-plt.ylabel('$\epsilon$ [$m^2s^{-3}$]')
-plt.title('FALL: P+B vs. $\epsilon$')
+sns.scatterplot(x='Ubar', y='P+B-Eps', data=df_binEstimate_LII_UbarVsDeficit, color = 'darkorange', label = "binned LII")
+plt.errorbar('Ubar', 'P+B-Eps', yerr='ci', data=df_binEstimate_LII_UbarVsDeficit, color = 'coral', ls='', lw=2, alpha=0.2, label = 'LII errorbar')
+sns.scatterplot(x='Ubar', y='P+B-Eps', data=df_binEstimate_LI_UbarVsDeficit, color = 'dodgerblue', label = "binned LI")
+plt.errorbar('Ubar', 'P+B-Eps', yerr='ci', data=df_binEstimate_LI_UbarVsDeficit, color = 'navy', ls='', lw=2, alpha=0.2, label = 'LI errorbar')
+# plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
+
+# plt.xscale('log')
+# plt.yscale('log')
+plt.legend(loc = 'upper left')
+plt.xlabel('$\overline{u}$ [$ms^{-1}$]')
+plt.ylabel('$P\; +\; B \; - \; \epsilon$ [$m^2s^{-3}$]')
+plt.title('$P+B- \epsilon$ vs. Wind Speed ($\overline{u}$) \n (Binned)')
 ax = plt.gca() 
 # plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_II_PB_str), transform=ax.transAxes)
 # plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.transAxes)
-plt.axis('equal')
+# plt.axis('equal')
+plt.hlines(y=0,xmin=2,xmax=15,color='k',linestyles='--')
+plt.xlim(2,15)
 plt.tight_layout()
-plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Fall.png",dpi=300)
-plt.savefig(plot_savePath + "scatterplot_PplusBvEps_Fall.pdf")
-
-
-
+plt.savefig(plot_savePath + "scatterplotBIN_UbarVSPplusBminusEps_combinedAnalysis.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplotBIN__UbarVSPplusBvEps_combinedAnalysis.pdf")
 #%%
 # sort by z/L
 zL_I_df = pd.DataFrame()

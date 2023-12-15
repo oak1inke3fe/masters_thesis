@@ -130,13 +130,13 @@ prod_newDF['prod_III'] = prod_LIII_new
 
 #%%
 plt.figure()
-plt.plot(sonic4_mean_df['Ubar']/10, label = '<u>/10', color = 'black')
+# plt.plot(sonic4_mean_df['Ubar']/10, label = '<u>/10', color = 'black')
 plt.plot(prod_newDF['prod_III'], label = 'III', color = 'green')
 plt.plot(prod_newDF['prod_II'], label = 'II', color = 'darkorange')
 plt.plot(prod_newDF['prod_I'], label = 'I', color = 'blue')
 # plt.vlines(x=break_index, ymin=-1, ymax=1, color = 'k')
 plt.legend()
-# plt.ylim(-0.5,0.5)
+plt.ylim(-0.5,0.5)
 plt.title('Production $m^2s^{-3}$ Combined')
 #%%
 # plt.figure()
@@ -199,6 +199,9 @@ UpWp_bar_df['UpWp_bar_s3'] = s3_turbTerms_Df['UpWp_bar']
 UpWp_bar_df['UpWp_bar_s4'] = s4_turbTerms_Df['UpWp_bar']
 
 UpWp_bar_df.to_csv(file_path + 'UpWp_bar_combinedAnalysis.csv')
+
+plt.figure()
+UpWp_bar_df.plot()
 
 print('done with UpWp_bar')
 #%%

@@ -45,6 +45,7 @@ plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/Plots/'
 
 sonic_file1 = "despiked_s1_turbulenceTerms_andMore_combined.csv"
 sonic1_df = pd.read_csv(file_path+sonic_file1)
+sonic1_df['sum'] = np.ones(len(sonic1_df))
 
 windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv")
 windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
@@ -189,6 +190,7 @@ plt.title('Ubar BEFORE 8m/s restriction mask')
 plt.xlabel('index')
 plt.ylabel('Ubar')
 plt.legend(loc='lower right')
+plt.xlim(1600,1950)
 plt.show()
 
 Ubar_index_array = np.arange(len(sonic1_df))
@@ -216,6 +218,26 @@ plt.show()
 
 print('done with setting up Ubar restrictions to confident pw calcs')
 
+#%%
+plt.figure()
+plt.scatter(sonic1_df.index, sonic1_df['Ubar'], label = 'Ubar s1', color = 'g')
+plt.title('Ubar AFTER 8m/s restriction mask')
+plt.xlabel('index')
+plt.ylabel('Ubar')
+plt.legend(loc='lower right')
+plt.xlim(1600,1950) # spring
+# plt.xlim(4790,4920) # fall
+plt.hlines(y=8,xmin=0,xmax=7000,color='k')
+
+spring_event_arr_sonic1 = np.array(sonic1_df['sum'][1609:1933]) # 8m/s restriction
+spring_event_arr_sonic1_sum = np.nansum(spring_event_arr_sonic1) 
+print(spring_event_arr_sonic1_sum)
+print('wind direction range = ' + str(np.max(windDir_df['alpha_s3'][1609:1933]))+", "+ str(np.min(windDir_df['alpha_s3'][1609:1933])))
+
+fall_event_arr_sonic1 = np.array(sonic1_df['sum'][4583:4807]) # 8m/s restriction
+fall_event_arr_sonic1_sum = np.nansum(fall_event_arr_sonic1)
+print(fall_event_arr_sonic1_sum)
+print('wind direction range = ' + str(np.max(windDir_df['alpha_s3'][4583:4807]))+", "+ str(np.min(windDir_df['alpha_s3'][4583:4807])))
 #%% Offshore setting
 # all_windDirs = False
 # onshore = False

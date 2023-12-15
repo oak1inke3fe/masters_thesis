@@ -17,6 +17,7 @@ print('done with imports')
 #%%
 
 file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
+rho_df = pd.read_csv(file_path + 'rhoAvg_CombinedAnalysis.csv')
 date_df = pd.read_csv(file_path + 'date_combinedAnalysis.csv')
 spring_start = date_df['datetime'][0]
 spring_end = date_df['datetime'][3959]
@@ -87,10 +88,11 @@ dz_LI_fall = 1.8161  #sonic 2- sonic 1: FALL SEPT 2022 deployment
 dz_LII_fall = 3.2131 #sonic 3- sonic 2: FALL SEPT 2022 deployment
 dz_LIII_fall = 2.468 #sonic 4- sonic 3: FALL SEPT 2022 deployment
 break_index = 3959
-pw_dI_spring = (np.array(expand1_pw_df['PW boom-2 [m^3/s^3]'][:break_index+1])-np.array(expand1_pw_df['PW boom-1 [m^3/s^3]'][:break_index+1]))/dz_LI_spring
-pw_dII_spring = (np.array(expand1_pw_df['PW boom-3 [m^3/s^3]'][:break_index+1])-np.array(expand1_pw_df['PW boom-2 [m^3/s^3]'][:break_index+1]))/dz_LII_spring
-pw_dI_fall = (np.array(expand1_pw_df['PW boom-2 [m^3/s^3]'][break_index+1:])-np.array(expand1_pw_df['PW boom-1 [m^3/s^3]'][break_index+1:]))/dz_LI_fall
-pw_dII_fall = (np.array(expand1_pw_df['PW boom-3 [m^3/s^3]'][break_index+1:])-np.array(expand1_pw_df['PW boom-2 [m^3/s^3]'][break_index+1:]))/dz_LII_fall
+# pw = rho(pw_boom2-pw_boom1)/(dzI)
+pw_dI_spring = np.array(rho_df['rho_bar_1_dry'][:break_index+1])*(np.array(expand1_pw_df['PW boom-2 [m^3/s^3]'][:break_index+1])-np.array(expand1_pw_df['PW boom-1 [m^3/s^3]'][:break_index+1]))/dz_LI_spring
+pw_dII_spring = np.array(rho_df['rho_bar_2_dry'][:break_index+1])*(np.array(expand1_pw_df['PW boom-3 [m^3/s^3]'][:break_index+1])-np.array(expand1_pw_df['PW boom-2 [m^3/s^3]'][:break_index+1]))/dz_LII_spring
+pw_dI_fall = np.array(rho_df['rho_bar_1_dry'][break_index+1:])*(np.array(expand1_pw_df['PW boom-2 [m^3/s^3]'][break_index+1:])-np.array(expand1_pw_df['PW boom-1 [m^3/s^3]'][break_index+1:]))/dz_LI_fall
+pw_dII_fall = np.array(rho_df['rho_bar_2_dry'][break_index+1:])*(np.array(expand1_pw_df['PW boom-3 [m^3/s^3]'][break_index+1:])-np.array(expand1_pw_df['PW boom-2 [m^3/s^3]'][break_index+1:]))/dz_LII_fall
 #%%
 pw_dI = np.concatenate([pw_dI_spring,pw_dI_fall],axis=0)
 pw_dII = np.concatenate([pw_dII_spring,pw_dII_fall],axis=0)

@@ -439,14 +439,13 @@ plt.xlim(4650,4680)
 plt.ylim(40,60)
 plt.title('Fall Deployment Adjusted to 360')
 #%%
-# fig, ax = plt.subplots(1,1)
+fig, ax = plt.subplots(1,1)
 ax = WindroseAxes.from_ax()
 ax.bar(adjusted_alpha_df_final['alpha_s4'], sonic4_df['Ubar'], bins=np.arange(3, 18, 3), normed = True)
 ax.set_title('Wind Velocity [$ms^{-1}$] \n Combined Deployments', fontsize=20)
 ax.set_legend(bbox_to_anchor=(0.9, -0.1),fontsize=20)
 
 plt.savefig(plot_save_path+ "windRose_combinedAnalysis.png", dpi=300)
-plt.show()
 plt.savefig(plot_save_path+ "windRose_combinedAnalysis.pdf")
 
 #%% make windroses of daylight conditions 

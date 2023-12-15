@@ -88,7 +88,7 @@ Eps_df = Eps_df.drop(['Unnamed: 0'], axis=1)
 # tke_transport_df = tke_transport_df.drop(['Unnamed: 0'], axis=1)
 
 
-windDir_file = "windDir_withBadFlags_110to155_within15degRequirement_combinedAnalysis.csv"
+windDir_file = "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv"
 windDir_df = pd.read_csv(file_path + windDir_file)
 windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
 
@@ -559,7 +559,7 @@ plt.grid()
 plt.legend()
 #%%
 # import binsreg
-
+# binscatter function written by Matteo Courthoud in Towards Data Science May 9, 2022
 def binscatter(**kwargs):
     # Estimate binsreg
     est = binsreg.binsreg(**kwargs)
@@ -636,13 +636,34 @@ plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_II_dc, color =
 # plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_III_dc, color = 'k', ls='', lw=2, alpha=0.2, label = 'L III error')
 plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE eq. 34, 41')
 plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
-plt.title(oct_addition+ title_windDir + "$\phi_{M}(z/L) (DC)$")
-# plt.xlim(-1.2,0.8)
+plt.title("$\phi_{M}(\zeta)$")
+plt.vlines(x=0,ymin=-0.5,ymax=3,linestyles='--',color='k',)
 plt.xlim(-2,1)
-plt.ylim(-0.5,3)
+plt.ylim(0,3)
+plt.xlabel("$\zeta = z/L$")
+plt.ylabel('$\phi_M(\zeta)$')
 plt.legend()
 plt.savefig(plot_savePath + "binnedScatterplot_phiM_Puu.png",dpi=300)
 plt.savefig(plot_savePath + "binnedScatterplot_phiM_Puu.pdf")
+
+plt.figure(figsize=(6,5))
+sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_I_dc, color = 'dodgerblue', label = "L I")
+plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_I_dc, color = 'navy', ls='', lw=2, alpha=0.2, label = 'L I error')
+sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_II_dc, color = 'darkorange', label = "L II")
+plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_II_dc, color = 'red', ls='', lw=2, alpha=0.2, label = 'L II error')
+# sns.scatterplot(x='z/L', y='phi_m', data=df_binEstimate_phi_m_III_dc, color = 'seagreen', label = "L III")
+# plt.errorbar('z/L', 'phi_m', yerr='ci', data=df_binEstimate_phi_m_III_dc, color = 'k', ls='', lw=2, alpha=0.2, label = 'L III error')
+plt.plot(coare_zL_neg, eq34, color = 'k',linewidth=3, label = 'COARE eq. 34, 41')
+plt.plot(coare_zL_pos, eq41, color = 'k',linewidth=3)
+plt.title("$\phi_{M}(\zeta)$ \n(Zoomed Near-Neautral )")
+plt.vlines(x=0,ymin=-0.5,ymax=3,linestyles='--',color='k',)
+plt.xlim(-0.5,0.5)
+plt.ylim(0,3)
+plt.xlabel("$\zeta = z/L$")
+plt.ylabel('$\phi_M(\zeta)$')
+plt.legend()
+plt.savefig(plot_savePath + "binnedZOOMScatterplot_phiM_Puu.png",dpi=300)
+plt.savefig(plot_savePath + "binnedZOOMScatterplot_phiM_Puu.pdf")
 
 #%% Phi_m binned scatterplot levels 4-1, 3-1, 4-2
 xmin = -2
@@ -1049,7 +1070,7 @@ plt.legend()
 
 plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/Plots/'
 plt.figure(figsize=(6,5))
-sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_I_dc, color = 'dodgerblue', label = "L I")
+sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_I_dc, color = 'dodgerblue',edgecolor='navy', label = "L I")
 plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_I_dc, color = 'navy', ls='', lw=2, alpha=0.2, label = 'L I error')
 sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_II_dc, color = 'darkorange', label = "L II")
 plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_II_dc, color = 'red', ls='', lw=2, alpha=0.2, label = 'L II error')
@@ -1058,14 +1079,38 @@ plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_II_dc, col
 plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=3, label = 'Edson et al. (1998) eq. 40, 42')
 plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=3)
 # plt.plot(coare_zL_neg, eq40_me, color = 'blue',linewidth=2, label = 'My suggested new form')
-plt.title(oct_addition+ title_windDir + "$\phi_{\epsilon}(z/L) (DC)$")
-plt.xlim(-4,2)
-# plt.ylim(-5,4)
-plt.ylabel('$\phi_\epsilon$')
+plt.title("$\phi_{\epsilon}(\zeta)$")
+plt.xlim(-2,2)
+# plt.ylim(0,10)
+plt.vlines(x=0,ymin=0,ymax=10,linestyles='--',color='k')
+plt.xlabel('$\zeta = z/L$')
+plt.ylabel('$\phi_{\epsilon}(\zeta)$')
 plt.yscale('log')
 plt.legend(loc = 'upper left')
 plt.savefig(plot_savePath + "binnedScatterplot_phiEps_Puu.png",dpi=300)
 plt.savefig(plot_savePath + "binnedScatterplot_phiEps_Puu.pdf")
+
+plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/Plots/'
+plt.figure(figsize=(6,5))
+sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_I_dc, color = 'dodgerblue',edgecolor='navy', label = "L I")
+plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_I_dc, color = 'navy', ls='', lw=2, alpha=0.2, label = 'L I error')
+sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_II_dc, color = 'darkorange', label = "L II")
+plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_II_dc, color = 'red', ls='', lw=2, alpha=0.2, label = 'L II error')
+# sns.scatterplot(x='z/L', y='phi_eps', data=df_binEstimate_phi_eps_III_dc, color = 'seagreen', label = "L III")
+# plt.errorbar('z/L', 'phi_eps', yerr='ci', data=df_binEstimate_phi_eps_III_dc, color = 'k', ls='', lw=2, alpha=0.2, label = 'L III error')
+plt.plot(coare_zL_neg, eq40, color = 'k',linewidth=3, label = 'Edson et al. (1998) eq. 40, 42')
+plt.plot(coare_zL_pos, eq42, color = 'k',linewidth=3)
+# plt.plot(coare_zL_neg, eq40_me, color = 'blue',linewidth=2, label = 'My suggested new form')
+plt.title("$\phi_{\epsilon}(\zeta)$  \n(Zoomed Near-Neautral")
+plt.xlim(-0.5,0.5)
+# plt.ylim(0,10)
+plt.vlines(x=0,ymin=0,ymax=10,linestyles='--',color='k')
+plt.xlabel('$\zeta = z/L$')
+plt.ylabel('$\phi_{\epsilon}(\zeta)$')
+plt.yscale('log')
+plt.legend(loc = 'upper left')
+plt.savefig(plot_savePath + "binnedZOOMScatterplot_phiEps_Puu.png",dpi=300)
+plt.savefig(plot_savePath + "binnedZOOMScatterplot_phiEps_Puu.pdf")
 
 #%% Phi_epsilon binned scatterplots levels 4-1, 3-1, 4-2
  
