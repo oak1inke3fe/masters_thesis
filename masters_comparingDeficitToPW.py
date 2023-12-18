@@ -4,6 +4,15 @@
 Created on Tue Dec 12 13:47:11 2023
 
 @author: oaklinkeefe
+
+
+
+For each 20m block, we have 4 estimates of <uw> (one from each sonic). 
+Could you take the median of those 4 measurements to reduce the noise (i.e., assume constant stress layer, and average more). 
+Then we’d have a single lower-noise <uw> for each 20min block.
+ 
+The integrated production from sonic1 to sonic3 would then be: ( - <uw>_ave )*(U3-U1)
+
 """
 
 #%%
@@ -29,6 +38,8 @@ sonic_file2 = "despiked_s2_turbulenceTerms_andMore_combined.csv"
 sonic2_df = pd.read_csv(file_path+sonic_file2)
 sonic_file3 = "despiked_s3_turbulenceTerms_andMore_combined.csv"
 sonic3_df = pd.read_csv(file_path+sonic_file3)
+sonic_file4 = "despiked_s4_turbulenceTerms_andMore_combined.csv"
+sonic4_df = pd.read_csv(file_path+sonic_file4)
 
 windSpeed_df = pd.DataFrame()
 windSpeed_df['Ubar_LI'] = (sonic1_df['Ubar']+sonic2_df['Ubar'])/2
@@ -80,24 +91,196 @@ plt.figure()
 plt.plot(-1*sonic1_df['UpWp_bar'], label = 's1')
 plt.plot(-1*sonic2_df['UpWp_bar'], label = 's2')
 plt.plot(-1*sonic3_df['UpWp_bar'], label = 's3')
+plt.plot(-1*sonic4_df['UpWp_bar'], label = 's4') #1878, 1899
 # plt.plot(-1*sonic2_df['UpWp_bar']-(-1*sonic1_df['UpWp_bar']), label = 's2-s1 difference')
-plt.plot(-1*sonic3_df['UpWp_bar']-(-1*sonic1_df['UpWp_bar']), label = 's3-s1 difference')
+# plt.plot(-1*sonic3_df['UpWp_bar']-(-1*sonic1_df['UpWp_bar']), label = 's3-s1 difference')
 plt.hlines(y=0,xmin=0,xmax=break_index,color = 'k')
-plt.xlim(1500, 2000)
+plt.xlim(1500,2000)
 plt.ylim(-0.2,0.7)
 plt.legend()
 plt.title("$-\overline{u'w'}$")
+
 #%%
+# mask to make when s4 out of bounds, it reads NaN
+s4_index_array = np.arange(len(sonic4_df))
+sonic4_df['new_index_arr'] = np.where((np.abs(sonic4_df['UpWp_bar'])<=np.abs(sonic3_df['UpWp_bar'])+0.05), np.nan, s4_index_array)
+mask_s4 = np.isin(sonic4_df['new_index_arr'],s4_index_array)
+
+sonic4_df[mask_s4] = np.nan
+
 plt.figure()
-plt.plot(sonic1_df['Ubar'], label = 's1')
-plt.plot(sonic2_df['Ubar'], label = 's2')
-plt.plot(sonic3_df['Ubar'], label = 's3')
-# plt.plot(sonic2_df['Ubar']-sonic1_df['Ubar'], label = 's2-s1 difference')
-plt.plot(sonic3_df['Ubar']-sonic1_df['Ubar'], label = 's3-s1 difference')
+plt.plot(-1*sonic1_df['UpWp_bar'], label = 's1')
+plt.plot(-1*sonic2_df['UpWp_bar'], label = 's2')
+plt.plot(-1*sonic3_df['UpWp_bar'], label = 's3')
+plt.plot(-1*sonic4_df['UpWp_bar'], label = 's4') #1878, 1899
+# plt.plot(-1*sonic2_df['UpWp_bar']-(-1*sonic1_df['UpWp_bar']), label = 's2-s1 difference')
+# plt.plot(-1*sonic3_df['UpWp_bar']-(-1*sonic1_df['UpWp_bar']), label = 's3-s1 difference')
 plt.hlines(y=0,xmin=0,xmax=break_index,color = 'k')
-plt.xlim(1500, 2000)
+plt.xlim(1500,2000)
+plt.ylim(-0.2,0.7)
 plt.legend()
-plt.title("$\overline{u}$")
+plt.title("$-\overline{u'w'}$")
+
+
+#%%
+"""
+For each 20m block, we have 4 estimates of <uw> (one from each sonic). 
+Could you take the median of those 4 measurements to reduce the noise (i.e., assume constant stress layer, and average more). 
+Then we’d have a single lower-noise <uw> for each 20min block.
+ 
+The integrated production from sonic1 to sonic3 would then be: ( - <uw>_ave )*(U3-U1)
+"""
+
+UpWp_bar_df = pd.DataFrame()
+UpWp_bar_df['s1_UpWp_bar']= sonic1_df['UpWp_bar']
+UpWp_bar_df['s2_UpWp_bar']= sonic2_df['UpWp_bar']
+UpWp_bar_df['s3_UpWp_bar']= sonic3_df['UpWp_bar']
+UpWp_bar_df['s4_UpWp_bar']= sonic4_df['UpWp_bar']
+
+UpWp_bar_avg = np.array(UpWp_bar_df.mean(axis=1, skipna=True))
+
+rho_P_avg_13 = np.array(rho_df['rho_bar_1_dry']*(-1*UpWp_bar_avg)*(sonic3_df['Ubar']-sonic1_df['Ubar']))
+y_spring = np.vstack((eps_df['epsU_sonic1_MAD'][:break_index+1], eps_df['epsU_sonic3_MAD'][:break_index+1])).T
+y_fall = np.vstack((eps_df['epsU_sonic1_MAD'][break_index+1:], eps_df['epsU_sonic3_MAD'][break_index+1:])).T
+rho_eps_spring = np.array(rho_df['rho_bar_1_dry'][:break_index+1])*np.trapz(y=y_spring, x=None, dx=5.49)#do trapz for between sonics 1-3
+rho_eps_fall = np.array(rho_df['rho_bar_1_dry'][break_index+1:])*np.trapz(y=y_fall, x=None, dx=5.0292)#do trapz for between sonics 1-3
+rho_eps = np.concatenate((rho_eps_spring, rho_eps_fall), axis=0)
+# rho_eps_MAYstorm = rho_eps[storm_index_start:storm_index_stop]
+deficit = (rho_P_avg_13)-np.array(rho_eps)
+#%%
+# deficit_minus_pw = deficit 
+plt.figure(figsize=(8,3))
+# plt.scatter(np.arange(len(deficit)), rho_P_avg_13, s=10, color = 'b', label = r'$\rho \cdot P$')
+# plt.plot(np.arange(len(deficit)), rho_P_avg_13, color = 'b',)
+# plt.scatter(np.arange(len(deficit)), rho_eps, s=10, color = 'navy', label = r'$\rho \cdot \epsilon$')
+# plt.plot(np.arange(len(deficit)), rho_eps, color = 'navy',)
+plt.scatter(np.arange(len(deficit)), deficit, s=10, color = 'gray', label = r'$\rho \cdot P -\rho \cdot \epsilon$')
+plt.plot(np.arange(len(deficit)), deficit, color = 'gray',)
+plt.scatter(np.arange(len(deficit)), pw_df['PW boom-1 [m^3/s^3]'], s=10, color='red', label = 'PW')
+plt.plot(np.arange(len(deficit)), pw_df['PW boom-1 [m^3/s^3]'],color='red', )
+plt.scatter(np.arange(len(deficit)), deficit+pw_df['PW boom-1 [m^3/s^3]'], s=10, color = 'black', label = r'$(\rho \cdot P -\rho \cdot \epsilon) - PW$')
+plt.plot(np.arange(len(deficit)), deficit+pw_df['PW boom-1 [m^3/s^3]'], color = 'black',)
+plt.hlines(y=0,xmin=0,xmax=3959,linestyles='--', color = 'k')
+plt.legend(fontsize=9)
+plt.xlim(1500,2000)
+plt.ylim(-0.3,0.3)
+plt.title('Deficit with PW')
+
+#%%
+rho_P_avg_13_spring_df = pd.DataFrame()
+rho_P_avg_13_spring_df['rho_P'] = rho_P_avg_13[:break_index+1]
+
+rho_P_avg_13_arr_spring = [rho_P_avg_13_spring_df,]
+
+rho_P_avg_13_spring_despike = pd.DataFrame()
+
+rho_P_avg_13_despike_arr_spring = [rho_P_avg_13_spring_despike,]
+column_arr = ['rho_P']
+
+for i in range(len(rho_P_avg_13_arr_spring)):
+# for sonic in sonics_df_arr:
+    for column_name in column_arr:
+    
+        my_array = rho_P_avg_13_arr_spring[i][column_name]
+        
+        # Just outlier detection
+        input_array = my_array
+        window_size = 5
+        n = 2
+        
+        my_outlier_indicies = hampel(input_array, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts = hampel(input_array, window_size, n, imputation=True)
+        my_despiked_1times = my_outlier_in_Ts
+        
+        # plt.figure()
+        # plt.plot(L_despiked_once)
+    
+        input_array2 = my_despiked_1times
+        my_outlier_indicies2 = hampel(input_array2, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts2 = hampel(input_array2, window_size, n, imputation=True)
+        rho_P_avg_13_despike_arr_spring[i][column_name] = my_outlier_in_Ts2
+        print(column_name)
+        print('done with '+str(i+1))
+        # L_despiked_2times = L_outlier_in_Ts2
+
+print('done hampel SPRING despike')
+
+#%%
+rho_P_avg_13_fall_df = pd.DataFrame()
+rho_P_avg_13_fall_df['rho_P'] = rho_P_avg_13[break_index+1:]
+rho_P_avg_13_fall_df = rho_P_avg_13_fall_df.reset_index(drop = True)
+
+
+
+rho_P_avg_13_arr_fall = [rho_P_avg_13_fall_df,]
+
+rho_P_avg_13_fall_despike = pd.DataFrame()
+
+rho_P_avg_13_despike_arr_fall = [rho_P_avg_13_fall_despike,]
+column_arr = ['rho_P']
+
+for i in range(len(rho_P_avg_13_arr_fall)):
+# for sonic in sonics_df_arr:
+    for column_name in column_arr:
+    
+        my_array = rho_P_avg_13_arr_fall[i][column_name]
+        
+        # Just outlier detection
+        input_array = my_array
+        window_size = 5
+        n = 2
+        
+        my_outlier_indicies = hampel(input_array, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts = hampel(input_array, window_size, n, imputation=True)
+        my_despiked_1times = my_outlier_in_Ts
+        
+        # plt.figure()
+        # plt.plot(L_despiked_once)
+    
+        input_array2 = my_despiked_1times
+        my_outlier_indicies2 = hampel(input_array2, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts2 = hampel(input_array2, window_size, n, imputation=True)
+        rho_P_avg_13_despike_arr_fall[i][column_name] = my_outlier_in_Ts2
+        print(column_name)
+        print('done with '+str(i+1))
+        # L_despiked_2times = L_outlier_in_Ts2
+
+print('done hampel FALL despike')
+#%%
+# combine new spring/fall despiked values/dataframes to one combined dataframe
+rho_P_avg_13_despiked_combined = pd.concat([rho_P_avg_13_spring_despike,rho_P_avg_13_fall_despike], axis = 0)
+rho_P_avg_13_despiked_combined['new_index'] = np.arange(0, len(rho_P_avg_13_despiked_combined))
+rho_P_avg_13_despiked_combined = rho_P_avg_13_despiked_combined.set_index('new_index')
+
+print('done combining spring and fall')
+#%%
+deficit_despike = np.array(rho_P_avg_13_despiked_combined['rho_P'])-np.array(rho_eps)
+
+# deficit_minus_pw = deficit 
+plt.figure(figsize=(8,3))
+# plt.scatter(np.arange(len(deficit_despike)), rho_P_avg_13_despiked_combined['rho_P'], s=10, color = 'b', label = r'$\rho \cdot P$')
+# plt.plot(np.arange(len(deficit_despike)), rho_P_avg_13_despiked_combined['rho_P'], color = 'b',)
+# plt.scatter(np.arange(len(deficit_despike)), rho_eps, s=10, color = 'navy', label = r'$\rho \cdot \epsilon$')
+# plt.plot(np.arange(len(deficit_despike)), rho_eps, color = 'navy',)
+plt.scatter(np.arange(len(deficit_despike)), deficit_despike, s=10, color = 'gray', label = r'$\rho \cdot P -\rho \cdot \epsilon$')
+plt.plot(np.arange(len(deficit_despike)), deficit_despike, color = 'gray',)
+plt.scatter(np.arange(len(deficit_despike)), pw_df['PW boom-1 [m^3/s^3]'], s=10, color='red', label = 'PW')
+plt.plot(np.arange(len(deficit_despike)), pw_df['PW boom-1 [m^3/s^3]'],color='red', )
+plt.scatter(np.arange(len(deficit_despike)), deficit_despike+pw_df['PW boom-1 [m^3/s^3]'], s=10, color = 'black', label = r'$(\rho \cdot P -\rho \cdot \epsilon) - PW$')
+plt.plot(np.arange(len(deficit_despike)), deficit_despike+pw_df['PW boom-1 [m^3/s^3]'], color = 'black',)
+plt.hlines(y=0,xmin=0,xmax=3959,linestyles='--', color = 'k')
+plt.legend()
+plt.xlim(1500,2000)
+plt.ylim(-0.3,0.3)
+plt.ylabel("$[m^3/s^3]$")
+plt.xlabel('May Storm Time Index')
+plt.title('Deficit Despike with PW')
+plt.savefig(plot_savePath+'mayStorm_despike31dissipationDeficit_comparisonWithPW.png', dpi = 300)
+plt.savefig(plot_savePath+'mayStorm_despike31dissipationDeficit_comparisonWithPW.pdf')
 
 #%%
 plt.figure()
