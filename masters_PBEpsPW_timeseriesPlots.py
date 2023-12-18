@@ -95,33 +95,35 @@ date_df = pd.read_csv(file_path+'date_combinedAnalysis.csv')
 dates_arr = np.array(pd.to_datetime(date_df['datetime']))
 
 # SPRING
-fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, figsize=(7,3))
+s=5
+fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, figsize=(7,5))
 fig.tight_layout()
 fig.subplots_adjust(top=0.85)
 fig.suptitle('Production ($P$), Buoyancy ($B$), and Dissipation Rate ($\epsilon$) [$m^2/s^3$]: Spring')
-ax1.scatter(dates_arr[:break_index+1], prod_df['prod_II'][:break_index+1], s=10, color = 'mediumblue', label = '$P$')
-ax1.scatter(dates_arr[:break_index+1], buoy_df['buoy_II'][:break_index+1], s=10, color = 'black', label = '$B$')
-ax1.scatter(dates_arr[:break_index+1], (eps_df['epsU_sonic3_MAD'][:break_index+1]+eps_df['epsU_sonic2_MAD'][:break_index+1])/2, s=7, color = 'gray', label = '$\epsilon$')
+ax1.scatter(dates_arr[:break_index+1], prod_df['prod_II'][:break_index+1], s=s, color = 'mediumblue', label = '$P$')
+ax1.scatter(dates_arr[:break_index+1], buoy_df['buoy_II'][:break_index+1], s=s, color = 'black', label = '$B$')
+ax1.scatter(dates_arr[:break_index+1], (eps_df['epsU_sonic3_MAD'][:break_index+1]+eps_df['epsU_sonic2_MAD'][:break_index+1])/2, s=5, color = 'gray', label = '$\epsilon$')
 ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax1.get_xticklabels(which='major'):
     label.set(rotation=0, horizontalalignment='center')
-ax1.legend(fontsize=7)
+ax1.legend(fontsize=7,loc='lower left')
 ax1.set_yscale('log')
 ax1.set_title('Level II')
-ax2.scatter(dates_arr[:break_index+1], prod_df['prod_I'][:break_index+1], s=10, color = 'mediumblue', label = '$P$')
-ax2.scatter(dates_arr[:break_index+1], buoy_df['buoy_I'][:break_index+1], s=10, color = 'black', label = '$B$')
-ax2.scatter(dates_arr[:break_index+1], (eps_df['epsU_sonic2_MAD'][:break_index+1]+eps_df['epsU_sonic1_MAD'][:break_index+1])/2, s=7, color = 'gray', label = '$\epsilon$')
+ax1.set_ylim([10**-6,1])
+ax2.scatter(dates_arr[:break_index+1], prod_df['prod_I'][:break_index+1], s=s, color = 'mediumblue', label = '$P$')
+ax2.scatter(dates_arr[:break_index+1], buoy_df['buoy_I'][:break_index+1], s=s, color = 'black', label = '$B$')
+ax2.scatter(dates_arr[:break_index+1], (eps_df['epsU_sonic2_MAD'][:break_index+1]+eps_df['epsU_sonic1_MAD'][:break_index+1])/2, s=s, color = 'gray', label = '$\epsilon$')
 ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax2.get_xticklabels(which='major'):
     label.set(rotation=0, horizontalalignment='center')
-ax2.legend(fontsize=7)
+# ax2.legend(fontsize=7)
 ax2.set_yscale('log')
 ax2.set_title('Level I')
-
-ax1.set_ylabel('Magnitude of $P$, $B$, $\epsilon$ [$m^2/s^3$]')
-ax2.set_ylabel('Magnitude of $P$, $B$, $\epsilon$ [$m^2/s^3$]')
+ax2.set_ylim([10**-6,1])
+ax1.set_ylabel('$P, \;B, \; \epsilon$ [$m^2/s^3$]')
+ax2.set_ylabel('$P, \;B, \; \epsilon$  [$m^2/s^3$]')
 
 
 plt.show()
@@ -129,16 +131,17 @@ plt.show()
 fig.savefig(plot_savePath + "timeseries_PBEps_Spring.png",dpi=300)
 fig.savefig(plot_savePath + "timeseries_PBEps_Spring.pdf")
 
-
+#%%
 
 # FALL
-fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, figsize=(7,3))
+s=5
+fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, figsize=(7,5))
 fig.suptitle('Production ($P$), Buoyancy ($B$), and Dissipation Rate ($\epsilon$) [$m^2/s^3$]: Fall')
 fig.tight_layout()
 fig.subplots_adjust(top=0.85)
-ax1.scatter(dates_arr[break_index+1:], prod_df['prod_II'][break_index+1:], s=10, color = 'mediumblue', label = '$P$')
-ax1.scatter(dates_arr[break_index+1:], buoy_df['buoy_II'][break_index+1:], s=10, color = 'black', label = '$B$')
-ax1.scatter(dates_arr[break_index+1:], (eps_df['epsU_sonic3_MAD'][break_index+1:]+eps_df['epsU_sonic2_MAD'][break_index+1:])/2, s=10, color = 'gray', label = '$\epsilon$')
+ax1.scatter(dates_arr[break_index+1:], prod_df['prod_II'][break_index+1:], s=s, color = 'mediumblue', label = '$P$')
+ax1.scatter(dates_arr[break_index+1:], buoy_df['buoy_II'][break_index+1:], s=s, color = 'black', label = '$B$')
+ax1.scatter(dates_arr[break_index+1:], (eps_df['epsU_sonic3_MAD'][break_index+1:]+eps_df['epsU_sonic2_MAD'][break_index+1:])/2, s=s, color = 'gray', label = '$\epsilon$')
 ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax1.get_xticklabels(which='major'):
@@ -146,19 +149,20 @@ for label in ax1.get_xticklabels(which='major'):
 ax1.legend(fontsize=7, loc='lower left')
 ax1.set_yscale('log')
 ax1.set_title('Level II')
-ax2.scatter(dates_arr[break_index+1:], prod_df['prod_I'][break_index+1:], s=10, color = 'mediumblue', label = '$P$')
-ax2.scatter(dates_arr[break_index+1:], buoy_df['buoy_I'][break_index+1:], s=10, color = 'black', label = '$B$')
-ax2.scatter(dates_arr[break_index+1:], (eps_df['epsU_sonic2_MAD'][break_index+1:]+eps_df['epsU_sonic1_MAD'][break_index+1:])/2, s=10, color = 'gray', label = '$\epsilon$')
+ax1.set_ylim([10**-6,1])
+ax2.scatter(dates_arr[break_index+1:], prod_df['prod_I'][break_index+1:], s=s, color = 'mediumblue', label = '$P$')
+ax2.scatter(dates_arr[break_index+1:], buoy_df['buoy_I'][break_index+1:], s=s, color = 'black', label = '$B$')
+ax2.scatter(dates_arr[break_index+1:], (eps_df['epsU_sonic2_MAD'][break_index+1:]+eps_df['epsU_sonic1_MAD'][break_index+1:])/2, s=s, color = 'gray', label = '$\epsilon$')
 ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax2.get_xticklabels(which='major'):
     label.set(rotation=0, horizontalalignment='center')
-ax2.legend(fontsize=7)
+# ax2.legend(fontsize=7)
 ax2.set_yscale('log')
 ax2.set_title('Level I')
-
-ax1.set_ylabel('Magnitude of $P$, $B$, $\epsilon$ [$m^2/s^3$]')
-ax2.set_ylabel('Magnitude of $P$, $B$, $\epsilon$ [$m^2/s^3$]')
+ax2.set_ylim([10**-6,1])
+ax1.set_ylabel('$P, \;B, \; \epsilon$ [$m^2/s^3$]')
+ax2.set_ylabel('$P, \;B, \; \epsilon$  [$m^2/s^3$]')
 
 
 plt.show()
@@ -166,3 +170,84 @@ plt.show()
 fig.savefig(plot_savePath + "timeseries_PBEps_Fall.png",dpi=300)
 fig.savefig(plot_savePath + "timeseries_PBEps_Fall.pdf")
 
+
+#%% NOW INCLUDE PW
+# SPRING
+s=5
+fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, figsize=(7,5))
+fig.tight_layout()
+fig.subplots_adjust(top=0.85)
+fig.suptitle('Production ($P$), Buoyancy ($B$), and Dissipation Rate ($\epsilon$) [$m^2/s^3$]: Spring')
+ax1.scatter(dates_arr[:break_index+1], prod_df['prod_II'][:break_index+1], s=s, color = 'mediumblue', label = '$P$')
+ax1.scatter(dates_arr[:break_index+1], buoy_df['buoy_II'][:break_index+1], s=s, color = 'black', label = '$B$')
+ax1.scatter(dates_arr[:break_index+1], (eps_df['epsU_sonic3_MAD'][:break_index+1]+eps_df['epsU_sonic2_MAD'][:break_index+1])/2, s=5, color = 'gray', label = '$\epsilon$')
+ax1.scatter(dates_arr[:break_index+1], pw_df['d_dz_pw_theory_II'][:break_index+1], s=s, color = 'cornflowerblue', label = '$T_{\widetilde{pw}}$')
+ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax1.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+ax1.legend(fontsize=7,loc='lower left')
+ax1.set_yscale('log')
+ax1.set_title('Level II')
+ax1.set_ylim([10**-6,1])
+ax2.scatter(dates_arr[:break_index+1], prod_df['prod_I'][:break_index+1], s=s, color = 'mediumblue', label = '$P$')
+ax2.scatter(dates_arr[:break_index+1], buoy_df['buoy_I'][:break_index+1], s=s, color = 'black', label = '$B$')
+ax2.scatter(dates_arr[:break_index+1], (eps_df['epsU_sonic2_MAD'][:break_index+1]+eps_df['epsU_sonic1_MAD'][:break_index+1])/2, s=s, color = 'gray', label = '$\epsilon$')
+ax2.scatter(dates_arr[:break_index+1], pw_df['d_dz_pw_theory_I'][:break_index+1], s=s, color = 'cornflowerblue', label = '$T_{\widetilde{pw}}$')
+ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax2.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+# ax2.legend(fontsize=7)
+ax2.set_yscale('log')
+ax2.set_title('Level I')
+ax2.set_ylim([10**-6,1])
+ax1.set_ylabel('$P, \;B, \; \epsilon$ [$m^2/s^3$]')
+ax2.set_ylabel('$P, \;B, \; \epsilon$  [$m^2/s^3$]')
+
+
+plt.show()
+
+fig.savefig(plot_savePath + "timeseries_PBEpsPW_Spring.png",dpi=300)
+fig.savefig(plot_savePath + "timeseries_PBEpsPW_Spring.pdf")
+
+#%%
+
+# FALL
+s=5
+fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, figsize=(7,5))
+fig.suptitle('Production ($P$), Buoyancy ($B$), and Dissipation Rate ($\epsilon$) [$m^2/s^3$]: Fall')
+fig.tight_layout()
+fig.subplots_adjust(top=0.85)
+ax1.scatter(dates_arr[break_index+1:], prod_df['prod_II'][break_index+1:], s=s, color = 'mediumblue', label = '$P$')
+ax1.scatter(dates_arr[break_index+1:], buoy_df['buoy_II'][break_index+1:], s=s, color = 'black', label = '$B$')
+ax1.scatter(dates_arr[break_index+1:], (eps_df['epsU_sonic3_MAD'][break_index+1:]+eps_df['epsU_sonic2_MAD'][break_index+1:])/2, s=s, color = 'gray', label = '$\epsilon$')
+ax1.scatter(dates_arr[break_index+1:], pw_df['d_dz_pw_theory_II'][break_index+1:], s=s, color = 'cornflowerblue', label = '$T_{\widetilde{pw}}$')
+ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax1.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+ax1.legend(fontsize=7, loc='lower left')
+ax1.set_yscale('log')
+ax1.set_title('Level II')
+ax1.set_ylim([10**-6,1])
+ax2.scatter(dates_arr[break_index+1:], prod_df['prod_I'][break_index+1:], s=s, color = 'mediumblue', label = '$P$')
+ax2.scatter(dates_arr[break_index+1:], buoy_df['buoy_I'][break_index+1:], s=s, color = 'black', label = '$B$')
+ax2.scatter(dates_arr[break_index+1:], (eps_df['epsU_sonic2_MAD'][break_index+1:]+eps_df['epsU_sonic1_MAD'][break_index+1:])/2, s=s, color = 'gray', label = '$\epsilon$')
+ax2.scatter(dates_arr[break_index+1:], pw_df['d_dz_pw_theory_I'][break_index+1:], s=s, color = 'cornflowerblue', label = '$T_{\widetilde{pw}}$')
+ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax2.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center')
+# ax2.legend(fontsize=7)
+ax2.set_yscale('log')
+ax2.set_title('Level I')
+ax2.set_ylim([10**-6,1])
+ax1.set_ylabel('$P, \;B, \; \epsilon$ [$m^2/s^3$]')
+ax2.set_ylabel('$P, \;B, \; \epsilon$  [$m^2/s^3$]')
+
+
+plt.show()
+
+fig.savefig(plot_savePath + "timeseries_PBEpsPW_Fall.png",dpi=300)
+fig.savefig(plot_savePath + "timeseries_PBEpsPW_Fall.pdf")

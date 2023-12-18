@@ -462,3 +462,24 @@ z_df_20m_Fall.to_csv(path_save+'z_airSide_allFall.csv')
 
 print('done with saving to .csv')
 print('done with code')
+
+#%%
+filepath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
+ctd_df_spring = pd.read_csv(filepath + 'ctd20mAvg_allSpring.csv')
+print('spring head')
+print(ctd_df_spring.head(5))
+print('tail')
+print(ctd_df_spring.tail(5))
+ctd_df_fall = pd.read_csv(filepath + 'ctd20mAvg_allFall.csv')
+print('fall head')
+print(ctd_df_fall.head(5))
+print('tail')
+print(ctd_df_fall.tail(5))
+#%%
+print('average spring ctd depth: '+str(np.nanmean(ctd_df_spring['depth'])+9.91)) #spring uses CTD #1
+print('average fall ctd depth: '+str(np.nanmean(ctd_df_fall['depth'])+9.235)) #Fall uses CTD #2... they are similar because we moved up the CTDs 
+# in the second deployment to get closer to the seasurface
+
+
+print('average spring s3 height: '+str(20.505-9.91-np.nanmean(ctd_df_spring['depth'])))
+print('average fall s3 height: '+str(20.45208-9.235-np.nanmean(ctd_df_fall['depth'])))
