@@ -51,13 +51,17 @@ ctd_spring_df = pd.read_csv(filepath + "ctd20mAvg_allSpring.csv")
 ctd_fall_df = pd.read_csv(filepath + "ctd20mAvg_allFall.csv")
 Tsea_df = pd.concat([ctd_spring_df, ctd_fall_df], axis=0)
 
+Tsea_temp_file_spring = "thermistorsAvg_allSpring.csv"
+Tsea_temp_spring_df = pd.read_csv(filepath + Tsea_temp_file_spring)
+Tsea_temp_file_fall = "thermistorsAvg_allFall.csv"
+Tsea_temp_fall_df = pd.read_csv(filepath + Tsea_temp_file_fall)
+Tsea_temp_df = pd.concat([Tsea_temp_spring_df, Tsea_temp_fall_df], axis=0)
 
-# Tsea_temp_file = pd.read_csv(filepath + "thermistorsAvg_allFall.csv")
 
 LatLon_df = pd.read_csv(filepath + "LatLon_combinedAnalysis.csv")
 rain_df = pd.read_csv(filepath + "rain_rate_combinedAnalysis.csv")
 # Ts_depth_df = pd.read_csv(filepath + "thermistorsAvg_allFall.csv")
-waves_df = pd.read_csv(filepath + 'waveData_allFall.csv')
+waves_df = pd.read_csv(filepath + 'waveData_combinedAnalysis.csv')
 # Ss_file = none
 # Cp_file = none
 # sigH_file = none
@@ -91,17 +95,19 @@ for sonic in sonic_arr:
     coare_df['P'] = np.array(p_df['p'+sonicP+'_avg [mb]']).flatten()
     # coare_df['Tsea'] = np.array(Tsea_file['sst']).flatten()
     coare_df['Tsea'] = np.array(Tsea_temp_df['temp_therm1']).flatten()
-    coare_df['sw_dn'] = np.array(ta_rh_swDN_lwDN_df['sw_dn']).flatten()
-    coare_df['lw_dn'] = np.array(ta_rh_swDN_lwDN_df['lw_dn']).flatten()
+    # coare_df['sw_dn'] = np.array(ta_rh_swDN_lwDN_df['sw_dn']).flatten()
+    # coare_df['lw_dn'] = np.array(ta_rh_swDN_lwDN_df['lw_dn']).flatten()
+    coare_df['sw_dn'] = np.array(jd_df['jd']).flatten()
+    coare_df['lw_dn'] = np.array(jd_df['jd']).flatten()
     coare_df['lat'] = np.array(LatLon_df['lat']).flatten()
     coare_df['lon'] = np.array(LatLon_df['lon']).flatten()
     coare_df['Zi'] = np.ones(len(u_df))*600 
     coare_df['rain'] = np.array(rain_df['rain_rate']).flatten()
     coare_df['Ss'] = np.array(Tsea_df['salinity']).flatten()
     # coare_df['Cp'] = blank_array
-    coare_df['Cp'] = np.array(waves_df['Cp']).flatten()
+    # coare_df['Cp'] = np.array(waves_df['Cp']).flatten()
     # coare_df['sigH'] = blank_array
-    coare_df['sigH'] = np.array(waves_df['sigH']).flatten()
+    # coare_df['sigH'] = np.array(waves_df['sigH']).flatten()
     # coare_df['tsg'] = np.array(Tsea_file['sst']).flatten()
     coare_df['tsg'] = np.array(Tsea_temp_df['temp_therm1']).flatten()
     # coare_df['Ts_depth'] = np.ones(len(u_file_new))*3.88         #this is just while we are using average depth of Ts sensor
@@ -116,7 +122,8 @@ for sonic in sonic_arr:
     # coare_df_new = coare_df.drop(index=coare_drop_arr)
     
     
-    coare_df.to_csv(filepath+"coare_Inputs_s"+sonic+"_withWaves.csv")
+    # coare_df.to_csv(filepath+"coare_Inputs_s"+sonic+"_withWaves.csv")
+    coare_df.to_csv(filepath+"coare_Inputs_s"+sonic+".csv")
     print("done with sonic "+ sonic)
     print("used met sensor "+ met_sensor)
     print('Used pressure from sonic/pressure head #'+sonicP)

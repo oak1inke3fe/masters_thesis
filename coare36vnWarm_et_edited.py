@@ -22,10 +22,14 @@ The rest of the functions are imported via the module 'coare36vn_zrf_et'
 ludovic Bariteau, CU/CIRES, NOAA/ESRL/PSL
 v1: September 2022
 """
+
+import os
+current_directory = os.getcwd()
+os.chdir(r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/')
+current_directory = os.getcwd()
 import math
 import numpy as np
 import coare36vn_zrf_et as c36
-import os
 
 def coare36vnWarm_et(Jd, U, Zu, Tair, Zt, RH, Zq, P, Tsea, SW_dn, LW_dn, Lat, Lon, Zi, Rainrate, Ts_depth, Ss, cp, sigH,zrf_u = 10.0,zrf_t = 10.0,zrf_q = 10.0): 
     print('WarmCoolLayer')
@@ -421,7 +425,8 @@ for sonic in sonic_arr:
         # import os
         # import util
         # import matplotlib.pyplot as plt
-        path = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level4/"
+        # path = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level4/"
+        path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
     # for sonic in sonic_arr:
         # fil = 'coare_Inputs_s'+sonic+'.csv'
         fil = 'coare_Inputs_s'+sonic+'_withWaves.csv'
@@ -459,24 +464,24 @@ for sonic in sonic_arr:
     
         
         
-        fnameA = os.path.join(path,'coare_outputs_s'+sonic+'_Warm_UbarGreaterThan2ms.txt')
-        # fnameA = os.path.join(path,'coare_outputs_s1_Warm_UbarGreaterThan2ms.txt')
-        A= coare36vnWarm_et(Jd, U, Zu, Tair, Zt, RH, Zq, P, Tsg, SW_dn, LW_dn, Lat, Lon, Zi, Rainrate, Ts_depth, Ss, None, None, zrf_u, zrf_t, zrf_q) #original NO WAVES
+        # fnameA = os.path.join(path,'coare_outputs_s'+sonic+'_WindStressOnly.txt')
+        # # fnameA = os.path.join(path,'coare_outputs_s1_Warm_UbarGreaterThan2ms.txt')
+        # A= coare36vnWarm_et(Jd, U, Zu, Tair, Zt, RH, Zq, P, Tsg, SW_dn, LW_dn, Lat, Lon, Zi, Rainrate, Ts_depth, Ss, None, None, zrf_u, zrf_t, zrf_q) #original NO WAVES
     
         
     
-        A_hdr = 'usr\ttau\thsb\thlb\thbb\thsbb\thlwebb\ttsr\tqsr\tzo\tzot\tzoq\tCd\t'
-        A_hdr += 'Ch\tCe\tL\tzeta\tdT_skinx\tdq_skinx\tdz_skin\tUrf\tTrf\tQrf\t'
-        A_hdr += 'RHrf\tUrfN\tTrfN\tQrfN\tlw_net\tsw_net\tLe\trhoa\tUN\tU10\tU10N\t'
-        A_hdr += 'Cdn_10\tChn_10\tCen_10\thrain\tQs\tEvap\tT10\tT10N\tQ10\tQ10N\tRH10\t'
-        A_hdr += 'P10\trhoa10\tgust\twc_frac\tEdis\tdT_warm\tdz_warm\tdT_warm_to_skin\tdu_warm'
+        # A_hdr = 'usr\ttau\thsb\thlb\thbb\thsbb\thlwebb\ttsr\tqsr\tzo\tzot\tzoq\tCd\t'
+        # A_hdr += 'Ch\tCe\tL\tzeta\tdT_skinx\tdq_skinx\tdz_skin\tUrf\tTrf\tQrf\t'
+        # A_hdr += 'RHrf\tUrfN\tTrfN\tQrfN\tlw_net\tsw_net\tLe\trhoa\tUN\tU10\tU10N\t'
+        # A_hdr += 'Cdn_10\tChn_10\tCen_10\thrain\tQs\tEvap\tT10\tT10N\tQ10\tQ10N\tRH10\t'
+        # A_hdr += 'P10\trhoa10\tgust\twc_frac\tEdis\tdT_warm\tdz_warm\tdT_warm_to_skin\tdu_warm'
         
-        np.savetxt(fnameA,A,fmt='%.18e',delimiter='\t',header=A_hdr)
-        # np.savetxt(fnameA,A,fmt='%.18e',delimiter=',',header=A_hdr)
-        print('done with sonic '+sonic+ " wind stress only")
+        # np.savetxt(fnameA,A,fmt='%.18e',delimiter='\t',header=A_hdr)
+        # # np.savetxt(fnameA,A,fmt='%.18e',delimiter=',',header=A_hdr)
+        # print('done with sonic '+sonic+ " wind stress only")
         
         
-        fnameCp = os.path.join(path,'coare_outputs_s'+sonic+'_Warm_UbarGreaterThan2ms_withCp.txt')
+        fnameCp = os.path.join(path,'coare_outputs_s'+sonic+'_WindStress_withCp.txt')
         A_Cp= coare36vnWarm_et(Jd, U, Zu, Tair, Zt, RH, Zq, P, Tsg, SW_dn, LW_dn, Lat, Lon, Zi, Rainrate, Ts_depth, Ss, cp, None, zrf_u, zrf_t, zrf_q) #with Cp
         
         Cp_hdr = 'usr\ttau\thsb\thlb\thbb\thsbb\thlwebb\ttsr\tqsr\tzo\tzot\tzoq\tCd\t'
@@ -490,7 +495,7 @@ for sonic in sonic_arr:
         print('done with sonic '+sonic+ " wind stress, and cp")
         
         
-        fnameSigH = os.path.join(path,'coare_outputs_s'+sonic+'_Warm_UbarGreaterThan2ms_withSigH.txt')
+        fnameSigH = os.path.join(path,'coare_outputs_s'+sonic+'_WindStress_withSigH.txt')
         A_SigH = coare36vnWarm_et(Jd, U, Zu, Tair, Zt, RH, Zq, P, Tsg, SW_dn, LW_dn, Lat, Lon, Zi, Rainrate, Ts_depth, Ss, None, sigH, zrf_u, zrf_t, zrf_q) #with Cp
         
         SigH_hdr = 'usr\ttau\thsb\thlb\thbb\thsbb\thlwebb\ttsr\tqsr\tzo\tzot\tzoq\tCd\t'
@@ -505,7 +510,7 @@ for sonic in sonic_arr:
         
         
         
-        fnameCp_SigH = os.path.join(path,'coare_outputs_s'+sonic+'_Warm_UbarGreaterThan2ms_withCp_SigH.txt')
+        fnameCp_SigH = os.path.join(path,'coare_outputs_s'+sonic+'_WindStress_withCp_SigH.txt')
         A_Cp_SigH = coare36vnWarm_et(Jd, U, Zu, Tair, Zt, RH, Zq, P, Tsg, SW_dn, LW_dn, Lat, Lon, Zi, Rainrate, Ts_depth, Ss, cp, sigH, zrf_u, zrf_t, zrf_q) #with Cp
         
         Cp_SigH_hdr = 'usr\ttau\thsb\thlb\thbb\thsbb\thlwebb\ttsr\tqsr\tzo\tzot\tzoq\tCd\t'

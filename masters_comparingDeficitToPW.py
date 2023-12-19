@@ -135,11 +135,294 @@ UpWp_bar_df = pd.DataFrame()
 UpWp_bar_df['s1_UpWp_bar']= sonic1_df['UpWp_bar']
 UpWp_bar_df['s2_UpWp_bar']= sonic2_df['UpWp_bar']
 UpWp_bar_df['s3_UpWp_bar']= sonic3_df['UpWp_bar']
-UpWp_bar_df['s4_UpWp_bar']= sonic4_df['UpWp_bar']
+# UpWp_bar_df['s4_UpWp_bar']= sonic4_df['UpWp_bar']
 
 UpWp_bar_avg = np.array(UpWp_bar_df.mean(axis=1, skipna=True))
 
-rho_P_avg_13 = np.array(rho_df['rho_bar_1_dry']*(-1*UpWp_bar_avg)*(sonic3_df['Ubar']-sonic1_df['Ubar']))
+plt.figure()
+plt.plot(-1*sonic1_df['UpWp_bar'], label = 's1')
+plt.plot(-1*sonic2_df['UpWp_bar'], label = 's2')
+plt.plot(-1*sonic3_df['UpWp_bar'], label = 's3')
+plt.plot(-1*sonic4_df['UpWp_bar'], label = 's4') #1878, 1899
+plt.plot(-1*UpWp_bar_avg, color = 'k', label = 'AVG')
+# plt.plot(-1*sonic2_df['UpWp_bar']-(-1*sonic1_df['UpWp_bar']), label = 's2-s1 difference')
+# plt.plot(-1*sonic3_df['UpWp_bar']-(-1*sonic1_df['UpWp_bar']), label = 's3-s1 difference')
+plt.hlines(y=0,xmin=0,xmax=break_index,color = 'k')
+plt.xlim(1500,2000)
+plt.ylim(-0.2,0.7)
+plt.legend()
+plt.title("$-\overline{u'w'}$")
+
+#%%
+UpWp_spring_df = pd.DataFrame()
+UpWp_spring_df['UpWp_bar'] = UpWp_bar_avg[:break_index+1]
+
+UpWp_arr_spring = [UpWp_spring_df,]
+
+UpWp_spring_despike = pd.DataFrame()
+UpWp_despike_arr_spring = [UpWp_spring_despike,]
+
+column_arr = ['UpWp_bar']
+
+for i in range(len(UpWp_arr_spring)):
+# for sonic in sonics_df_arr:
+    for column_name in column_arr:
+    
+        my_array = UpWp_arr_spring[i][column_name]
+        
+        # Just outlier detection
+        input_array = my_array
+        window_size = 5
+        n = 1
+        
+        my_outlier_indicies = hampel(input_array, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts = hampel(input_array, window_size, n, imputation=True)
+        my_despiked_1times = my_outlier_in_Ts
+        
+        # plt.figure()
+        # plt.plot(L_despiked_once)
+    
+        input_array2 = my_despiked_1times
+        my_outlier_indicies2 = hampel(input_array2, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts2 = hampel(input_array2, window_size, n, imputation=True)
+        UpWp_despike_arr_spring[i][column_name] = my_outlier_in_Ts2
+        print(column_name)
+        print('done with '+str(i+1))
+        # L_despiked_2times = L_outlier_in_Ts2
+
+print('done hampel SPRING despike')
+
+#%%
+UpWp_fall_df = pd.DataFrame()
+UpWp_fall_df['UpWp_bar'] = UpWp_bar_avg[break_index+1:]
+UpWp_fall_df = UpWp_fall_df.reset_index(drop = True)
+
+
+
+UpWp_arr_fall = [UpWp_fall_df,]
+
+UpWp_fall_despike = pd.DataFrame()
+
+UpWp_despike_arr_fall = [UpWp_fall_despike,]
+column_arr = ['UpWp_bar']
+
+for i in range(len(UpWp_arr_fall)):
+# for sonic in sonics_df_arr:
+    for column_name in column_arr:
+    
+        my_array = UpWp_arr_fall[i][column_name]
+        
+        # Just outlier detection
+        input_array = my_array
+        window_size = 5
+        n = 1
+        
+        my_outlier_indicies = hampel(input_array, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts = hampel(input_array, window_size, n, imputation=True)
+        my_despiked_1times = my_outlier_in_Ts
+        
+        # plt.figure()
+        # plt.plot(L_despiked_once)
+    
+        input_array2 = my_despiked_1times
+        my_outlier_indicies2 = hampel(input_array2, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts2 = hampel(input_array2, window_size, n, imputation=True)
+        UpWp_despike_arr_fall[i][column_name] = my_outlier_in_Ts2
+        print(column_name)
+        print('done with '+str(i+1))
+        # L_despiked_2times = L_outlier_in_Ts2
+
+print('done hampel FALL despike')
+#%%
+# combine new spring/fall despiked values/dataframes to one combined dataframe
+UpWp_despiked_combined = pd.concat([UpWp_spring_despike,UpWp_fall_despike], axis = 0)
+UpWp_despiked_combined['new_index'] = np.arange(0, len(UpWp_despiked_combined))
+UpWp_despiked_combined = UpWp_despiked_combined.set_index('new_index')
+
+print('done combining spring and fall')
+#%%
+plt.figure()
+# plt.plot(-1*sonic1_df['UpWp_bar'], label = 's1')
+# plt.plot(-1*sonic2_df['UpWp_bar'], label = 's2')
+# plt.plot(-1*sonic3_df['UpWp_bar'], label = 's3')
+# plt.plot(-1*sonic4_df['UpWp_bar'], label = 's4') #1878, 1899
+plt.plot(-1*UpWp_bar_avg, color = 'gray', label = ' AVG')
+plt.plot(-1*UpWp_despiked_combined, color = 'k', label = 'despiked AVG')
+# plt.plot(-1*sonic2_df['UpWp_bar']-(-1*sonic1_df['UpWp_bar']), label = 's2-s1 difference')
+# plt.plot(-1*sonic3_df['UpWp_bar']-(-1*sonic1_df['UpWp_bar']), label = 's3-s1 difference')
+plt.hlines(y=0,xmin=0,xmax=break_index,color = 'k')
+plt.xlim(1500,2000)
+plt.ylim(-0.2,0.7)
+plt.legend()
+plt.title("Despiked $-\overline{u'w'}$")
+
+y_spring = np.vstack((eps_df['epsU_sonic1_MAD'][:break_index+1], eps_df['epsU_sonic3_MAD'][:break_index+1])).T
+y_fall = np.vstack((eps_df['epsU_sonic1_MAD'][break_index+1:], eps_df['epsU_sonic3_MAD'][break_index+1:])).T
+rho_eps_spring = np.array(rho_df['rho_bar_1_dry'][:break_index+1])*np.trapz(y=y_spring, x=None, dx=5.49)#do trapz for between sonics 1-3
+rho_eps_fall = np.array(rho_df['rho_bar_1_dry'][break_index+1:])*np.trapz(y=y_fall, x=None, dx=5.0292)#do trapz for between sonics 1-3
+rho_eps = np.concatenate((rho_eps_spring, rho_eps_fall), axis=0)
+
+plt.figure()
+# plt.plot(rho_df['rho_bar_1_dry']*(-1*np.array(UpWp_despiked_combined['UpWp_bar']))*(np.array(sonic3_df['Ubar']-sonic1_df['Ubar'])), color = 'gray', label = r"$\rho (-\overline{u'w'} \cdot \overline{u})$" )
+# plt.plot(rho_df['rho_bar_1_dry']*(-1*np.array(sonic3_df['UpWp_bar'])*(np.array(sonic3_df['Ubar']-sonic1_df['Ubar']))), color = 'blue', label = r"$\rho (-\overline{u'w'} \cdot \overline{u})$" )
+# plt.plot(rho_eps, color = 'brown', label = r"$\rho (\epsilon)$" )
+plt.plot(rho_df['rho_bar_1_dry']*(-1*np.array(UpWp_despiked_combined['UpWp_bar']))*(np.array(sonic3_df['Ubar']-sonic1_df['Ubar']))-rho_eps, color = 'k', label = r"$\rho (-\overline{u'w'} \cdot \overline{u})-\rho(\epsilon)$")
+plt.plot(rho_df['rho_bar_1_dry']*(-1*np.array(sonic3_df['UpWp_bar'])*(np.array(sonic3_df['Ubar']-sonic1_df['Ubar'])))-rho_eps, color = 'gray', label = r"$\rho (-\overline{u'w'}_{s3} \cdot \overline{u})-\rho(\epsilon)$")
+plt.title(r"P and Eps")
+plt.xlim(1500,2000)
+plt.legend()
+plt.ylim(-0.3,0.3)
+
+
+#%%
+Eps_spring_df = pd.DataFrame()
+Eps_spring_df['Eps'] = rho_eps[:break_index+1]
+
+Eps_arr_spring = [Eps_spring_df,]
+
+Eps_spring_despike = pd.DataFrame()
+Eps_despike_arr_spring = [Eps_spring_despike,]
+
+column_arr = ['Eps']
+
+for i in range(len(Eps_arr_spring)):
+# for sonic in sonics_df_arr:
+    for column_name in column_arr:
+    
+        my_array = Eps_arr_spring[i][column_name]
+        
+        # Just outlier detection
+        input_array = my_array
+        window_size = 5
+        n = 1
+        
+        my_outlier_indicies = hampel(input_array, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts = hampel(input_array, window_size, n, imputation=True)
+        my_despiked_1times = my_outlier_in_Ts
+        
+        # plt.figure()
+        # plt.plot(L_despiked_once)
+    
+        input_array2 = my_despiked_1times
+        my_outlier_indicies2 = hampel(input_array2, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts2 = hampel(input_array2, window_size, n, imputation=True)
+        Eps_despike_arr_spring[i][column_name] = my_outlier_in_Ts2
+        print(column_name)
+        print('done with '+str(i+1))
+        # L_despiked_2times = L_outlier_in_Ts2
+
+print('done hampel SPRING despike')
+
+#%%
+Eps_fall_df = pd.DataFrame()
+Eps_fall_df['Eps'] = rho_eps[break_index+1:]
+Eps_fall_df = Eps_fall_df.reset_index(drop = True)
+
+
+
+Eps_arr_fall = [Eps_fall_df,]
+
+Eps_fall_despike = pd.DataFrame()
+
+Eps_despike_arr_fall = [Eps_fall_despike,]
+column_arr = ['Eps']
+
+for i in range(len(Eps_arr_fall)):
+# for sonic in sonics_df_arr:
+    for column_name in column_arr:
+    
+        my_array = Eps_arr_fall[i][column_name]
+        
+        # Just outlier detection
+        input_array = my_array
+        window_size = 5
+        n = 1
+        
+        my_outlier_indicies = hampel(input_array, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts = hampel(input_array, window_size, n, imputation=True)
+        my_despiked_1times = my_outlier_in_Ts
+        
+        # plt.figure()
+        # plt.plot(L_despiked_once)
+    
+        input_array2 = my_despiked_1times
+        my_outlier_indicies2 = hampel(input_array2, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts2 = hampel(input_array2, window_size, n, imputation=True)
+        Eps_despike_arr_fall[i][column_name] = my_outlier_in_Ts2
+        print(column_name)
+        print('done with '+str(i+1))
+        # L_despiked_2times = L_outlier_in_Ts2
+
+print('done hampel FALL despike')
+#%%
+# combine new spring/fall despiked values/dataframes to one combined dataframe
+Eps_despiked_combined = pd.concat([Eps_spring_despike,Eps_fall_despike], axis = 0)
+Eps_despiked_combined['new_index'] = np.arange(0, len(Eps_despiked_combined))
+Eps_despiked_combined = Eps_despiked_combined.set_index('new_index')
+
+print('done combining spring and fall')
+
+
+#%%
+plt.figure()
+# plt.plot(rho_df['rho_bar_1_dry']*(-1*np.array(UpWp_despiked_combined['UpWp_bar']))*(np.array(sonic3_df['Ubar']-sonic1_df['Ubar'])), label = r"$\rho (-\overline{u'w'} \cdot \overline{u})$" )
+plt.plot(rho_eps, color = 'k', label = r'$\rho(\epsilon)$')
+plt.plot(Eps_despiked_combined['Eps'], color = 'gray', label = r'despiked $\rho(\epsilon)$')
+plt.title(r"Eps and despiked Eps")
+plt.xlim(1500,2000)
+plt.legend()
+plt.ylim(0,3)
+
+#%%
+rho_P_avg_13 = np.array(rho_df['rho_bar_1_dry']*(-1*np.array(UpWp_despiked_combined['UpWp_bar']))*(np.array(sonic3_df['Ubar']-sonic1_df['Ubar'])))
+deficit_despike = (rho_P_avg_13)-np.array(Eps_despiked_combined['Eps'])
+
+# deficit_minus_pw = deficit 
+plt.figure(figsize=(8,3))
+plt.scatter(np.arange(len(deficit_despike)), rho_P_avg_13, s=10, color = 'b', label = r'$\rho \cdot P$')
+plt.plot(np.arange(len(deficit_despike)), rho_P_avg_13, color = 'b',)
+plt.scatter(np.arange(len(deficit_despike)), Eps_despiked_combined['Eps'], s=10, color = 'navy', label = r'$\rho \cdot \epsilon$')
+plt.plot(np.arange(len(deficit_despike)), Eps_despiked_combined['Eps'], color = 'navy',)
+plt.scatter(np.arange(len(deficit_despike)), deficit_despike, s=10, color = 'gray', label = r'$\rho \cdot P -\rho \cdot \epsilon$')
+plt.plot(np.arange(len(deficit_despike)), deficit_despike, color = 'gray',)
+# plt.scatter(np.arange(len(deficit_despike)), pw_df['PW boom-1 [m^3/s^3]'], s=10, color='red', label = 'PW')
+# plt.plot(np.arange(len(deficit_despike)), pw_df['PW boom-1 [m^3/s^3]'],color='red', )
+# plt.scatter(np.arange(len(deficit_despike)), deficit_despike+pw_df['PW boom-1 [m^3/s^3]'], s=10, color = 'black', label = r'$(\rho \cdot P -\rho \cdot \epsilon) - PW$')
+# plt.plot(np.arange(len(deficit_despike)), deficit_despike+pw_df['PW boom-1 [m^3/s^3]'], color = 'black',)
+plt.hlines(y=0,xmin=0,xmax=3959,linestyles='--', color = 'k')
+plt.legend()
+plt.xlim(1500,2000)
+plt.ylim(-0.3,0.3)
+plt.ylabel("$[m^3/s^3]$")
+plt.xlabel('May Storm Time Index')
+plt.title('Deficit Despike with PW')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#%%
+rho_P_avg_13 = np.array(rho_df['rho_bar_1_dry']*(-1*np.array(UpWp_despiked_combined['UpWp_bar']))*(np.array(sonic3_df['Ubar']-sonic1_df['Ubar'])))
 y_spring = np.vstack((eps_df['epsU_sonic1_MAD'][:break_index+1], eps_df['epsU_sonic3_MAD'][:break_index+1])).T
 y_fall = np.vstack((eps_df['epsU_sonic1_MAD'][break_index+1:], eps_df['epsU_sonic3_MAD'][break_index+1:])).T
 rho_eps_spring = np.array(rho_df['rho_bar_1_dry'][:break_index+1])*np.trapz(y=y_spring, x=None, dx=5.49)#do trapz for between sonics 1-3
