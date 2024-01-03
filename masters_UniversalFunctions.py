@@ -84,8 +84,8 @@ Eps_df = pd.read_csv(file_path+"epsU_terms_combinedAnalysis_MAD_k_UoverZbar.csv"
 Eps_df = Eps_df.drop(['Unnamed: 0'], axis=1)
 
 
-# tke_transport_df = pd.read_csv(file_path + "tke_transport_allFall.csv")
-# tke_transport_df = tke_transport_df.drop(['Unnamed: 0'], axis=1)
+tke_transport_df = pd.read_csv(file_path + "tke_transport_combinedAnalysis.csv")
+tke_transport_df = tke_transport_df.drop(['Unnamed: 0'], axis=1)
 
 
 windDir_file = "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv"
@@ -139,6 +139,7 @@ rho_df[mask_goodWindDir] = np.nan
 
 buoy_df[mask_goodWindDir] = np.nan
 
+tke_transport_df[mask_goodWindDir] = np.nan
 
 print('done with setting up good wind direction only dataframes')
 
@@ -1228,18 +1229,26 @@ NOW WE ARE MOVING ON TO PHI_TKE
 """
 #%% getting phi_tke
 
-dWpEp_bar_dz_LI = np.array(tke_transport_df['WpEp_bar_2']-tke_transport_df['WpEp_bar_1'])/dz_LI
-dWpEp_bar_dz_LII = np.array(tke_transport_df['WpEp_bar_3']-tke_transport_df['WpEp_bar_2'])/dz_LII
-dWpEp_bar_dz_LIII = np.array(tke_transport_df['WpEp_bar_4']-tke_transport_df['WpEp_bar_3'])/dz_LIII
+dWpEp_bar_dz_LI_spring = np.array(tke_transport_df['WpEp_bar_2'][:break_index+1]-tke_transport_df['WpEp_bar_1'][:break_index+1])/dz_LI_spring
+dWpEp_bar_dz_LII_spring = np.array(tke_transport_df['WpEp_bar_3'][:break_index+1]-tke_transport_df['WpEp_bar_2'][:break_index+1])/dz_LII_spring
+dWpEp_bar_dz_LIII_spring = np.array(tke_transport_df['WpEp_bar_4'][:break_index+1]-tke_transport_df['WpEp_bar_3'][:break_index+1])/dz_LIII_spring
+
+dWpEp_bar_dz_LI_fall = np.array(tke_transport_df['WpEp_bar_2'][break_index+1:]-tke_transport_df['WpEp_bar_1'][break_index+1:])/dz_LI_fall
+dWpEp_bar_dz_LII_fall = np.array(tke_transport_df['WpEp_bar_3'][break_index+1:]-tke_transport_df['WpEp_bar_2'][break_index+1:])/dz_LII_fall
+dWpEp_bar_dz_LIII_fall = np.array(tke_transport_df['WpEp_bar_4'][break_index+1:]-tke_transport_df['WpEp_bar_3'][break_index+1:])/dz_LIII_fall
+
+dWpEp_bar_dz_LI = np.concatenate([dWpEp_bar_dz_LI_spring, dWpEp_bar_dz_LI_fall], axis = 0)
+dWpEp_bar_dz_LII = np.concatenate([dWpEp_bar_dz_LII_spring, dWpEp_bar_dz_LII_fall], axis = 0)
+dWpEp_bar_dz_LIII = np.concatenate([dWpEp_bar_dz_LIII_spring, dWpEp_bar_dz_LIII_fall], axis = 0)
 
 phi_tke_I_dc = kappa*np.array(z_LI)/(np.array(usr_LI)**3)*(np.array(dWpEp_bar_dz_LI))
 phi_tke_II_dc = kappa*np.array(z_LII)/(np.array(usr_LII)**3)*(np.array(dWpEp_bar_dz_LII))
 phi_tke_III_dc = kappa*np.array(z_LIII)/(np.array(usr_LIII)**3)*(np.array(dWpEp_bar_dz_LIII))
 
 phi_tke_dc_df = pd.DataFrame()
-phi_tke_dc_df['z/L I'] = zL_df['z/L I dc']
-phi_tke_dc_df['z/L II'] = zL_df['z/L II dc']
-phi_tke_dc_df['z/L III'] = zL_df['z/L III dc']
+phi_tke_dc_df['z/L I'] = zL_df['zL_I_dc']
+phi_tke_dc_df['z/L II'] = zL_df['zL_II_dc']
+phi_tke_dc_df['z/L III'] = zL_df['zL_III_dc']
 phi_tke_dc_df['phi_tke I'] = phi_tke_I_dc
 phi_tke_dc_df['phi_tke II'] = phi_tke_II_dc
 phi_tke_dc_df['phi_tke III'] = phi_tke_III_dc
@@ -1248,18 +1257,18 @@ phi_tke_dc_df['phi_tke III'] = phi_tke_III_dc
 
 plt.figure()
 # plt.plot(phi_tke_coare_df['z/L I'], label='coare')
-plt.plot(phi_tke_dc_df['z/L I'], label='dc')
+plt.plot(phi_tke_dc_df['phi_tke I'], label='dc')
 plt.legend()
-plt.ylim(-10,10)
+# plt.ylim(-10,10)
 plt.title(title_windDir + 'phi_tke LEVEL I')
 
 
 print('done with writing phi_tke via D.C. method')
-print('done at line 638')
+print('done at line 1267')
 
 #%%
 phi_tke_I_dc_df = pd.DataFrame()
-phi_tke_I_dc_df['z/L'] = zL_df['z/L I dc']
+phi_tke_I_dc_df['z/L'] = zL_df['zL_I_dc']
 phi_tke_I_dc_df['phi_tke'] = phi_tke_I_dc
 # #get rid of negative tke values
 # phi_tke_I_dc_df['phi_tke_pos'] = np.where(phi_tke_I_dc_df['phi_tke']>=0,phi_tke_I_dc_df['phi_tke'],np.nan)
@@ -1273,7 +1282,7 @@ phi_tke_I_dc_pos = phi_tke_I_dc_df_final.loc[phi_tke_I_dc_df_final['z/L']>=0]
 
 
 phi_tke_II_dc_df = pd.DataFrame()
-phi_tke_II_dc_df['z/L'] = zL_df['z/L II dc']
+phi_tke_II_dc_df['z/L'] = zL_df['zL_II_dc']
 phi_tke_II_dc_df['phi_tke'] = phi_tke_II_dc
 # #get rid of negative tke values
 # phi_tke_II_dc_df['phi_tke_pos'] = np.where(phi_tke_II_dc_df['phi_tke']>=0,phi_tke_II_dc_df['phi_tke'],np.nan)
@@ -1287,7 +1296,7 @@ phi_tke_II_dc_pos = phi_tke_II_dc_df_final.loc[phi_tke_II_dc_df_final['z/L']>=0]
 
 
 phi_tke_III_dc_df = pd.DataFrame()
-phi_tke_III_dc_df['z/L'] = zL_df['z/L III dc']
+phi_tke_III_dc_df['z/L'] = zL_df['zL_III_dc']
 phi_tke_III_dc_df['phi_tke'] = phi_tke_III_dc
 # #get rid of negative tke values
 # phi_tke_III_dc_df['phi_tke_pos'] = np.where(phi_tke_III_dc_df['phi_tke']>=0,phi_tke_III_dc_df['phi_tke'],np.nan)
@@ -1438,11 +1447,11 @@ print('done at line 800')
 Combine to a master DF
 """
 master_I_dc_df = pd.DataFrame()
-master_I_dc_df['z/L'] = np.array(zL_df['z/L I dc'])
+master_I_dc_df['z/L'] = np.array(zL_df['zL_I_dc'])
 master_I_dc_df['phi_m'] = np.array(phi_m_dc_df['phi_m I'])
 master_I_dc_df['phi_eps'] = -1*np.array(phi_eps_dc_df['phi_eps I'])
 master_I_dc_df['phi_tke'] = -1*np.array(phi_tke_dc_df['phi_tke I'])
-master_I_dc_df['buoyancy'] = -1*np.array(zL_df['z/L I dc'])
+master_I_dc_df['buoyancy'] = -1*np.array(zL_df['zL_I_dc'])
 master_I_dc_df['phi_tp'] = -1*(np.array(master_I_dc_df['buoyancy']) + np.array(master_I_dc_df['phi_m']) + np.array(master_I_dc_df['phi_eps']) + np.array(master_I_dc_df['phi_tke']))
 
 
@@ -1459,11 +1468,11 @@ plt.hlines(y=0, xmin=-4,xmax=2, color = 'k')
 plt.vlines(x=0, ymin=-4,ymax=4, color = 'k')
 
 master_II_dc_df = pd.DataFrame()
-master_II_dc_df['z/L'] = np.array(zL_df['z/L II dc'])
+master_II_dc_df['z/L'] = np.array(zL_df['zL_II_dc'])
 master_II_dc_df['phi_m'] = np.array(phi_m_dc_df['phi_m II'])
 master_II_dc_df['phi_eps'] = -1*np.array(phi_eps_dc_df['phi_eps II'])
 master_II_dc_df['phi_tke'] = -1*np.array(phi_tke_dc_df['phi_tke II'])
-master_II_dc_df['buoyancy'] = -1*np.array(zL_df['z/L II dc'])
+master_II_dc_df['buoyancy'] = -1*np.array(zL_df['zL_II_dc'])
 master_II_dc_df['phi_tp'] = -1*(np.array(master_II_dc_df['buoyancy']) + np.array(master_II_dc_df['phi_m']) + np.array(master_II_dc_df['phi_eps']) + np.array(master_II_dc_df['phi_tke']))
 
 
@@ -1553,4 +1562,68 @@ plt.grid()
 # plt.legend()
 # plt.grid()
 
+#%%
+# compare pressure transport to TKE turbulent transport (which we expect to cancel out)
 
+transport_diff_LI = (phi_tke_I_dc_df_final['phi_tke']-master_I_dc_df['phi_tp'])/(kappa*np.array(z_LI)/(np.array(usr_LI)**3))
+transport_diff_LII = (phi_tke_II_dc_df_final['phi_tke']-master_II_dc_df['phi_tp'])/(kappa*np.array(z_LII)/(np.array(usr_LII)**3))
+
+plt.figure()
+plt.scatter(np.arange(len(transport_diff_LII)), transport_diff_LII, s=5, color = 'darkorange', label = 'LII')
+plt.scatter(np.arange(len(transport_diff_LI)), transport_diff_LI, s=5, color = 'dodgerblue', label = 'LI')
+plt.title('$T_e - T_p$ $[m^2/s^3]$')
+plt.legend(loc='lower right')
+plt.ylabel('$T_e - T_p$ $[m^2/s^3]$')
+plt.xlabel('time index')
+plt.ylim(-1,1)
+#%%
+
+transport_df_LI = pd.DataFrame()
+transport_df_LI['Te-Tp'] = transport_diff_LI
+transport_df_LI['z/L'] = np.array(zL_df['zL_I_dc'])
+
+transport_df_LII = pd.DataFrame()
+transport_df_LII['Te-Tp'] = transport_diff_LII
+transport_df_LII['z/L'] = np.array(zL_df['zL_II_dc'])
+
+def binscatter(**kwargs):
+    # Estimate binsreg
+    est = binsreg.binsreg(**kwargs)
+    
+    # Retrieve estimates
+    df_est = pd.concat([d.dots for d in est.data_plot])
+    df_est = df_est.rename(columns={'x': kwargs.get("x"), 'fit': kwargs.get("y")})
+    
+    # Add confidence intervals
+    if "ci" in kwargs:
+        df_est = pd.merge(df_est, pd.concat([d.ci for d in est.data_plot]))
+        df_est = df_est.drop(columns=['x'])
+        df_est['ci'] = df_est['ci_r'] - df_est['ci_l']
+    
+    # Rename groups
+    if "by" in kwargs:
+        df_est['group'] = df_est['group'].astype(df_est[kwargs.get("by")].dtype)
+        df_est = df_est.rename(columns={'group': kwargs.get("by")})
+
+    return df_est
+
+# Estimate binsreg
+
+df_binEstimate_transportDiff_I_dc = binscatter(x='z/L', y='Te-Tp', data=transport_df_LI, ci=(3,3), randcut=1)
+df_binEstimate_transportDiff_II_dc = binscatter(x='z/L', y='Te-Tp', data=transport_df_LII, ci=(3,3), randcut=1)
+
+
+#%% transport terms difference binned scatterplot
+plt.figure(figsize=(6,5))
+sns.scatterplot(x='z/L', y='Te-Tp', data=df_binEstimate_transportDiff_II_dc, color = 'darkorange', label = "binned $T_e+T_p$: L II")
+plt.errorbar('z/L', 'Te-Tp', yerr='ci', data=df_binEstimate_transportDiff_II_dc, color = 'darkorange', ls='', lw=2, alpha=0.2, label = 'L II error')
+sns.scatterplot(x='z/L', y='Te-Tp', data=df_binEstimate_transportDiff_I_dc, color = 'dodgerblue', label = "binned $T_e+T_p$: L I")
+plt.errorbar('z/L', 'Te-Tp', yerr='ci', data=df_binEstimate_transportDiff_I_dc, color = 'navy', ls='', lw=2, alpha=0.2, label = 'L I error')
+# plt.plot(coare_zL_neg, -1*phi_tp, color = 'k', label = 'COARE funcitonal form')
+plt.title(r"$T_e+T_p$")
+plt.xlim(-1.2,0.8)
+# plt.ylim(-0.5,3)
+plt.legend(loc = 'upper left')
+plt.grid()
+plt.savefig(plot_savePath + "binnedScatterplot_TransportTermDifferences_TeMinusTp.png",dpi=300)
+plt.savefig(plot_savePath + "binnedScatterplot_TransportTermDifferences_TeMinusTp.pdf")

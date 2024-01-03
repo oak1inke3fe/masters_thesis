@@ -146,7 +146,7 @@ windSpeed_df[mask_neutral_zL] = np.nan
 
 plt.figure()
 # plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II')
-plt.scatter(zL_df.index, zL_df['zL_I_dc'], label = 'z/L level I', color = 'gray')
+plt.scatter(zL_df.index, zL_df['zL_I_dc'], s=5, label = 'z/L level I', color = 'gray')
 plt.plot(prod_df['prod_I']*10, label = 'prod LI*10', color = 'black')
 plt.legend()
 plt.title('z/L and Prod AFTER neutral mask')
@@ -188,7 +188,7 @@ plt.figure()
 # plt.scatter(zL_df.index, zL_df['zL_II_dc'], label = 'z/L level II')
 plt.scatter(sonic1_df.index, sonic1_df['Ubar'], label = 'Ubar s1', color = 'gray')
 plt.legend()
-plt.title('Ubar AFTER 8m/s restriction mask')
+plt.title('Ubar AFTER 10m/s restriction mask')
 plt.ylim(0,18)
 print('done with setting up Ubar restrictions to confident pw calcs')
 
@@ -283,7 +283,7 @@ plt.scatter(np.arange(len(p_minus_diss_I)), p_minus_diss_I, color = 'dodgerblue'
 plt.plot(np.arange(len(p_minus_diss_I)), p_minus_diss_I, color = 'dodgerblue')
 plt.scatter(np.arange(len(p_minus_diss_I)), np.array(pw_df['d_dz_pw_theory_I']), color = 'navy', s=5, label = '$T_{\widetilde{pw}}$')
 plt.plot(np.arange(len(p_minus_diss_I)), np.array(pw_df['d_dz_pw_theory_I']), color = 'navy')
-plt.hlines(y=0, xmin=0,xmax=4395,color='k')
+# plt.hlines(y=0, xmin=0,xmax=4395,color='k')
 plt.legend()
 plt.ylabel('$P- \epsilon, \;, T_{\widetilde{pw}} \quad [m^2/s^3]$')
 plt.ylim(-0.05,0.1)
@@ -295,7 +295,7 @@ plt.title("$P-\epsilon$ and $T_{\widetilde{pw}}$ \n Level I")
 fig = plt.figure()
 plt.scatter(np.arange(len(p_minus_diss_I)), p_minus_diss_I-np.array(pw_df['d_dz_pw_theory_I']), color = 'navy', s=5, label = '$P-\epsilon-T_{\widetilde{pw}}$')
 plt.plot(np.arange(len(p_minus_diss_I)), p_minus_diss_I-np.array(pw_df['d_dz_pw_theory_I']), color = 'navy')
-plt.hlines(y=0, xmin=0,xmax=4395,color='k')
+# plt.hlines(y=0, xmin=0,xmax=4395,color='k')
 plt.legend()
 plt.ylabel('$P- \epsilon -T_{\widetilde{pw}} \quad [m^2/s^3]$')
 plt.ylim(-0.1,0.1)
@@ -318,7 +318,7 @@ fig = plt.figure(figsize=(15,8))
 plt.plot(p_minus_diss_II, color = 'darkorange', label = 'L II')
 plt.plot(p_minus_diss_I, color = 'dodgerblue', label = 'L I')
 plt.legend()
-plt.hlines(y=0, xmin=0,xmax=4395,color='k')
+# plt.hlines(y=0, xmin=0,xmax=4395,color='k')
 # plt.xlim(700,860)
 plt.ylim(-0.2,0.2)
 plt.xlabel('time')
@@ -329,8 +329,8 @@ plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for $\overline{
 plt.savefig(plot_savePath + "timeseries_neutralPvEps_pwUbarRestriction.png", dpi = 300)
 plt.savefig(plot_savePath + "timeseries_neutralPvEps_pwUbarRestriction.pdf")
 #%%
-# fig = plt.figure(figsize=(7,2))
-fig = plt.figure()
+fig = plt.figure(figsize=(7,2))
+# fig = plt.figure()
 plt.plot(p_minus_diss_II, color = 'darkorange', label = 'L II')
 plt.plot(p_minus_diss_I, color = 'dodgerblue', label = 'L I')
 plt.legend()
@@ -342,7 +342,7 @@ plt.xlabel('May Storm')
 plt.ylabel('$P-\epsilon$ [m^2/s^3]')
 plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis')
 
-plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for $\overline{u}$ sonic1 >=10m/s')
+plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for $\overline{u}$ sonic1 $\geq$ 10m/s')
 plt.savefig(plot_savePath + "timeseries_MAYstorm_neutralPvEps_pwUbarRestriction.png", dpi = 300)
 plt.savefig(plot_savePath + "timeseries_MAYstorm_neutralPvEps_pwUbarRestriction.pdf")
 
@@ -358,7 +358,7 @@ plt.xlabel('October Storm')
 plt.ylabel('$P-\epsilon$ [m^2/s^3]')
 plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis')
 
-plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for $\overline{u}$ sonic1 >=10m/s')
+plt.title('Neutral Conditions: $P-\epsilon$ Combined Analysis \n for $\overline{u}$ sonic1 $\geq$ 10m/s')
 plt.savefig(plot_savePath + "timeseries_OCTstorm_neutralPvEps_pwUbarRestriction.png", dpi = 300)
 plt.savefig(plot_savePath + "timeseries_OCTstorm_neutralPvEps_pwUbarRestriction.pdf")
 #%%
@@ -679,12 +679,16 @@ print('done plotting P vs. Eps simple diss (new)')
 Level_I_df = pd.DataFrame()
 Level_I_df['P+B-Eps-PW'] = np.array(PplusB_minus_eps_df['LI']-pw_df['d_dz_pw_theory_I'])
 Level_I_df['Ubar'] = np.array(windSpeed_df['Ubar_LI'])
+Level_I_df['PW'] = np.array(pw_df['d_dz_pw_theory_I'])
+Level_I_df['P+B-Eps'] = np.array(PplusB_minus_eps_df['LI'])
 Level_I_df['windDir'] = np.array(windDir_df['alpha_s2'])
 
 
 Level_II_df = pd.DataFrame()
 Level_II_df['P+B-Eps-PW'] = np.array(PplusB_minus_eps_df['LII']-pw_df['d_dz_pw_theory_II'])
 Level_II_df['Ubar'] = np.array(windSpeed_df['Ubar_LII'])
+Level_II_df['PW'] = np.array(pw_df['d_dz_pw_theory_I'])
+Level_II_df['P+B-Eps'] = np.array(PplusB_minus_eps_df['LII'])
 Level_II_df['windDir'] = np.array(windDir_df['alpha_s3'])
 #%%
 
@@ -716,8 +720,17 @@ df_binEstimate_LI_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps-PW', data=Leve
 df_binEstimate_LII_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps-PW',w=['windDir'], data=Level_II_df, ci=(3,3),randcut=1)
 df_binEstimate_LII_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps-PW', data=Level_II_df, ci=(3,3),randcut=1)
 
+
+df_binEstimate_LI_UbarVsDeficit_noPW = binscatter(x='Ubar', y='P+B-Eps',w=['windDir'], data=Level_I_df, ci=(3,3),randcut=1)
+df_binEstimate_LI_UbarVsDeficit_noPW = binscatter(x='Ubar', y='P+B-Eps', data=Level_I_df, ci=(3,3),randcut=1)
+
+df_binEstimate_LII_UbarVsDeficit_noPW = binscatter(x='Ubar', y='P+B-Eps',w=['windDir'], data=Level_II_df, ci=(3,3),randcut=1)
+df_binEstimate_LII_UbarVsDeficit_noPW = binscatter(x='Ubar', y='P+B-Eps', data=Level_II_df, ci=(3,3),randcut=1)
+
+df_binEstimate_LI_UbarVsPW = binscatter(x='Ubar', y='PW',w=['windDir'], data=Level_I_df, ci=(3,3),randcut=1)
+df_binEstimate_LI_UbarVsPW = binscatter(x='Ubar', y='PW', data=Level_I_df, ci=(3,3),randcut=1)
 #%%
-# scatterplot of Production AND Buoyancy versus Dissipation: combined analysis
+# scatterplot of Production plus Buoyancy versus Dissipation minus PW versus wind speed: combined analysis
 fig = plt.figure(figsize = (6,6))
 sns.scatterplot(x='Ubar', y='P+B-Eps-PW', data=df_binEstimate_LII_UbarVsDeficit, color = 'darkorange', label = "binned LII")
 plt.errorbar('Ubar', 'P+B-Eps-PW', yerr='ci', data=df_binEstimate_LII_UbarVsDeficit, color = 'coral', ls='', lw=2, alpha=0.2, label = 'LII errorbar')
@@ -741,6 +754,65 @@ plt.ylim(-0.2,0.2)
 plt.tight_layout()
 plt.savefig(plot_savePath + "scatterplotBIN_PWrestriction_UbarVSPplusBminusEpsMinusPW_combinedAnalysis.png",dpi=300)
 plt.savefig(plot_savePath + "scatterplotBIN_PWrestriction_UbarVSPplusBvEpsMinusPW_combinedAnalysis.pdf")
+
+#%%
+# scatterplot of Production plus Buoyancy versus Dissipation minus PW versus wind speed AND PW vs Wind speed: combined analysis
+fig = plt.figure(figsize = (6,6))
+sns.scatterplot(x='Ubar', y='P+B-Eps-PW', data=df_binEstimate_LII_UbarVsDeficit, color = 'darkorange', label = "binned LII")
+plt.errorbar('Ubar', 'P+B-Eps-PW', yerr='ci', data=df_binEstimate_LII_UbarVsDeficit, color = 'coral', ls='', lw=2, alpha=0.2, label = 'LII errorbar')
+sns.scatterplot(x='Ubar', y='P+B-Eps-PW', data=df_binEstimate_LI_UbarVsDeficit, color = 'dodgerblue', label = "binned LI")
+plt.errorbar('Ubar', 'P+B-Eps-PW', yerr='ci', data=df_binEstimate_LI_UbarVsDeficit, color = 'navy', ls='', lw=2, alpha=0.2, label = 'LI errorbar')
+# plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
+sns.scatterplot(x='Ubar', y='PW', data=df_binEstimate_LI_UbarVsPW, color = 'dimgray', label = "binned PW boom-1")
+plt.errorbar('Ubar', 'PW', yerr='ci', data=df_binEstimate_LI_UbarVsPW, color = 'dimgray', ls='', lw=2, alpha=0.2, label = 'PW errorbar')
+
+
+# plt.xscale('log')
+# plt.yscale('log')
+plt.legend(loc = 'upper left')
+plt.xlabel('$\overline{u}$ [$ms^{-1}$]')
+plt.ylabel('$P + B - (\epsilon + T_{\widetilde{pw}})$ [$m^2s^{-3}$]')
+plt.title('$P+B-(\epsilon+T_{\widetilde{pw}})$ vs. Wind Speed ($\overline{u}$) \n (Binned)')
+ax = plt.gca() 
+# plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_II_PB_str), transform=ax.transAxes)
+# plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.transAxes)
+# plt.axis('equal')
+plt.hlines(y=0,xmin=2,xmax=16,color='k',linestyles='--')
+plt.xlim(10,16)
+plt.ylim(-0.2,0.2)
+plt.tight_layout()
+plt.savefig(plot_savePath + "scatterplotBIN_PWrestriction_UbarVSPplusBminusEpsMinusPW_withPWvsWindSpeed_combinedAnalysis.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplotBIN_PWrestriction_UbarVSPplusBminusEpsMinusPW_withPWvsWindSpeed_combinedAnalysis.pdf")
+
+#%%
+# scatterplot of Production plus Buoyancy versus Dissipation (no PW) versus wind speed AND PW vs Wind speed: combined analysis
+fig = plt.figure(figsize = (6,6))
+sns.scatterplot(x='Ubar', y='P+B-Eps', data=df_binEstimate_LII_UbarVsDeficit_noPW, color = 'darkorange', label = "binned LII")
+plt.errorbar('Ubar', 'P+B-Eps', yerr='ci', data=df_binEstimate_LII_UbarVsDeficit_noPW, color = 'coral', ls='', lw=2, alpha=0.2, label = 'LII errorbar')
+sns.scatterplot(x='Ubar', y='P+B-Eps', data=df_binEstimate_LI_UbarVsDeficit_noPW, color = 'dodgerblue', label = "binned LI")
+plt.errorbar('Ubar', 'P+B-Eps', yerr='ci', data=df_binEstimate_LI_UbarVsDeficit_noPW, color = 'navy', ls='', lw=2, alpha=0.2, label = 'LI errorbar')
+# plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
+sns.scatterplot(x='Ubar', y='PW', data=df_binEstimate_LI_UbarVsPW, color = 'darkolivegreen', label = "binned PW boom-1")
+plt.errorbar('Ubar', 'PW', yerr='ci', data=df_binEstimate_LI_UbarVsPW, color = 'darkolivegreen', ls='', lw=2, alpha=0.2, label = 'PW errorbar')
+
+
+# plt.xscale('log')
+# plt.yscale('log')
+plt.legend(loc = 'upper left')
+plt.xlabel('$\overline{u}$ [$ms^{-1}$]')
+plt.ylabel('$P + B - \epsilon$, $T_{\widetilde{pw}}$ [$m^2s^{-3}$]')
+plt.title('$P+B-\epsilon$ and $T_{\widetilde{pw}}$ vs. Wind Speed ($\overline{u}$) \n (Binned)')
+ax = plt.gca() 
+# plt.text(.05, .85, "Pearson's r L II ={:.3f}".format(r_II_PB_str), transform=ax.transAxes)
+# plt.text(.05, .8, "Pearson's r L I ={:.3f}".format(r_I_PB_str), transform=ax.transAxes)
+# plt.axis('equal')
+plt.hlines(y=0,xmin=2,xmax=16,color='k',linestyles='--')
+plt.xlim(10,16)
+plt.ylim(-0.2,0.2)
+plt.tight_layout()
+plt.savefig(plot_savePath + "scatterplotBIN_PWrestriction_UbarVSPplusBminusEps_withPWvsWindSpeed_combinedAnalysis.png",dpi=300)
+plt.savefig(plot_savePath + "scatterplotBIN_PWrestriction_UbarVSPplusBminusEps_withPWvsWindSpeed_combinedAnalysis.pdf")
+
 #%%
 # sort by z/L
 zL_I_df = pd.DataFrame()

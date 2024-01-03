@@ -15,24 +15,49 @@ import matplotlib.pyplot as plt
 print('done with imports')
 
 #%%
-file_path = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level4/"
-rho_df = pd.read_csv(file_path+"rho_bar_allFall.csv")
-rho_df = rho_df[27:]
-WpTp_bar_df = pd.read_csv(file_path+"WpTp_bar_allSonics_allFall.csv")
-WpTp_bar_df = WpTp_bar_df[27:]
-Tbar_df = pd.read_csv(file_path+"Tbar_allSonics_allFall.csv")
-Tbar_df = Tbar_df[27:]
+# file_path = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level4/"
+file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
+file_sonic1 = "despiked_s1_turbulenceTerms_andMore_combined.csv"
+sonic1_df = pd.read_csv(file_path+file_sonic1)
+sonic1_df = sonic1_df.drop(['new_index'], axis=1)
 
-# Tbar_df['Tbar_s1_C'] = Tbar_df['Tbar_s1']-273.15
-z_df = pd.read_csv(file_path+"z_airSide_allFall.csv")
-buoy_df = pd.read_csv(file_path+"New_buoy_terms_allFall.csv")
+file_sonic2 = "despiked_s2_turbulenceTerms_andMore_combined.csv"
+sonic2_df = pd.read_csv(file_path+file_sonic2)
+sonic2_df = sonic2_df.drop(['new_index'], axis=1)
+
+file_sonic3 = "despiked_s3_turbulenceTerms_andMore_combined.csv"
+sonic3_df = pd.read_csv(file_path+file_sonic3)
+sonic3_df = sonic3_df.drop(['new_index'], axis=1)
+
+file_sonic4 = "despiked_s4_turbulenceTerms_andMore_combined.csv"
+sonic4_df = pd.read_csv(file_path+file_sonic4)
+sonic4_df = sonic4_df.drop(['new_index'], axis=1)
+
+rho_df = pd.read_csv(file_path+"rhoAvg_combinedAnalysis.csv")
+
+z_df = pd.read_csv(file_path+"z_airSide_combinedAnalysis.csv")
+buoy_df = pd.read_csv(file_path+"buoy_terms_combinedAnalysis.csv")
 g = -9.81
+#%%
+WpTp_bar_df = pd.DataFrame()
+WpTp_bar_df['WpTp_bar_s1'] = sonic1_df['WpTp_bar']
+WpTp_bar_df['WpTp_bar_s2'] = sonic2_df['WpTp_bar']
+WpTp_bar_df['WpTp_bar_s3'] = sonic3_df['WpTp_bar']
+WpTp_bar_df['WpTp_bar_s4'] = sonic4_df['WpTp_bar']
+
+
+Tbar_df = pd.DataFrame()
+Tbar_df['Tbar_s1'] = sonic1_df['Tbar']
+Tbar_df['Tbar_s2'] = sonic2_df['Tbar']
+Tbar_df['Tbar_s3'] = sonic3_df['Tbar']
+Tbar_df['Tbar_s4'] = sonic4_df['Tbar']
+# Tbar_df['Tbar_s1_C'] = Tbar_df['Tbar_s1']-273.15
 #%%
 BuoyancyFlux_coare_df = pd.DataFrame()
 sonic_arr = ['1','2','3','4']
 for sonic_num in sonic_arr:
 # sonic_num = str(1)
-    file_name = 'coare_outputs_s'+sonic_num+'_Warm_UbarGreaterThan2ms.txt'
+    file_name = 'coare_outputs_s'+sonic_num+'_WindStressOnly.txt'
     A_hdr = 'usr\ttau\thsb\thlb\thbb\thsbb\thlwebb\ttsr\tqsr\tzo\tzot\tzoq\tCd\t'
     A_hdr += 'Ch\tCe\tL\tzeta\tdT_skinx\tdq_skinx\tdz_skin\tUrf\tTrf\tQrf\t'
     A_hdr += 'RHrf\tUrfN\tTrfN\tQrfN\tlw_net\tsw_net\tLe\trhoa\tUN\tU10\tU10N\t'
@@ -46,10 +71,10 @@ for sonic_num in sonic_arr:
 Cp = 1004.67
 BuoyancyFlux_dc_df = pd.DataFrame()
 BuoyancyFlux_dc_df['new_index'] = np.arange(len(BuoyancyFlux_coare_df))
-BuoyancyFlux_dc_df['B_sonic1'] = rho_df['rho_bar_1']*WpTp_bar_df['WpTp_bar_s1']*Cp
-BuoyancyFlux_dc_df['B_sonic2'] = rho_df['rho_bar_2']*WpTp_bar_df['WpTp_bar_s2']*Cp
-BuoyancyFlux_dc_df['B_sonic3'] = rho_df['rho_bar_3']*WpTp_bar_df['WpTp_bar_s3']*Cp
-BuoyancyFlux_dc_df['B_sonic4'] = rho_df['rho_bar_3']*WpTp_bar_df['WpTp_bar_s4']*Cp
+BuoyancyFlux_dc_df['B_sonic1'] = rho_df['rho_bar_1_dry']*WpTp_bar_df['WpTp_bar_s1']*Cp
+BuoyancyFlux_dc_df['B_sonic2'] = rho_df['rho_bar_2_dry']*WpTp_bar_df['WpTp_bar_s2']*Cp
+BuoyancyFlux_dc_df['B_sonic3'] = rho_df['rho_bar_3_dry']*WpTp_bar_df['WpTp_bar_s3']*Cp
+BuoyancyFlux_dc_df['B_sonic4'] = rho_df['rho_bar_3_dry']*WpTp_bar_df['WpTp_bar_s4']*Cp
 
 dc_buoyFlux_despiked = pd.DataFrame()
 from hampel import hampel
@@ -108,11 +133,12 @@ for sonic in sonic_arr:
 
 
 #%%
-windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_120to196.csv")
+windDir_df = pd.read_csv(file_path + "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv")
 windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
-index_array = np.arange(len(windDir_df))
-windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, index_array)
-mask_goodWindDir = np.isin(windDir_df['new_index_arr'],index_array)
+
+windDir_index_array = np.arange(len(windDir_df))
+windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, windDir_index_array)
+mask_goodWindDir = np.isin(windDir_df['new_index_arr'],windDir_index_array)
 
 windDir_df[mask_goodWindDir] = np.nan
 
@@ -302,7 +328,7 @@ plt.ylim(-300,300)
 plt.legend()
 plt.title('LII: Buoyancy Flux DC bv. COARE')
 #%%
-plot_savePath = r"Z:\Fall_Deployment\OaklinCopyMNode\code_pipeline\Level4\plots/"
+plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/plots/'
 plt.figure()
 plt.scatter(BF_LII['dc'],BF_LII['coare'], color = 'orange', edgecolor = 'red', label = 'L II')
 plt.scatter(BF_LI['dc'],BF_LI['coare'], color = 'dodgerblue', edgecolor = 'navy', label = 'L I')
@@ -319,6 +345,7 @@ plt.text(.03, .9, "r (L I) ={:.3f}".format(r_BF_LI_str), transform=ax.transAxes)
 plt.xlim(-1000,300)
 # plt.ylim(-300,300)
 plt.savefig(plot_savePath + "buoyancyFlux_scatterplot.png",dpi=300)
+plt.savefig(plot_savePath + "buoyancyFlux_scatterplot.pdf",)
 
 
 
@@ -326,7 +353,7 @@ plt.savefig(plot_savePath + "buoyancyFlux_scatterplot.png",dpi=300)
 # Timeseries
 import matplotlib.dates as mdates
 
-date_df = pd.read_csv(file_path+'date_allFall.csv')
+date_df = pd.read_csv(file_path+'date_combinedAnalysis.csv')
 dates_arr = np.array(pd.to_datetime(date_df['datetime']))
 
 fig, (ax1, ax2) = plt.subplots(2,1, figsize = (15,8), sharex=True)
@@ -384,16 +411,22 @@ ax = plt.gca()
 plt.text(.03, .95, "r (L II) ={:.3f}".format(r_BF_95_II_str), transform=ax.transAxes)
 plt.text(.03, .9, "r (L I) ={:.3f}".format(r_BF_95_I_str), transform=ax.transAxes)
 plt.axis('square')
-plt.savefig(plot_savePath + "buoyancyFlux_scatterplot.png",dpi=300)
+plt.savefig(plot_savePath + "buoyancyFlux95p_scatterplot.png",dpi=300)
+plt.savefig(plot_savePath + "buoyancyFlux95p_scatterplot.pdf")
 
 plt.figure()
 plt.scatter(BF_99p_II_df['dc'],BF_99p_II_df['coare'], color = 'orange', edgecolor = 'red', label = 'L II')
 plt.scatter(BF_99p_I_df['dc'],BF_99p_I_df['coare'], color = 'dodgerblue', edgecolor = 'navy', label = 'L I')
 plt.plot([-200, 200], [-200, 200], color = 'k', label = "1-to-1") #scale 1-to-1 line
-plt.title(r"Buoyancy Flux (99%-ile)", fontsize=16)
+plt.title(r"Buoyancy Flux [$Wm^{-2}$]: 99%-ile", fontsize=14)
 plt.xlabel('DC')
 plt.ylabel('COARE')
-plt.legend(loc='upper left')
+plt.legend(loc='lower right')
 plt.xlim(-300,300)
 plt.ylim(-300,300)
+ax = plt.gca() 
+plt.text(.03, .95, "r (L II) ={:.3f}".format(r_BF_99_II_str), transform=ax.transAxes)
+plt.text(.03, .9, "r (L I) ={:.3f}".format(r_BF_99_I_str), transform=ax.transAxes)
 plt.axis('square')
+plt.savefig(plot_savePath + "buoyancyFlux99p_scatterplot.png",dpi=300)
+plt.savefig(plot_savePath + "buoyancyFlux99p_scatterplot.pdf")
