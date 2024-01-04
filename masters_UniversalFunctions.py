@@ -33,7 +33,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import binsreg
 import seaborn as sns
+import os
 print('done with imports')
+
+print(os.getcwd())
+os.chdir('/Users/oaklinkeefe/Documents/GitHub/masters_thesis/')
+print(os.getcwd())
+
+from binscatter.py import binscatterplot
+name = "binscatter"
+print('done importing binscatter')
 
 g = -9.81
 kappa = 0.40 # von Karman constant used by Edson (1998) Similarity Theory paper
@@ -112,7 +121,7 @@ buoy_df = buoy_df.drop(['Unnamed: 0'], axis=1)
 
 oct_storm = False
 
-
+print('done with loading rest of files')
 #%% Mask the DFs to only keep the good wind directions
 all_windDirs = True
 onshore = False
@@ -388,6 +397,7 @@ phi_m_III_dc_df_final = phi_m_III_dc_df_final.sort_values(by='z/L')
 phi_m_III_dc_neg = phi_m_III_dc_df_final.loc[phi_m_III_dc_df['z/L']<=0]
 phi_m_III_dc_pos = phi_m_III_dc_df_final.loc[phi_m_III_dc_df['z/L']>=0]
 
+print('done at line 391')
 #%% #calculate phi_M for levels 4-1, 3-1, and 4-2
 phi_m_4_1_dc_df = pd.DataFrame()
 phi_m_4_1_dc_df['z/L'] = (np.array(zL_df['zL_4_dc'])+np.array(zL_df['zL_1_dc']))/2
@@ -431,6 +441,7 @@ phi_m_4_2_dc_df_final = phi_m_4_2_dc_df[mask_phi_m_4_2_dc_df]
 phi_m_4_2_dc_df_final = phi_m_4_2_dc_df_final.sort_values(by='z/L')
 phi_m_4_2_dc_neg = phi_m_4_2_dc_df_final.loc[phi_m_4_2_dc_df_final['z/L']<=0]
 phi_m_4_2_dc_pos = phi_m_4_2_dc_df_final.loc[phi_m_4_2_dc_df_final['z/L']>=0]
+print('done at line 435')
 #%% COARE functional form for Phi_m
 
 coare_zL_neg = np.arange(-4,0,0.005)
@@ -452,7 +463,7 @@ plt.legend()
 plt.title('$\phi_m$ functional form')
 
 
-
+print('done plotting Phi_M COARE functional form')
 #%% Phi_m plots
 plt.figure()
 plt.scatter(phi_m_I_dc_df_final['z/L'],phi_m_I_dc_df_final['phi_m'], color = 'dodgerblue', edgecolor = 'navy', label ='$\phi_m(z/L)$ d.c. L I')
@@ -511,7 +522,9 @@ plt.ylim(-4,4)
 plt.grid()
 plt.legend()
 
+print('done at line 516')
 #%% Phi_m plots levels 4-1, 3-1, 4-2
+"""
 ymin = -4
 ymax = 4
 xmin = -4
@@ -558,6 +571,7 @@ plt.ylim(ymin,ymax)
 # plt.yscale('log')
 plt.grid()
 plt.legend()
+"""
 #%%
 # import binsreg
 # binscatter function written by Matteo Courthoud in Towards Data Science May 9, 2022
@@ -583,12 +597,13 @@ def binscatter(**kwargs):
     return df_est
 
 # Estimate binsreg
-df_binEstimate_phi_m_I_dc = binscatter(x='z/L', y='phi_m', data=phi_m_I_dc_df_final, ci=(3,3), randcut=1)
-df_binEstimate_phi_m_II_dc = binscatter(x='z/L', y='phi_m', data=phi_m_II_dc_df_final, ci=(3,3), randcut=1)
-df_binEstimate_phi_m_III_dc = binscatter(x='z/L', y='phi_m', data=phi_m_III_dc_df_final, ci=(3,3), randcut=1)
-df_binEstimate_phi_m_4_1_dc = binscatter(x='z/L', y='phi_m', data=phi_m_4_1_dc_df_final, ci=(3,3), randcut=1)
-df_binEstimate_phi_m_3_1_dc = binscatter(x='z/L', y='phi_m', data=phi_m_3_1_dc_df_final, ci=(3,3), randcut=1)
-df_binEstimate_phi_m_4_2_dc = binscatter(x='z/L', y='phi_m', data=phi_m_4_2_dc_df_final, ci=(3,3), randcut=1)
+nbins_num = 100
+df_binEstimate_phi_m_I_dc = binscatter(x='z/L', y='phi_m', data=phi_m_I_dc_df_final, ci=(3,3), randcut=1, binspos=[1,100], nbins= nbins_num, samebinsby=True)
+# df_binEstimate_phi_m_II_dc = binscatter(x='z/L', y='phi_m', data=phi_m_II_dc_df_final, ci=(3,3), randcut=1, binspos='es', nbins=nbins_num)
+# df_binEstimate_phi_m_III_dc = binscatter(x='z/L', y='phi_m', data=phi_m_III_dc_df_final, ci=(3,3), randcut=1, binspos='es', nbins=nbins_num)
+# df_binEstimate_phi_m_4_1_dc = binscatter(x='z/L', y='phi_m', data=phi_m_4_1_dc_df_final, ci=(3,3), randcut=1, binspos='es', nbins=nbins_num)
+# df_binEstimate_phi_m_3_1_dc = binscatter(x='z/L', y='phi_m', data=phi_m_3_1_dc_df_final, ci=(3,3), randcut=1, binspos='es', nbins=nbins_num)
+# df_binEstimate_phi_m_4_2_dc = binscatter(x='z/L', y='phi_m', data=phi_m_4_2_dc_df_final, ci=(3,3), randcut=1, binspos='es', nbins=nbins_num)
 
 print('done with binning data')
 

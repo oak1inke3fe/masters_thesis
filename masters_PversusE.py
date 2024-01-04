@@ -811,16 +811,16 @@ plt.savefig(plot_savePath + "scatterplotZoomOut_PplusBvEps_combinedAnalysis.pdf"
 Level_I_df = pd.DataFrame()
 Level_I_df['P+B-Eps'] = np.array(PplusB_minus_eps_df['LI'])
 Level_I_df['Ubar'] = np.array(windSpeed_df['Ubar_LI'])
-Level_I_df['PW'] = np.array(-1*pw_df['PW boom-1 [m^3/s^3]'])
-Level_I_df['PW_theory'] = np.array(-1*pw_df['d_dz_pw_theory_I'])
+Level_I_df['PW'] = np.array(pw_df['PW boom-1 [m^3/s^3]'])
+Level_I_df['PW_theory'] = np.array(pw_df['d_dz_pw_theory_I'])
 Level_I_df['windDir'] = np.array(windDir_df['alpha_s2'])
 
 
 Level_II_df = pd.DataFrame()
 Level_II_df['P+B-Eps'] = np.array(PplusB_minus_eps_df['LII'])
 Level_II_df['Ubar'] = np.array(windSpeed_df['Ubar_LII'])
-Level_II_df['PW'] = np.array(-1*pw_df['PW boom-1 [m^3/s^3]'])
-Level_II_df['PW_theory'] = np.array(-1*pw_df['d_dz_pw_theory_II'])
+Level_II_df['PW'] = np.array(pw_df['PW boom-1 [m^3/s^3]'])
+Level_II_df['PW_theory'] = np.array(pw_df['d_dz_pw_theory_II'])
 Level_II_df['windDir'] = np.array(windDir_df['alpha_s3'])
 
 
@@ -846,15 +846,21 @@ def binscatter(**kwargs):
     return df_est
 
 # Estimate binsreg
+nbins_num = 50
 # df_binEstimate_LI_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps',w=['windDir'], data=Level_I_df, ci=(3,3),randcut=1,binspos='es')
-df_binEstimate_LI_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_I_df, ci=(3,3),randcut=1,binspos='es',nbins=40)
+# df_binEstimate_LI_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_I_df, ci=(3,3),randcut=1,binspos='es',nbins=40)
+df_binEstimate_LI_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_I_df, ci=(3,3),randcut=1,nbins=nbins_num)
+# df_binEstimate_LI_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_I_df, ci=(3,3),randcut=1,)
 
 # df_binEstimate_LII_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps',w=['windDir'], data=Level_II_df, ci=(3,3),randcut=1,binspos='es')
-df_binEstimate_LII_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_II_df, ci=(3,3),randcut=1,binspos='es',nbins=40)
+# df_binEstimate_LII_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_II_df, ci=(3,3),randcut=1,binspos='es',nbins=40)
+df_binEstimate_LII_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_II_df, ci=(3,3),randcut=1,nbins=nbins_num)
+# df_binEstimate_LII_UbarVsDeficit = binscatter(x='Ubar', y='P+B-Eps', data=Level_II_df, ci=(3,3),randcut=1,)
 
 
 # df_binEstimate_LI_UbarVsPW = binscatter(x='Ubar', y='PW',w=['windDir'], data=Level_I_df, ci=(3,3),randcut=1,binspos='es')
-df_binEstimate_LI_UbarVsPW = binscatter(x='Ubar', y='PW_theory', data=Level_I_df, ci=(3,3),randcut=1,binspos='es',nbins=40)
+df_binEstimate_LI_UbarVsPW = binscatter(x='Ubar', y='PW', data=Level_I_df, ci=(3,3),randcut=1,nbins=nbins_num)
+# df_binEstimate_LI_UbarVsPW = binscatter(x='Ubar', y='PW', data=Level_I_df, ci=(3,3),randcut=1,)
 
 #%%
 # scatterplot of Production AND Buoyancy minus Dissipation versus wind speed (binned): combined analysis
@@ -885,8 +891,8 @@ plt.savefig(plot_savePath + "scatterplotBIN__UbarVSPplusBvEps_combinedAnalysis.p
 # scatterplot of Production AND Buoyancy minus Dissipation versus wind speed and PW vs wind speed (binned): combined analysis
 
 fig = plt.figure(figsize = (6,6))
-sns.scatterplot(x='Ubar', y='P+B-Eps', data=df_binEstimate_LII_UbarVsDeficit, color = 'darkorange', label = "$P+B-\epsilon$ L II")
-plt.errorbar('Ubar', 'P+B-Eps', yerr='ci', data=df_binEstimate_LII_UbarVsDeficit, color = 'coral', ls='', lw=2, alpha=0.2, label = '$P+B-\epsilon$ L II errorbar')
+# sns.scatterplot(x='Ubar', y='P+B-Eps', data=df_binEstimate_LII_UbarVsDeficit, color = 'darkorange', label = "$P+B-\epsilon$ L II")
+# plt.errorbar('Ubar', 'P+B-Eps', yerr='ci', data=df_binEstimate_LII_UbarVsDeficit, color = 'coral', ls='', lw=2, alpha=0.2, label = '$P+B-\epsilon$ L II errorbar')
 sns.scatterplot(x='Ubar', y='P+B-Eps', data=df_binEstimate_LI_UbarVsDeficit, color = 'dodgerblue', label = "$P+B-\epsilon$ L I")
 plt.errorbar('Ubar', 'P+B-Eps', yerr='ci', data=df_binEstimate_LI_UbarVsDeficit, color = 'navy', ls='', lw=2, alpha=0.2, label = '$P+B-\epsilon$ L I errorbar')
 # plt.plot([0, 1], [0, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
@@ -909,6 +915,37 @@ plt.xlim(2,15)
 plt.tight_layout()
 plt.savefig(plot_savePath + "scatterplotBIN_UbarVSPplusBminusEps_withUbarVsPW_combinedAnalysis.png",dpi=300)
 plt.savefig(plot_savePath + "scatterplotBIN_UbarVSPplusBminusEps_withUbarVsPW_combinedAnalysis.pdf")
+
+#%%
+fig, ax1 = plt.subplots(figsize = (6,6))
+fig.suptitle('$P+B- \epsilon\; [m^2/s^3]$ vs. $\overline{u}\; [m/s]$ \n and \n $T_{\widetilde{pw}}\; [m^3/s^3]$ vs. $\overline{u}\; [m/s]$ ',fontsize=12)
+fig.subplots_adjust(top=0.85)
+# sns.scatterplot(x='Ubar', y='P+B-Eps', data=df_binEstimate_LII_UbarVsDeficit, color = 'darkorange', label = "$P+B-\epsilon$ L II")
+# plt.errorbar('Ubar', 'P+B-Eps', yerr='ci', data=df_binEstimate_LII_UbarVsDeficit, color = 'coral', ls='', lw=2, alpha=0.2, label = '$P+B-\epsilon$ L II errorbar')
+sns.scatterplot(x='Ubar', y='P+B-Eps', data=df_binEstimate_LI_UbarVsDeficit, color = 'dodgerblue', label = "$P+B-\epsilon$ L I",)
+plt.errorbar('Ubar', 'P+B-Eps', yerr='ci', data=df_binEstimate_LI_UbarVsDeficit, color = 'navy', ls='', lw=2, alpha=0.2, label = 'errorbar', )
+ax1.set_ylim(-0.05,0.07)
+ax1.set_xlim(2,14.5)
+ax1.set_ylabel('$P+B- \epsilon\; [m^2/s^3]$', color='dodgerblue', fontsize=10)
+ax1.tick_params(axis='y', colors='dodgerblue', which='major')
+ax1.set_xlabel('$\overline{u} \; [m/s]$', color='black', fontsize=10)
+# plt.legend(loc='upper left', prop={'size': 4})
+plt.legend(loc='upper left', fontsize=10)
+
+ax2 = ax1.twinx()
+sns.scatterplot(x='Ubar', y='PW', data=df_binEstimate_LI_UbarVsPW, color = 'black', label = "$T_{\widetilde{pw}}$ Boom-1", ax=ax2)
+ax2.set_ylim(-0.05,0.07)
+ax2.set_xlim(2,14.5)
+plt.errorbar('Ubar', 'PW', yerr='ci', data=df_binEstimate_LI_UbarVsPW, color = 'black', ls='', lw=2, alpha=0.2, label = 'errorbar')
+ax2.hlines(y=0,xmin=2,xmax=15,color='k',linestyles='--')
+ax2.set_ylabel('$T_{\widetilde{pw}}\; [m^3/s^3]$', color='black', fontsize=10)
+ax2.tick_params(colors='black', which='major')
+ax2.set_xlabel('$\overline{u} \; [m/s]$', color='black', fontsize=10)
+plt.legend(loc='lower left', fontsize=10)
+
+plt.savefig(plot_savePath + "scatterplotBIN_UbarVSPplusBminusEps_withUbarVsPW_combinedAnalysis.png",dpi=300, bbox_inches="tight")
+plt.savefig(plot_savePath + "scatterplotBIN_UbarVSPplusBminusEps_withUbarVsPW_combinedAnalysis.pdf", bbox_inches="tight")
+
 #%%
 # sort by z/L
 zL_I_df = pd.DataFrame()

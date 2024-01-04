@@ -15,11 +15,13 @@ from mat4py import loadmat
 # import pyrsktools # Import the library
 print('done with imports')
 
+import matplotlib.pyplot as plt
 
 #%%
 # file_path = r"Z:\Fall_Deployment\OaklinCopy_waveData/"
 file_path = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/myAnalysisFiles/'
 
+#%%
 # data = pyrsktools.open(file_path + '075965_20221214_1600.rsk') # Load up an rk file
 file_spring = "BBASIT_Spring_waves.mat"
 data_spring = loadmat(file_path+file_spring)
@@ -176,7 +178,7 @@ print("Un-extended SPRING Data:")
 print(wave_df_spring_interpolated.head(9))
 
 print("\nExtended SPRING Data:")
-print(wave_df_spring_full.head(30))
+print(wave_df_spring_full.head(9))
 #add new row to end of DataFrame
 # wave_df_interpolated = wave_df_interpolated.append(df_extension, ignore_index = True)
 # wave_df_interpolated = wave_df_interpolated.append(df_extension, ignore_index = False)
@@ -217,7 +219,7 @@ print("Un-extended FALL Data:")
 print(wave_df_fall_interpolated.tail(9))
 
 print("\nExtended FALL Data:")
-print(wave_df_fall_full.tail(30))
+print(wave_df_fall_full.tail(9))
 #%%
 wave_df_combined = pd.concat([wave_df_spring_full, wave_df_fall_full], axis=0)
 wave_df_combined['new_index_arr'] = np.arange(len(wave_df_combined))
@@ -227,10 +229,11 @@ wave_df_combined.set_index('new_index_arr', inplace=True)
 dates_df = pd.read_csv(file_path + 'date_combinedAnalysis.csv')
 
 wave_df_combined['new_datetime'] = dates_df['datetime']
-print(wave_df_combined.head(30))
-wave_df_combined = wave_df_combined.drop('datetime', axis=1)
-wave_df_combined = wave_df_combined.drop('index_arr', axis=1)
-print(wave_df_combined.head(30))
+print(wave_df_combined.head(9))
+
+# wave_df_combined = wave_df_combined.drop('datetime', axis=1)
+# wave_df_combined = wave_df_combined.drop('index_arr', axis=1)
+# print(wave_df_combined.head(9))
 
 #%%
 wave_df_combined.to_csv(file_path +'waveData_combinedAnalysis.csv')
@@ -239,6 +242,7 @@ print('done. Saved to .csv')
 #%%
 #some test plots
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 fig, axs = plt.subplots(3, sharex = True, sharey=False)
 fig.suptitle('Wave Data Time Series Fall')
@@ -261,3 +265,113 @@ axs[2].tick_params(axis = 'x', rotation=90)
 # sns.lineplot(data=wave_df_interpolated, x='index_arr', y='Cp', ax=axes[2])
 # axes[2].set_xticklabels(rotation=45)
 # # 
+#%%
+break_index = 3959
+date_df = pd.read_csv(file_path+'date_combinedAnalysis.csv')
+dates_arr = np.array(pd.to_datetime(date_df['datetime']))
+# SPRING
+s=5
+fig, (ax1, ax2, ax3) = plt.subplots(3,1, sharex=True, figsize=(4,4))
+fig.suptitle('Wave Data: Spring Deployment Period', fontsize=8)
+fig.tight_layout()
+fig.subplots_adjust(top=0.90)
+ax1.scatter(dates_arr[:break_index+1], wave_df_combined['sigH'][:break_index+1], s=s, color = 'navy', label = '$H_{sig}$')
+
+ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax1.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center', fontsize=5)
+# ax1.legend(fontsize=7, loc='lower left')
+ax1.set_title('$H_{sig}$ [m]', fontsize=6)
+ax1.tick_params(axis='y', labelsize=6)
+ax1.set_ylim([0,2])
+
+ax2.scatter(dates_arr[:break_index+1], wave_df_combined['Cp'][:break_index+1], s=s, color = 'dimgray', label = '$c_{p}$')
+ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax2.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center', fontsize=5)
+# ax2.legend(fontsize=7)
+ax2.set_title('$c_{p}$ [m/s]', fontsize=6)
+ax2.tick_params(axis='y', labelsize=6)
+ax2.set_ylim([0,12])
+
+ax3.scatter(dates_arr[:break_index+1], wave_df_combined['T_period'][:break_index+1], s=s, color = 'darkslategray', label = '$T$')
+ax3.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax3.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax3.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center', fontsize=5)
+# ax3.legend(fontsize=7)
+ax3.set_title('$T$ [s]', fontsize=6)
+ax3.tick_params(axis='y', labelsize=6)
+ax3.set_ylim([0,10])
+
+ax1.set_ylabel('$H_{sig}$ [m]', fontsize=6)
+ax2.set_ylabel('$c_{p}$ [m/s]', fontsize=6)
+ax3.set_ylabel('$T$ [s]', fontsize=6)
+
+
+plt.show()
+
+
+plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/plots/'
+fig.savefig(plot_savePath + "timeseries_WaveData_Spring.png",dpi=300)
+fig.savefig(plot_savePath + "timeseries_WaveData_Spring.pdf")
+#%%
+
+
+# FALL
+s=5
+fig, (ax1, ax2, ax3) = plt.subplots(3,1, sharex=True, figsize=(4,4))
+fig.suptitle('Wave Data: Fall Deployment Period', fontsize=8)
+fig.tight_layout()
+fig.subplots_adjust(top=0.90)
+ax1.scatter(dates_arr[break_index+1:], wave_df_combined['sigH'][break_index+1:], s=s, color = 'navy', label = '$H_{sig}$')
+
+ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax1.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center', fontsize=5)
+# ax1.legend(fontsize=7, loc='lower left')
+ax1.set_title('$H_{sig}$ [m]', fontsize=6)
+ax1.tick_params(axis='y', labelsize=6)
+ax1.set_ylim([0,2])
+
+ax2.scatter(dates_arr[break_index+1:], wave_df_combined['Cp'][break_index+1:], s=s, color = 'dimgray', label = '$c_{p}$')
+ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax2.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center', fontsize=5)
+# ax2.legend(fontsize=7)
+ax2.set_title('$c_{p}$ [m/s]', fontsize=6)
+ax2.tick_params(axis='y', labelsize=6)
+ax2.set_ylim([0,12])
+
+ax3.scatter(dates_arr[break_index+1:], wave_df_combined['T_period'][break_index+1:], s=s, color = 'darkslategray', label = '$T$')
+ax3.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax3.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+for label in ax3.get_xticklabels(which='major'):
+    label.set(rotation=0, horizontalalignment='center', fontsize=5)
+# ax3.legend(fontsize=7)
+ax3.set_title('$T$ [s]', fontsize=6)
+ax3.tick_params(axis='y', labelsize=6)
+ax3.set_ylim([0,10])
+
+ax1.set_ylabel('$H_{sig}$ [m]', fontsize=6)
+ax2.set_ylabel('$c_{p}$ [m/s]', fontsize=6)
+ax3.set_ylabel('$T$ [s]', fontsize=6)
+
+
+plt.show()
+
+
+plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/plots/'
+fig.savefig(plot_savePath + "timeseries_WaveData_Fall.png",dpi=300)
+fig.savefig(plot_savePath + "timeseries_WaveData_Fall.pdf")
+
+
+
+
+
+
+
