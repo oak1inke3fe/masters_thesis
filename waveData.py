@@ -270,8 +270,8 @@ break_index = 3959
 date_df = pd.read_csv(file_path+'date_combinedAnalysis.csv')
 dates_arr = np.array(pd.to_datetime(date_df['datetime']))
 # SPRING
-s=5
-fig, (ax1, ax2, ax3) = plt.subplots(3,1, sharex=True, figsize=(4,4))
+s=2
+fig, (ax1, ax2, ax3) = plt.subplots(3,1, sharex=True, figsize=(7,4))
 fig.suptitle('Wave Data: Spring Deployment Period', fontsize=8)
 fig.tight_layout()
 fig.subplots_adjust(top=0.90)
@@ -317,12 +317,12 @@ plt.show()
 plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/plots/'
 fig.savefig(plot_savePath + "timeseries_WaveData_Spring.png",dpi=300)
 fig.savefig(plot_savePath + "timeseries_WaveData_Spring.pdf")
-#%%
+
 
 
 # FALL
-s=5
-fig, (ax1, ax2, ax3) = plt.subplots(3,1, sharex=True, figsize=(4,4))
+
+fig, (ax1, ax2, ax3) = plt.subplots(3,1, sharex=True, figsize=(7,4))
 fig.suptitle('Wave Data: Fall Deployment Period', fontsize=8)
 fig.tight_layout()
 fig.subplots_adjust(top=0.90)
