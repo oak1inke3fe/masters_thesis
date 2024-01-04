@@ -225,20 +225,136 @@ wave_df_combined = pd.concat([wave_df_spring_full, wave_df_fall_full], axis=0)
 wave_df_combined['new_index_arr'] = np.arange(len(wave_df_combined))
 wave_df_combined.set_index('new_index_arr', inplace=True)
 
+#%%
+from hampel import hampel
+break_index = 3959
+column_arr = ['index_arr', 'sigH', 'T_period', 'Cp', ]
 
+#create a spring df, and make sure the indexing starts at zero by resetting the index
+wave_df_good_spring = wave_df_combined[:break_index+1]
+wave_df_good_spring = wave_df_good_spring.reset_index(drop = True)
+
+
+wave_df_arr_spring = [wave_df_good_spring, ]
+print('done with creating spring dataframes')
+
+wave_df_despiked_spring = pd.DataFrame()
+
+wave_despike_arr_spring = [wave_df_despiked_spring, ]
+
+for i in range(len(wave_df_arr_spring)):
+# for sonic in sonics_df_arr:
+    for column_name in column_arr:
+    
+        my_array = wave_df_arr_spring[i][column_name]
+        
+        # Just outlier detection
+        input_array = my_array
+        window_size = 10
+        n = 3
+        
+        my_outlier_indicies = hampel(input_array, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts = hampel(input_array, window_size, n, imputation=True)
+        my_despiked_1times = my_outlier_in_Ts
+        
+        # plt.figure()
+        # plt.plot(L_despiked_once)
+    
+        input_array2 = my_despiked_1times
+        my_outlier_indicies2 = hampel(input_array2, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts2 = hampel(input_array2, window_size, n, imputation=True)
+        wave_despike_arr_spring[i][column_name] = my_outlier_in_Ts2
+        print(column_name)
+        print('sonic '+str(i+1))
+        # L_despiked_2times = L_outlier_in_Ts2
+
+print('done SPRING hampel')
+
+
+
+#create a fall df, and make sure the indexing starts at zero by resetting the index
+wave_df_good_fall = wave_df_combined[break_index+1:]
+wave_df_good_fall = wave_df_good_fall.reset_index(drop = True)
+
+
+wave_df_arr_fall = [wave_df_good_fall, ]
+print('done with creating fall dataframes')
+
+wave_df_despiked_fall = pd.DataFrame()
+
+wave_despike_arr_fall = [wave_df_despiked_fall, ]
+
+for i in range(len(wave_df_arr_fall)):
+# for sonic in sonics_df_arr:
+    for column_name in column_arr:
+    
+        my_array = wave_df_arr_fall[i][column_name]
+        
+        # Just outlier detection
+        input_array = my_array
+        window_size = 10
+        n = 3
+        
+        my_outlier_indicies = hampel(input_array, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts = hampel(input_array, window_size, n, imputation=True)
+        my_despiked_1times = my_outlier_in_Ts
+        
+        # plt.figure()
+        # plt.plot(L_despiked_once)
+    
+        input_array2 = my_despiked_1times
+        my_outlier_indicies2 = hampel(input_array2, window_size, n,imputation=False )
+        # Outlier Imputation with rolling median
+        my_outlier_in_Ts2 = hampel(input_array2, window_size, n, imputation=True)
+        wave_despike_arr_fall[i][column_name] = my_outlier_in_Ts2
+        print(column_name)
+        print('sonic '+str(i+1))
+        # L_despiked_2times = L_outlier_in_Ts2
+
+print('done FALL hampel')
+
+
+#%%
+# save new despiked values/dataframes to new files separated by spring/fall deployment
+wave_df_despiked_spring.to_csv(file_path + 'wave_despiked_spring.csv')
+wave_df_despiked_fall.to_csv(file_path + 'wave_despiked_fall.csv')
+
+print('done saving despiked to .csv')
+#%%
+
+wave_df_combined_despiked = pd.concat([wave_df_despiked_spring, wave_df_despiked_fall], axis=0)
 dates_df = pd.read_csv(file_path + 'date_combinedAnalysis.csv')
 
-wave_df_combined['new_datetime'] = dates_df['datetime']
-print(wave_df_combined.head(9))
+wave_df_combined_despiked['new_datetime'] = dates_df['datetime']
+print(wave_df_combined_despiked.head(9))
 
 # wave_df_combined = wave_df_combined.drop('datetime', axis=1)
 # wave_df_combined = wave_df_combined.drop('index_arr', axis=1)
 # print(wave_df_combined.head(9))
 
 #%%
-wave_df_combined.to_csv(file_path +'waveData_combinedAnalysis.csv')
+
+wave_df_combined_despiked['new_index_arr'] = np.arange(len(wave_df_combined_despiked))
+wave_df_combined_despiked.set_index('new_index_arr', inplace=True)
+
+wave_df_combined_despiked.to_csv(file_path +'waveData_despiked_combinedAnalysis.csv')
 print('done. Saved to .csv')
 
+#%%
+# get rid of bad wind directions
+windDir_file = "windDir_withBadFlags_110to160_within15degRequirement_combinedAnalysis.csv"
+windDir_df = pd.read_csv(file_path + windDir_file)
+windDir_df = windDir_df.drop(['Unnamed: 0'], axis=1)
+
+windDir_index_array = np.arange(len(windDir_df))
+windDir_df['new_index_arr'] = np.where((windDir_df['good_wind_dir'])==True, np.nan, windDir_index_array)
+mask_goodWindDir = np.isin(windDir_df['new_index_arr'],windDir_index_array)
+
+windDir_df[mask_goodWindDir] = np.nan
+wave_df_combined_despiked[mask_goodWindDir] = np.nan
 #%%
 #some test plots
 import matplotlib.pyplot as plt
@@ -246,11 +362,11 @@ import matplotlib.dates as mdates
 
 fig, axs = plt.subplots(3, sharex = True, sharey=False)
 fig.suptitle('Wave Data Time Series Fall')
-axs[0].plot(wave_df_combined['sigH'], label = 'sigH')
+axs[0].plot(wave_df_combined_despiked['sigH'], label = 'sigH')
 plt.ylabel('$H_{sig}$ [m]')
-axs[1].plot(wave_df_combined['T_period'], label = 'T')
+axs[1].plot(wave_df_combined_despiked['T_period'], label = 'T')
 plt.ylabel('T [s]')
-axs[2].plot(wave_df_combined['Cp'], label = '$c_p$')
+axs[2].plot(wave_df_combined_despiked['Cp'], label = '$c_p$')
 plt.ylabel('$c_p$ [m/s]')
 axs[2].tick_params(axis = 'x', rotation=90)
 
@@ -269,46 +385,50 @@ axs[2].tick_params(axis = 'x', rotation=90)
 break_index = 3959
 date_df = pd.read_csv(file_path+'date_combinedAnalysis.csv')
 dates_arr = np.array(pd.to_datetime(date_df['datetime']))
+axis_font_size = 8
+title_font_size = 12
 # SPRING
 s=2
 fig, (ax1, ax2, ax3) = plt.subplots(3,1, sharex=True, figsize=(7,4))
-fig.suptitle('Wave Data: Spring Deployment Period', fontsize=8)
+fig.suptitle('Wave Data: Spring Deployment Period', fontsize=title_font_size)
 fig.tight_layout()
-fig.subplots_adjust(top=0.90)
-ax1.scatter(dates_arr[:break_index+1], wave_df_combined['sigH'][:break_index+1], s=s, color = 'navy', label = '$H_{sig}$')
-
+fig.subplots_adjust(top=0.875)
+ax1.hlines(y=1,xmin=dates_arr[0],xmax=dates_arr[3959],color='white',linestyles='--')
+ax1.scatter(dates_arr[:break_index+1], wave_df_combined_despiked['sigH'][:break_index+1], s=s, color = 'navy', label = '$H_{sig}$')
+# ax1.hlines(y=1,xmin=dates_arr[0],xmax=dates_arr[3959],color='k',linestyles='--', label = '1m')
+# ax1.hlines(y=1.5,xmin=dates_arr[1000],xmax=dates_arr[3959],color='k',linestyles='--')
 ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax1.get_xticklabels(which='major'):
-    label.set(rotation=0, horizontalalignment='center', fontsize=5)
-# ax1.legend(fontsize=7, loc='lower left')
-ax1.set_title('$H_{sig}$ [m]', fontsize=6)
-ax1.tick_params(axis='y', labelsize=6)
+    label.set(rotation=0, horizontalalignment='center', fontsize=axis_font_size)
+ax1.legend(prop={'size': 6}, loc='upper right')
+ax1.set_title('$H_{sig}$ [m]', fontsize=axis_font_size)
+ax1.tick_params(axis='y', labelsize=axis_font_size)
 ax1.set_ylim([0,2])
 
-ax2.scatter(dates_arr[:break_index+1], wave_df_combined['Cp'][:break_index+1], s=s, color = 'dimgray', label = '$c_{p}$')
+ax2.scatter(dates_arr[:break_index+1], wave_df_combined_despiked['Cp'][:break_index+1], s=s, color = 'dimgray', label = '$c_{p}$')
 ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax2.get_xticklabels(which='major'):
-    label.set(rotation=0, horizontalalignment='center', fontsize=5)
-# ax2.legend(fontsize=7)
-ax2.set_title('$c_{p}$ [m/s]', fontsize=6)
-ax2.tick_params(axis='y', labelsize=6)
+    label.set(rotation=0, horizontalalignment='center', fontsize=axis_font_size)
+ax2.legend(prop={'size': 6}, loc='upper right')
+ax2.set_title('$c_{p}$ [m/s]', fontsize=axis_font_size)
+ax2.tick_params(axis='y', labelsize=axis_font_size)
 ax2.set_ylim([0,12])
 
-ax3.scatter(dates_arr[:break_index+1], wave_df_combined['T_period'][:break_index+1], s=s, color = 'darkslategray', label = '$T$')
+ax3.scatter(dates_arr[:break_index+1], wave_df_combined_despiked['T_period'][:break_index+1], s=s, color = 'darkslategray', label = '$T$')
 ax3.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax3.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax3.get_xticklabels(which='major'):
-    label.set(rotation=0, horizontalalignment='center', fontsize=5)
-# ax3.legend(fontsize=7)
-ax3.set_title('$T$ [s]', fontsize=6)
-ax3.tick_params(axis='y', labelsize=6)
+    label.set(rotation=0, horizontalalignment='center', fontsize=axis_font_size)
+ax3.legend(prop={'size': 6}, loc='upper right')
+ax3.set_title('$T$ [s]', fontsize=axis_font_size)
+ax3.tick_params(axis='y', labelsize=axis_font_size)
 ax3.set_ylim([0,10])
 
-ax1.set_ylabel('$H_{sig}$ [m]', fontsize=6)
-ax2.set_ylabel('$c_{p}$ [m/s]', fontsize=6)
-ax3.set_ylabel('$T$ [s]', fontsize=6)
+ax1.set_ylabel('$H_{sig}$ [m]', fontsize=axis_font_size)
+ax2.set_ylabel('$c_{p}$ [m/s]', fontsize=axis_font_size)
+ax3.set_ylabel('$T$ [s]', fontsize=axis_font_size)
 
 
 plt.show()
@@ -318,48 +438,49 @@ plot_savePath = r'/Users/oaklinkeefe/documents/GitHub/masters_thesis/plots/'
 fig.savefig(plot_savePath + "timeseries_WaveData_Spring.png",dpi=300)
 fig.savefig(plot_savePath + "timeseries_WaveData_Spring.pdf")
 
-
+#%%
 
 # FALL
 
 fig, (ax1, ax2, ax3) = plt.subplots(3,1, sharex=True, figsize=(7,4))
-fig.suptitle('Wave Data: Fall Deployment Period', fontsize=8)
+fig.suptitle('Wave Data: Fall Deployment Period', fontsize=title_font_size)
 fig.tight_layout()
-fig.subplots_adjust(top=0.90)
-ax1.scatter(dates_arr[break_index+1:], wave_df_combined['sigH'][break_index+1:], s=s, color = 'navy', label = '$H_{sig}$')
-
+fig.subplots_adjust(top=0.875)
+ax1.hlines(y=1,xmin=dates_arr[break_index+1],xmax=dates_arr[-1],color='white',linestyles='--')
+ax1.scatter(dates_arr[break_index+1:], wave_df_combined_despiked['sigH'][break_index+1:], s=s, color = 'navy', label = '$H_{sig}$')
 ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax1.get_xticklabels(which='major'):
-    label.set(rotation=0, horizontalalignment='center', fontsize=5)
-# ax1.legend(fontsize=7, loc='lower left')
-ax1.set_title('$H_{sig}$ [m]', fontsize=6)
-ax1.tick_params(axis='y', labelsize=6)
+    label.set(rotation=0, horizontalalignment='center', fontsize=axis_font_size)
+ax1.set_title('$H_{sig}$ [m]', fontsize=axis_font_size)
+ax1.tick_params(axis='y', labelsize=axis_font_size)
 ax1.set_ylim([0,2])
+# ax1.hlines(y=1.5,xmin=dates_arr[break_index+1],xmax=dates_arr[-1],color='k',linestyles='--')
+ax1.legend(prop={'size': 6}, loc='upper right')
 
-ax2.scatter(dates_arr[break_index+1:], wave_df_combined['Cp'][break_index+1:], s=s, color = 'dimgray', label = '$c_{p}$')
+ax2.scatter(dates_arr[break_index+1:], wave_df_combined_despiked['Cp'][break_index+1:], s=s, color = 'dimgray', label = '$c_{p}$')
 ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax2.get_xticklabels(which='major'):
-    label.set(rotation=0, horizontalalignment='center', fontsize=5)
-# ax2.legend(fontsize=7)
-ax2.set_title('$c_{p}$ [m/s]', fontsize=6)
-ax2.tick_params(axis='y', labelsize=6)
+    label.set(rotation=0, horizontalalignment='center', fontsize=axis_font_size)
+ax2.set_title('$c_{p}$ [m/s]', fontsize=axis_font_size)
+ax2.tick_params(axis='y', labelsize=axis_font_size)
 ax2.set_ylim([0,12])
+ax2.legend(prop={'size': 6}, loc='upper right')
 
-ax3.scatter(dates_arr[break_index+1:], wave_df_combined['T_period'][break_index+1:], s=s, color = 'darkslategray', label = '$T$')
+ax3.scatter(dates_arr[break_index+1:], wave_df_combined_despiked['T_period'][break_index+1:], s=s, color = 'darkslategray', label = '$T$')
 ax3.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax3.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 for label in ax3.get_xticklabels(which='major'):
-    label.set(rotation=0, horizontalalignment='center', fontsize=5)
-# ax3.legend(fontsize=7)
-ax3.set_title('$T$ [s]', fontsize=6)
-ax3.tick_params(axis='y', labelsize=6)
+    label.set(rotation=0, horizontalalignment='center', fontsize=axis_font_size)
+ax3.set_title('$T$ [s]', fontsize=axis_font_size)
+ax3.tick_params(axis='y', labelsize=axis_font_size)
 ax3.set_ylim([0,10])
+ax3.legend(prop={'size': 6}, loc='upper right')
 
-ax1.set_ylabel('$H_{sig}$ [m]', fontsize=6)
-ax2.set_ylabel('$c_{p}$ [m/s]', fontsize=6)
-ax3.set_ylabel('$T$ [s]', fontsize=6)
+ax1.set_ylabel('$H_{sig}$ [m]', fontsize=axis_font_size)
+ax2.set_ylabel('$c_{p}$ [m/s]', fontsize=axis_font_size)
+ax3.set_ylabel('$T$ [s]', fontsize=axis_font_size)
 
 
 plt.show()

@@ -432,6 +432,21 @@ PplusB_minus_eps_df['LI'] = np.array(prodPLUSbuoy['P+B LI'])-np.array(eps_df['ep
 PplusB_minus_eps_df['LII'] = np.array(prodPLUSbuoy['P+B LII'])-np.array(eps_df['eps_LII'])
 
 print('done with combining production and buoyancy')
+
+
+#%%
+pw_percentage_of_deficit = pw_df['d_dz_pw_theory_I']/PplusB_minus_eps_df['LI']*100
+pw_percentage_of_deficit_mean = np.nanmean(pw_percentage_of_deficit)
+print('mean percent = '+ str(pw_percentage_of_deficit_mean))
+pw_percentage_of_deficit_median = np.nanmedian(pw_percentage_of_deficit)
+print('meadin percent = '+ str(pw_percentage_of_deficit_median))
+from scipy import stats
+pw_percentage_of_deficit_mode = stats.mode(pw_percentage_of_deficit,nan_policy='omit')
+print('mode percent = '+ str(pw_percentage_of_deficit_mode))
+
+plt.figure()
+plt.scatter(pw_percentage_of_deficit,pw_percentage_of_deficit)
+# plt.ylim(0,100)
 #%% P + B versus Eps (NO PW added, but PW Ubar restriction applied)
 fig = plt.figure(figsize=(6,6))
 plt.plot([-0.1, 1], [-0.1, 1], color = 'k', label = "1-to-1") #scale 1-to-1 line
